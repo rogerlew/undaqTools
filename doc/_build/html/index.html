@@ -1,0 +1,267 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>undaqTools [uhn-dak-tools] &mdash; undaqTools 0.2.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="undaqTools 0.2.0 documentation" href="#" />
+ 
+<style type="text/css">
+  table.right { float: right; margin-left: 20px; }
+  table.right td { border: 1px solid #ccc; }
+
+/* These are for the citation customization
+   
+   I don't like using long variable names but don't want
+   to figure out what is in the namespace */
+div.specialfooter {
+    height:25px;
+    background-color: #E3EFF1;
+    color: #86989B;
+    padding: 3px 8px 3px 8px;
+    clear: both;
+    font-size: 0.8em;
+}
+div.specialfooter a {
+    color: #86989B;
+    text-decoration: underline;
+}
+div.specialfooterleft {
+    float:left;
+    width:60%
+    padding-left:15px;
+    padding-bottom:6px;
+    white-space:nowrap;
+    text-align:left;
+}
+div.specialfooterright {
+    float:right;
+    width:40%
+    padding-right:13px;
+    padding-bottom:6px;
+    white-space:nowrap;
+    text-align:right;
+}
+table.docutils {
+    width:100%
+}
+
+table.citation td.label{
+    width:150px;
+}
+
+</style>
+
+  </head>
+  <body>
+<div style="background-color: white; text-align: center; padding: 10px 10px 15px 15px; ">
+<img src="_static/undaqtools_logo.png" alt="undaqtools logo" />
+</div>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="#">undaqTools home</a>&nbsp;|&nbsp;</li>
+        <li><a href="#">Documentation</a>
+          &raquo;</li>
+ 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">undaqTools [<em>uhn-dak-tools</em>]</a><ul>
+<li><a class="reference internal" href="#the-unofficial-nads-daq-api">The Unofficial NADS Daq API</a></li>
+<li><a class="reference internal" href="#undaqtools-unofficial-vs-ndaqtools-official">undaqTools (unofficial) vs. ndaqTools (official)</a></li>
+<li><a class="reference internal" href="#summary">Summary</a></li>
+<li><a class="reference internal" href="#installation">Installation</a><ul>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="undaqtools-uhn-dak-tools">
+<h1>undaqTools [<em>uhn-dak-tools</em>]<a class="headerlink" href="#undaqtools-uhn-dak-tools" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="the-unofficial-nads-daq-api">
+<h2>The Unofficial NADS Daq API<a class="headerlink" href="#the-unofficial-nads-daq-api" title="Permalink to this headline">¶</a></h2>
+<p>undaqTools is a pythonic interface to the National Advanced
+Driving Simulator (NADS) Data AcQuisition (DAQ) files.</p>
+</div>
+<div class="section" id="undaqtools-unofficial-vs-ndaqtools-official">
+<h2>undaqTools (unofficial) vs. ndaqTools (official)<a class="headerlink" href="#undaqtools-unofficial-vs-ndaqtools-official" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt><strong>Approach:</strong></dt>
+<dd>ndaqTools focuses on ease-of-use (via GUIs) and
+templating. In contrast, the focus of undaqTools is on data
+abstraction and simplification of data extraction.</dd>
+<dt><strong>Programming Language:</strong></dt>
+<dd>ndaqTools is built on MATLAB.  Whereas, undaqTools utilizes the
+opensource Python programming language (as well as Python&#8217;s
+opensource scientific stack (NumPy, SciPy, Matplotlib, and h5py).</dd>
+<dt><strong>Data Storage:</strong></dt>
+<dd>ndaqTools stores and loads DAQ data as .mat files. undaqTools
+stores and loads data in HDF5 containers.</dd>
+</dl>
+</div>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>undaqTools converts the native DAQ data into the HDF5 high
+performance binary data format. From there data can be quickly
+accessed in Python using the Daq class of undaqTools. Daq objects
+are dict subclasses. The keys are the elements of the daq
+and the values are stored in a numpy array subclass called Element.
+Each Element contain measure relevent metadata stored as instance
+attributes so these metadata does not have to be accessed across
+datastructures.</p>
+<p>Each Element object also has a frames attribute that keeps track of
+the frames cooresponding to the element. This means that when they are
+sliced the resulting views keeps the frames in sync without
+any additional book-keeping to the end user! The element data can
+also be sliced using frame indices. These abstractions simplify the
+complexity of managing these complex datasets (see class hierarchy
+diagram below).</p>
+<p>Built in methods of Element also provide some additional conveniences
+for change state signal detection measures. By providing an isCSSDC
+method it is easy to test whether an Element contains CSSDC data. The
+value at any frame between the first and last frame defined for a
+CSSDC Element can be obtained via the state_at_frame method. This treats
+the data as categorical and always returns the last defined state.</p>
+<p>undaqTools can also unpack and process dynamic objects. Each dynamic
+object becomes a DynObj instance in the Daq&#8217;s dynobj dict attribute.
+The keys to the dynamic objects are the dynamic object names. The
+DynObj containers store the measure that you would expect (position,
+frames, speed, heading, etc.) as numpy.array objects as well as a
+running relative distance measure to the Own Vehicle.</p>
+<p>These abstractions from the original DAQ representation are intended
+to provide the end user the convenience and capability to
+decide how to best utilize their data.</p>
+<p><strong>Simplified Class Hierarchy Diagram</strong>:</p>
+<div class="highlight-python"><pre>Daq(dict)
+  + [elemName] -&gt; Element (ndarray)
+  |                 + data
+  |                 + frames (ndarray)
+  |                 + rate
+  |                 + type
+  |                 + ...
+  |               --------------------
+  |                 + isCSSDC()
+  |                 + state_at_frame()
+  |
+  + dynobjs (dict)
+  |   + [doName] -&gt; DynObj (object)
+  |                   + pos (Element)
+  |                   + heading (Element)
+  |                   + speed (Element)
+  |                   + ...
+  |                 ---------------------
+  |                   + process()
+  |                   + read_hd5()
+  |                   + write_hd5()
+  |                   + ...
+  |
+  + info (numedTuple)
+  |   + run
+  |   + subject
+  |   + date
+  |   + ...
+  |
+  | + ...
+--------------------------------------------
+  | + read_daq()
+  | + read_hd5py()
+  | + write_hd5py()
+  | + write_mat()
+  | ...</pre>
+</div>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>View the <a class="reference internal" href="install.html"><em>Installation Instructions</em></a></p>
+<div class="section" id="indices-and-tables">
+<h3>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
+<li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
+<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="#">undaqTools home</a>&nbsp;|&nbsp;</li>
+        <li><a href="#">Documentation</a>
+          &raquo;</li>
+ 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Roger Lew.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
