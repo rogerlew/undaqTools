@@ -1,6 +1,7 @@
 from __future__ import print_function
 
-# Authors: Roger Lew
+# Copyright (c) 2013, Roger Lew
+# All rights reserved.
 #
 # Credits: read_daq, and _loaddata are optimized version of Chris
 #          Schwarz's convert_daq.py scipy in ndaqTools
@@ -23,33 +24,10 @@ import numpy as np
 from numpy import fromfile
 from scipy import io as sio
 
-from undaqTools.misc import  _size_lookup, _nptype_lookup
-from undaqTools.element import Element
+from undaqTools.misc.base import  _size_lookup, _nptype_lookup
+from undaqTools.element import Element, FrameSlice
 from undaqTools.dynobj import DynObj
 from undaqTools.misc.recordtype import recordtype
-
-# Python 2 to 3 workarounds
-import sys
-if sys.version_info[0] == 2:
-    _strobj = basestring
-    _xrange = xrange
-elif sys.version_info[0] == 3:
-    _strobj = str
-    _xrange = range
-    
-def _flatten(L):
-    """
-    flatten a multidimensional object
-    """
-    for item in L:
-        if isinstance(item, _strobj):
-             yield item
-        else: 
-             try:
-                 for i in _flatten(item):
-                     yield i
-             except TypeError:
-                 yield item
 
 def _searchsorted(a, v):
     """
@@ -132,7 +110,16 @@ class Daq(dict):
     def __init__(self):
 
         # namedtuple containing drive relevant metadata
-        self.info = None 
+        self.info = Info(run='', 
+                         runinst='', 
+                         title='', 
+                         numentries=0, 
+                         frequency=0, 
+                         date='',  
+                         magic='', 
+                         subject='',
+                         filename='')
+                         
         
         # recordtype of frame information
         self.frame = Frame(code=array('i'),
@@ -149,6 +136,7 @@ class Daq(dict):
         self.fend = None             # last Frame in Daq
         self.cursor = 0              # byte where the data frames begin in daq
         self.dynobjs = OrderedDict() # object to hold dynamic objects
+        self.etc = {}
 
         dict.__init__(self)
 
@@ -279,7 +267,7 @@ class Daq(dict):
             warnings.warn(msg, RuntimeWarning)
 
         def nans(numitems):
-            return [np.nan for i in _xrange(numitems)]
+            return [np.nan for i in xrange(numitems)]
 
         _elemid_lookup = dict(zip(_header.name, _header.id))
         
@@ -327,7 +315,7 @@ class Daq(dict):
         # have to look through the elemlist for every variable on
         # every frame
         if elemlist is None: # elemlist empty                    
-            go_nogo = [True for i in _xrange(len(_header.name))]
+            go_nogo = [True for i in xrange(len(_header.name))]
         else: 
             go_nogo = [name in elemlist for name in _header.name]
 
@@ -346,7 +334,7 @@ class Daq(dict):
             frame.count.append(unpack('i', read(4))[0])
 
             # xrange (2.7, range in 3) is faster than range
-            for j in _xrange(frame.count[-1]):
+            for j in xrange(frame.count[-1]):
 
                 # stuff performed in this loop use to be appendtmpdata
                 # function call overhead is kind of high with python so
@@ -623,16 +611,28 @@ class Daq(dict):
         # header
         # The [:] unpacks the data from a h5py.dataset.Dataset
         # object to a numpy.ndarray object
-        _header = \
-            Header(id=root['header/id'][:],
-                   numvalues=root['header/numvalues'][:],
-                   name=root['header/name'][:],
-                   units=root['header/units'][:],
-                   rate=root['header/rate'][:],
-                   type=root['header/type'][:],
-                   nptype=root['header/nptype'][:],
-                   varrateflag=root['header/varrateflag'][:],
-                   bytes=root['header/bytes'][:])
+        try:
+            _header = \
+                Header(id=root['header/id'][:],
+                       numvalues=root['header/numvalues'][:],
+                       name=root['header/name'][:],
+                       units=root['header/units'][:],
+                       rate=root['header/rate'][:],
+                       type=root['header/type'][:],
+                       nptype=root['header/nptype'][:],
+                       varrateflag=root['header/varrateflag'][:],
+                       bytes=root['header/bytes'][:])
+        except:
+            _header = \
+                Header(id=array('i'),
+                       numvalues=array('i'),
+                       name=[],
+                       units=[],
+                       rate=array('i'),
+                       type=array('c'),
+                       nptype=[],
+                       varrateflag=array('i'),
+                       bytes=array('i'))
         
         # Find the indices cooresponding to the first and last
         # frames requested. We can use these indices to
@@ -659,9 +659,16 @@ class Daq(dict):
         indx = slice(i0,iend)
 
         # frame
-        self.frame.code = root['frame/code'][indx]
-        self.frame.frame = root['frame/frame'][indx]
-        self.frame.count = root['frame/count'][indx]
+        try:
+            self.frame = \
+                Frame(code=root['frame/code'][indx],
+                      frame=root['frame/frame'][indx],
+                      count=root['frame/count'][indx])
+        except:
+            self.frame = \
+                Frame(code=array('i'),
+                      frame=array('i'),
+                      count=array('i'))
 
         # elemlist
         try:
@@ -722,6 +729,11 @@ class Daq(dict):
             do.read_hd5(root=dynobj)
             self.dynobjs[name] = do
                     
+        # read etc dict
+        self.etc = {}  
+        for (name, obj) in root['etc'].attrs.iteritems():
+            self.etc[name] = eval(obj)
+            
         root.close()
 
         # cast as Element objects
@@ -758,6 +770,7 @@ class Daq(dict):
                 del tmpdata[name]
                 
         del _header
+        
 
     def write_hd5(self, filename=None):
         """
@@ -840,6 +853,11 @@ class Daq(dict):
         for (name, do) in self.dynobjs.items():
             root.create_group('dynobjs/%s'%name)
             do.write_hd5(root=root['dynobjs/%s'%name])
+            
+        # etc
+        root.create_group('etc')
+        for (name, value) in self.etc.items():
+            root['etc'].attrs[name] = repr(value)
             
         root.close()
 
@@ -959,7 +977,7 @@ class Daq(dict):
                 else:
                     axs[-1].plot(x, y)
             else:
-                for j in _xrange(y.shape[0]):
+                for j in xrange(y.shape[0]):
                     if elem.isCSSDC():
                         axs[-1].step(x, y[j,:], where='pre')
                     else:
@@ -989,7 +1007,7 @@ class Daq(dict):
                                             indx_frmttr(xindx)))
 
         # remove xticklabels from all but the last subplot
-        for i in _xrange(num_subplots-1):
+        for i in xrange(num_subplots-1):
             axs[i].set_xticklabels([])
 
         return fig

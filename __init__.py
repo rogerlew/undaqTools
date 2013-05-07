@@ -1,2 +1,7 @@
-from daq import Daq, stat, Info, Header
-from element import Element, frame_range
+
+# Copyright (c) 2013, Roger Lew
+# All rights reserved.
+
+from daq import Daq
+from element import Element, frame_range, FrameSlice
+from dynobj import DynObj

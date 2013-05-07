@@ -1,5 +1,8 @@
 from __future__ import print_function
 
+# Copyright (c) 2013, Roger Lew
+# All rights reserved.
+
 from collections import OrderedDict
 import os
 import unittest

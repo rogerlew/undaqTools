@@ -6,12 +6,7 @@ from __future__ import print_function
 from collections import OrderedDict
 
 from undaqTools.element import Element, FrameSlice
-
-def _isint(x):
-    try:
-        return int(x) == float(x)
-    except:
-        return False
+from undaqTools.misc import _isint
             
 def find_epochs(stream):
     '''

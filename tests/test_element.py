@@ -1,8 +1,11 @@
 from __future__ import print_function
 
-import os
+# Copyright (c) 2013, Roger Lew
+# All rights reserved.
 
+import os
 import unittest
+
 import numpy as np
 from scipy.signal import detrend
 from numpy.testing import assert_array_equal

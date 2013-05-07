@@ -1,10 +1,16 @@
 from __future__ import print_function
 
+# Copyright (c) 2013, Roger Lew
+# All rights reserved.
+
+import time
+import glob
+
 import os
 import unittest
 
 from undaqTools import Daq, Element, stat, Info
-Info # stat test uses Info in eval statement
+from undaqTools.element import frame_range, FrameSlice
 
 test_file = 'data reduction_20130204125617.daq'
 
@@ -57,6 +63,36 @@ class Test_match_keys(unittest.TestCase):
         self.assertEqual(''.join(ds), ''.join(rs))
 
 
+class Test_etc(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        time.sleep(.1)
+        tmp_files = glob.glob('./tmp/*')
+        for tmp_file in tmp_files:
+            os.remove(tmp_file)
+            
+    def test0(self):
+        global test_file
+        
+        daq = Daq()
+        
+        daq.etc['a'] = 1
+        daq.etc['b'] = [1,3]        
+        daq.etc['c'] = "this is a string"
+        daq.etc['d'] = frame_range(666)
+        daq.etc['d'] = {1: frame_range(100, 200),
+                        2: frame_range(200, 300)}
+        daq.write_hd5('./tmp/etctest.hdf5')
+        
+        daq2 = Daq()
+        daq2.read_hd5('./tmp/etctest.hdf5')
+        
+        for k in daq.etc:
+            self.assertTrue(k in daq2.etc)
+            self.assertEqual(daq.etc[k], daq2.etc[k])
+        
 class Test_setitem(unittest.TestCase):     
     def test0(self):
         daq = Daq()
@@ -115,6 +151,7 @@ def suite():
     return unittest.TestSuite((
             unittest.makeSuite(Test_stat),
             unittest.makeSuite(Test_match_keys),
+            unittest.makeSuite(Test_etc),
             unittest.makeSuite(Test_setitem),
             unittest.makeSuite(Test_load_elemlist_fromfile),
                               ))

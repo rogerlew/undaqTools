@@ -1,16 +1,14 @@
 from __future__ import print_function
 
+# Copyright (c) 2013, Roger Lew
+# All rights reserved.
+
 from collections import namedtuple
 
 import numpy as np
 
-from undaqTools.misc import  _size_lookup, _nptype_lookup, _type_lookup
-
-def _isint(x):
-    try:
-        return x == round(x,0)
-    except:
-        return False
+from undaqTools.misc.base import _size_lookup, _nptype_lookup, _type_lookup, \
+                                 _isint
         
 FrameSlice = namedtuple('FrameSlice', ['start', 'stop', 'step'])
 

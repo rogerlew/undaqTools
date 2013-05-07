@@ -1,5 +1,11 @@
 from __future__ import print_function
 
+# Copyright (c) 2013, Roger Lew
+# All rights reserved.
+
+import glob
+import os
+import time
 import unittest
 
 import numpy as np
@@ -9,25 +15,14 @@ from scipy import io as sio
 
 from undaqTools import Daq
 from undaqTools.deprecated import old_convert_daq
-
-# Python 2 to 3 workarounds
-import sys
-if sys.version_info[0] == 2:
-    _strobj = basestring
-    _xrange = xrange
-elif sys.version_info[0] == 3:
-    _strobj = str
-    _xrange = range
     
-test_file = './data/data reduction_20130204125617.daq'
-test_file_large = './data/data reduction_20130204125617.daq'
-##test_file_large = './data/Alaska_0_20130301142422.daq'
+test_file = 'data reduction_20130204125617.daq'
 
 VERBOSE = 1
 
 def flatten(L):
     for item in L:
-        if isinstance(item, _strobj):
+        if isinstance(item, basestring):
              yield item
         else: 
              try:
@@ -76,14 +71,32 @@ class Test_load(unittest.TestCase):
     """
     Validate that the data is read the same as the old convert_daq module
     """
+    def setUp(self):
+        global test_file
+        hdf5file = test_file[:-4]+'.hdf5'
+        hdf5file = os.path.join('data', hdf5file)
+        
+        try:
+           with open(hdf5file):
+               pass
+        except IOError:
+           daq = Daq()
+           daq.read(os.path.join('data', test_file))
+           daq.write_hd5(hdf5file)
+
+    def tearDown(self):
+        time.sleep(.1)
+        tmp_files = glob.glob('./tmp/*')
+        for tmp_file in tmp_files:
+            os.remove(tmp_file)
 
     def test_load(self):
         global test_file
         
         daq = Daq()
-        daq.read(test_file)
+        daq.read(os.path.join('data', test_file))
 
-        old_daq = old_convert_daq.read_file(test_file)
+        old_daq = old_convert_daq.read_file(os.path.join('data', test_file))
         self.__assert_old_daq_equals_daq(old_daq, daq)
 
     def test_load_with_elemlist(self):
@@ -91,9 +104,9 @@ class Test_load(unittest.TestCase):
         
         daq = Daq()
         daq.load_elemlist_fromfile('elemList2.txt')
-        daq.read(test_file)
+        daq.read(os.path.join('data', test_file))
         
-        old_daq = old_convert_daq.read_file(test_file, 
+        old_daq = old_convert_daq.read_file(os.path.join('data', test_file), 
                                             elemfile='elemList2.txt')
 
         self.__assert_old_daq_equals_daq(old_daq, daq)
@@ -175,35 +188,54 @@ class Test_mat(unittest.TestCase):
     """
     Validate that the data is read the same as the old convert_daq module
     """
+    def setUp(self):
+        global test_file
+        hdf5file = test_file[:-4]+'.hdf5'
+        hdf5file = os.path.join('data', hdf5file)
+        
+        try:
+           with open(hdf5file):
+               pass
+        except IOError:
+           daq = Daq()
+           daq.read(os.path.join('data', test_file))
+           daq.write_hd5(hdf5file)
+
+    def tearDown(self):
+        time.sleep(.1)
+        tmp_files = glob.glob('./tmp/*')
+        for tmp_file in tmp_files:
+            os.remove(tmp_file)
 
     def test_load(self):
         global test_file
-        matfile = test_file[:-4]+'1.mat'
-        matfile2 = test_file[:-4]+'2.mat'
+        matfile = os.path.join('output', test_file[:-4]+'1.mat')
+        matfile2 = os.path.join('output', test_file[:-4]+'2.mat')
         
         daq = Daq()
-        daq.read(test_file)
+        daq.read(os.path.join('data', test_file))
         daq.write_mat(matfile)
         del daq
         daqmat = sio.loadmat(matfile)
 
-        old_convert_daq.convert_daq(test_file,'',matfile2)
+        old_convert_daq.convert_daq(os.path.join('data', test_file),
+                                    '',matfile2)
         old_daqmat = sio.loadmat(matfile2)
         self.__assert_daqmats_equal(old_daqmat, daqmat)
 
     def test_load_with_elemlist(self):
         global test_file
-        matfile = test_file[:-4]+'3.mat'
-        matfile2 = test_file[:-4]+'4.mat'
+        matfile = os.path.join('output', test_file[:-4]+'11.mat')
+        matfile2 = os.path.join('output', test_file[:-4]+'22.mat')
         
         daq = Daq()
         daq.load_elemlist_fromfile('elemList2.txt')
-        daq.read(test_file)
+        daq.read(os.path.join('data', test_file))
         daq.write_mat(matfile)
         del daq
         daqmat = sio.loadmat(matfile)
 
-        old_convert_daq.convert_daq(test_file,
+        old_convert_daq.convert_daq(os.path.join('data', test_file),
                                     'elemList2.txt',matfile2)
         old_daqmat = sio.loadmat(matfile2)
         self.__assert_daqmats_equal(old_daqmat, daqmat)
@@ -237,7 +269,7 @@ class Test_mat(unittest.TestCase):
             x2 = np.array(list(flatten(new_daq['elemData'][name])))
 
             try:
-                is_string = isinstance(x1[0], _strobj)
+                is_string = isinstance(x1[0], basestring)
             except:
                 is_string = None
 
@@ -249,13 +281,31 @@ class Test_mat(unittest.TestCase):
                     
                     
 class Test_hd5(unittest.TestCase):
+    def setUp(self):
+        global test_file
+        hdf5file = test_file[:-4]+'.hdf5'
+        hdf5file = os.path.join('data', hdf5file)
+        
+        try:
+           with open(hdf5file):
+               pass
+        except IOError:
+           daq = Daq()
+           daq.read(os.path.join('data', test_file))
+           daq.write_hd5(hdf5file)
+
+    def tearDown(self):
+        time.sleep(.1)
+        tmp_files = glob.glob('./tmp/*')
+        for tmp_file in tmp_files:
+            os.remove(tmp_file)
     
     def test_readwrite(self):
         global test_file
-        hdf5file = test_file[:-4]+'_1.hdf5'
-        
+        hdf5file = os.path.join('output', test_file[:-4]+'_1.hdf5')
+                
         daq = Daq()
-        daq.read(test_file)
+        daq.read(os.path.join('data', test_file))
         daq.write_hd5(hdf5file)
 
         daq2 = Daq()
@@ -265,11 +315,11 @@ class Test_hd5(unittest.TestCase):
         
     def test_readwrite_with_elemlist(self):
         global test_file
-        hdf5file = test_file[:-4]+'_2.hdf5'
+        hdf5file = os.path.join('output', test_file[:-4]+'_2.hdf5')
         
         daq = Daq()
         daq.load_elemlist_fromfile('elemList2.txt')
-        daq.read(test_file)
+        daq.read(os.path.join('data', test_file))
         daq.write_hd5(hdf5file)
 
         daq2 = Daq()
@@ -279,11 +329,11 @@ class Test_hd5(unittest.TestCase):
 
     def test_readwrite_with_elemlist_f0(self):
         global test_file
-        hdf5file = test_file[:-4]+'_3.hdf5'
-        
+        hdf5file = os.path.join('output', test_file[:-4]+'_3.hdf5')
+                
         daq = Daq()
         daq.load_elemlist_fromfile('elemList2.txt')
-        daq.read(test_file)
+        daq.read(os.path.join('data', test_file))
         daq.write_hd5(hdf5file)
 
         daq2 = Daq()
@@ -293,11 +343,11 @@ class Test_hd5(unittest.TestCase):
         
     def test_readwrite_with_elemlist_f0fend(self):
         global test_file
-        hdf5file = test_file[:-4]+'_4.hdf5'
+        hdf5file = os.path.join('output', test_file[:-4]+'_4.hdf5')
         
         daq = Daq()
         daq.load_elemlist_fromfile('elemList2.txt')
-        daq.read(test_file)
+        daq.read(os.path.join('data', test_file))
         daq.write_hd5(hdf5file)
 
         daq2 = Daq()
@@ -307,10 +357,10 @@ class Test_hd5(unittest.TestCase):
         
     def test_readwrite_no_data(self):
         global test_file
-        hdf5file = test_file[:-4]+'_5.hdf5'
+        hdf5file = os.path.join('output', test_file[:-4]+'_5.hdf5')
         
         daq = Daq()
-        daq.read(test_file)
+        daq.read(os.path.join('data', test_file))
         daq.write_hd5(hdf5file)
 
         daq2 = Daq()
@@ -320,9 +370,9 @@ class Test_hd5(unittest.TestCase):
 
 def suite():
     return unittest.TestSuite((
-#            unittest.makeSuite(Test_load),
+            unittest.makeSuite(Test_load),
             unittest.makeSuite(Test_mat),
-#            unittest.makeSuite(Test_hd5)
+            unittest.makeSuite(Test_hd5)
                               ))
 
 if __name__ == "__main__":

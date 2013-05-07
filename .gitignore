@@ -1,4 +1,14 @@
 #################
+# User Defined
+#################
+*.pyc
+*.tmp
+*.daq
+*.hdf5
+*.mat
+*.png
+
+#################
 ## Eclipse
 #################
 
@@ -7,7 +17,6 @@
 .metadata
 bin/
 tmp/
-*.tmp
 *.bak
 *.swp
 *~.nib

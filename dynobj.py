@@ -1,5 +1,8 @@
 from __future__ import print_function
 
+# Copyright (c) 2013, Roger Lew
+# All rights reserved.
+
 from array import array
 import math
 from collections import Counter

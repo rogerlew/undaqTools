@@ -1,23 +1,16 @@
 from __future__ import print_function
 
+# Copyright (c) 2013, Roger Lew
+# All rights reserved.
+
 import glob
 import os
 import time
 import unittest
 
 from undaqTools import Daq, frame_range
-
-# Python 2 to 3 workarounds
-import sys
-if sys.version_info[0] == 2:
-    _strobj = basestring
-    _xrange = xrange
-elif sys.version_info[0] == 3:
-    _strobj = str
-    _xrange = range
     
 test_file = 'data reduction_20130204125617.daq'
-##test_file_large = 'Alaska_0_20130301142422.daq'
 
 class Test_plot(unittest.TestCase):
     def setUp(self):

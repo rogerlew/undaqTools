@@ -1,15 +1,16 @@
-# std lib
-import warnings
-from collections import namedtuple
+from __future__ import print_function
 
-# non-std lib
+# Copyright (c) 2013, Roger Lew
+# All rights reserved.
+
+import warnings
+
 import numpy as np
 from scipy.signal import decimate, lfilter, buttord, butter, \
-                         BadCoefficients, lti, freqs
+                         BadCoefficients, lti
 
-# local modules
 from undaqTools.misc.burg import arburg
-from undaqTools.misc.cdf import CDF, percentile
+from undaqTools.misc.cdf import percentile
 
 warnings.filterwarnings('ignore',category=BadCoefficients)
 
