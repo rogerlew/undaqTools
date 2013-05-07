@@ -1,5 +1,14 @@
 .. undaqTools documentation master file
 
+.. currentmodule:: undaqTools
+
+.. toctree::
+   :hidden:
+   
+   install
+   daq
+   element
+   
 ======================================
 undaqTools [*uhn-dak-tools*]
 ======================================
@@ -106,10 +115,8 @@ Installation
 
 View the :doc:`install`
 
-Indices and tables
+API
 ==================
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
+* :doc:`daq`
+* :doc:`element`

@@ -337,7 +337,8 @@ class SteeringEntropyModel:
         import matplotlib.pyplot as plt        
         plt.rc('font', family='serif')
         fig = plt.figure(figsize=(12, 12*(9/16.)))
-        fig.subplots_adjust(left=.07, right=.97, bottom=.03, top=.96, hspace=0.35)
+        fig.subplots_adjust(left=.07, right=.97, bottom=.03, 
+                            top=.96, hspace=0.35)
         
         # unfiltered data
         ax1 = fig.add_subplot(311)

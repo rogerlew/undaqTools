@@ -15,21 +15,9 @@ from scipy import io as sio
 
 from undaqTools import Daq
 from undaqTools.deprecated import old_convert_daq
-    
+from undaqToool.misc.base import _flatten
+
 test_file = 'data reduction_20130204125617.daq'
-
-VERBOSE = 1
-
-def flatten(L):
-    for item in L:
-        if isinstance(item, basestring):
-             yield item
-        else: 
-             try:
-                 for i in flatten(item):
-                     yield i
-             except TypeError:
-                 yield item
 
 def assert_Daqs_equal(testCase, daq, daq2):
 
@@ -251,22 +239,22 @@ class Test_mat(unittest.TestCase):
         
         # info
         x1 = dict(zip(old_daq['daqInfo'].dtype.names,
-                      list(flatten(old_daq['daqInfo']))))
+                      list(_flatten(old_daq['daqInfo']))))
         x2 = dict(zip(new_daq['daqInfo'].dtype.names,
-                      list(flatten(new_daq['daqInfo']))))
+                      list(_flatten(new_daq['daqInfo']))))
         for key in x1:
             self.assertEqual(x1[key], x2[key])
         
         # frames
         for name in old_daq['elemFrames'].dtype.names:
-            x1 = np.array(list(flatten(old_daq['elemFrames'][name])))
-            x2 = np.array(list(flatten(new_daq['elemFrames'][name])))
+            x1 = np.array(list(_flatten(old_daq['elemFrames'][name])))
+            x2 = np.array(list(_flatten(new_daq['elemFrames'][name])))
             assert_array_equal(x1, x2)
 
         # data
         for name in old_daq['elemData'].dtype.names:
-            x1 = np.array(list(flatten(old_daq['elemData'][name])))    
-            x2 = np.array(list(flatten(new_daq['elemData'][name])))
+            x1 = np.array(list(_flatten(old_daq['elemData'][name])))    
+            x2 = np.array(list(_flatten(new_daq['elemData'][name])))
 
             try:
                 is_string = isinstance(x1[0], basestring)

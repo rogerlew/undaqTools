@@ -86,7 +86,7 @@ class CDF:
 
     def __repr__(self):
         return ('CDF(%s, %s)'%(repr(self.bin_edges), repr(self.percentiles)))\
-               .replace('array', 'np.array')
+               .replace('np.','').replace('array', 'np.array')
 
     def __str__(self):
         st = ['  Bins       Percentiles\n',

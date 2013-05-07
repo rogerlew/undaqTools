@@ -1,5 +1,14 @@
 .. undaqTools documentation master file
 
+.. currentmodule:: undaqTools
+
+.. toctree::
+   :hidden:
+   
+   install
+   daq
+   element
+   
 ======================================
 undaqTools [*uhn-dak-tools*]
 ======================================
@@ -45,7 +54,7 @@ complexity of managing these complex datasets (see class hierarchy
 diagram below).
 
 Built in methods of Element also provide some additional conveniences
-for change state signal detection measures. By providing an isCSSDC
+for change state signal detection (CSSDC) measures. By providing an *isCSSDC*
 method it is easy to test whether an Element contains CSSDC data. The
 value at any frame between the first and last frame defined for a
 CSSDC Element can be obtained via the state_at_frame method. This treats
@@ -106,10 +115,8 @@ Installation
 
 View the :doc:`install`
 
-Indices and tables
+API
 ==================
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
+* :doc:`daq`
+* :doc:`element`

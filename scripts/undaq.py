@@ -62,22 +62,16 @@ def convert_daq(tupledArgs):
     (daq_file, ext, elemfile) = tupledArgs
     t0 = time.time()  
     
-    # both multiprocessing and ipython cluster mask Exceptions
-    # This way we can at least identify what file fails and the batch 
-    # processing continues
-    # 
-    # Discovered this is needed the hard way. During an experimental trial
-    # our MiniSim ran out of harddrive space and the resulting Daq failed to
-    # load.
     try:
         daq = undaqTools.Daq()        
-        daq.read(daq_file)
         if elemfile is not None:
             daq.load_elemlist_fromfile(elemfile)
             
         if ext == 'mat':
+            daq.read(daq_file, process_dynobjs=False)
             daq.write_mat(daq_file.replace('.daq', '.mat'))
-        else: 
+        else:
+            daq.read(daq_file) 
             daq.write_hd5(daq_file.replace('.daq', '.hdf5'))
             
         del daq

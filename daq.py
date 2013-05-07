@@ -27,17 +27,8 @@ from scipy import io as sio
 from undaqTools.misc.base import  _size_lookup, _nptype_lookup
 from undaqTools.element import Element, FrameSlice
 from undaqTools.dynobj import DynObj
+from undaqTools.misc.base import _searchsorted
 from undaqTools.misc.recordtype import recordtype
-
-def _searchsorted(a, v):
-    """
-    like numpy.searchsorted but returns len(a)-1 if v > a[-1]
-    and v must be an scalar
-    """
-    if a.flatten()[-1] <= v:
-        return len(a)-1
-    else:
-        return np.searchsorted(a.flatten(), v)
 
 Info = namedtuple('Info', ['run','runinst','title','numentries',
                            'frequency','date','magic','subject',
@@ -108,6 +99,7 @@ def stat(filename):
         
 class Daq(dict):
     def __init__(self):
+        """Abstraction of NADS .daq data"""
 
         # namedtuple containing drive relevant metadata
         self.info = Info(run='', 
@@ -164,12 +156,7 @@ class Daq(dict):
              
         process_dynobjs : bool
              True -> process dynobjs and put them in self.dynobjs
-             False -> don't load dynobjs
-
-        Returns
-        -------
-        None
-        
+             False -> don't load dynobjs        
         """        
         
         _header = \
@@ -287,13 +274,13 @@ class Daq(dict):
         
         # initialize temporary dict
         tmpdata = {}        
-        for name, _type, varrate, numvalues in \
+        for name, typ, varrate, numvalues in \
             zip(_header.name, _header.type, 
                 _header.varrateflag, _header.numvalues):
             if self.elemlist is None or \
                any(fnmatch(name, wc) for wc in self.elemlist):
                 if not varrate and numvalues == 1:
-                    tmpdata[name] = array(_type)
+                    tmpdata[name] = array(typ)
                 else:
                     tmpdata[name] = []
 
@@ -360,17 +347,17 @@ class Daq(dict):
                     name = _header.name[i]
                     
                     if numitems == 1:
-                        _type = _header.type[i]
+                        typ = _header.type[i]
                         try:
-                            tmpdata[name].append(unpack(_type, read(size))[0])
+                            tmpdata[name].append(unpack(typ,read(size))[0])
                         except:
                             _issue_frame_read_warning(frame.frame[-1], name)
                             tmpdata[name].append(np.nan)
                             
                     else: # numitems > 1
-                        _type = _header.nptype[i]
+                        typ = _header.nptype[i]
                         try:
-                            tmpdata[name].append(fromfile(fid, _type, numitems))
+                            tmpdata[name].append(fromfile(fid,typ,numitems))
                         except:
                             _issue_frame_read_warning(frame.frame[-1], name)                             
                             tmpdata[name].append(nans(numitems))
@@ -1050,14 +1037,6 @@ class Daq(dict):
         """
         Returns a list of keys (element names) that match 
         the Unix-style wildcard.
-
-        Patterns are Unix shell style:
-            *       matches everything
-            ?       matches any single character
-            [seq]   matches any character in seq
-            [!seq]  matches any char not in seq
-
-        keys and wc both case normalized
         
         Parameters
         ----------
@@ -1066,8 +1045,19 @@ class Daq(dict):
             
         Returns
         -------
-        list of names (keys to daq)
+        matches : list
+            names (keys to daq)
         
+        Notes
+        -----
+        keys and wc both case normalized
+
+        Patterns are Unix shell style::
+        
+            *       matches everything
+            ?       matches any single character
+            [seq]   matches any character in seq
+            [!seq]  matches any char not in seq
         
         """
         return [name for name in self if fnmatch(name, wc)]

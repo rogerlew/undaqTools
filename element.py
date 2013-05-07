@@ -3,14 +3,29 @@ from __future__ import print_function
 # Copyright (c) 2013, Roger Lew
 # All rights reserved.
 
-from collections import namedtuple
-
 import numpy as np
 
-from undaqTools.misc.base import _size_lookup, _nptype_lookup, _type_lookup, \
-                                 _isint
+from undaqTools.misc.base import _size_lookup, \
+                                 _nptype_lookup, \
+                                 _type_lookup, \
+                                 _namedtuple_factory
+    
+FrameSlice = _namedtuple_factory('FrameSlice', ['start', 'stop', 'step'], 
+                                 docstring= \
+    """
+    Create a FrameSlice object for slicing Element instances
+    
+    Parameters
+    ----------
+    start : int or None
+        starting frame
         
-FrameSlice = namedtuple('FrameSlice', ['start', 'stop', 'step'])
+    stop : int
+        endng frame
+        
+    step : int or None
+    
+    """)
 
 def frame_range(*args):
     """

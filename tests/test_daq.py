@@ -9,8 +9,8 @@ import glob
 import os
 import unittest
 
-from undaqTools import Daq, Element, stat, Info
-from undaqTools.element import frame_range, FrameSlice
+from undaqTools.daq import Daq, stat, Info
+from undaqTools.element import Element, frame_range, FrameSlice
 
 test_file = 'data reduction_20130204125617.daq'
 

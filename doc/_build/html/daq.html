@@ -1,0 +1,336 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>undaqTools.Daq &mdash; undaqTools 0.2.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/scipy.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="undaqTools 0.2.0 documentation" href="index.html" />
+    <link rel="next" title="undaqTools.Element" href="element.html" />
+    <link rel="prev" title="Installation Instructions" href="install.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="element.html" title="undaqTools.Element"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="install.html" title="Installation Instructions"
+             accesskey="P">previous</a> |</li>
+<li><a href="index.html">undaqTools 0.2.0 documentation</a> &raquo;</li>
+ 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="undaqtools-daq">
+<h1>undaqTools.Daq<a class="headerlink" href="#undaqtools-daq" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="undaqTools.Daq">
+<em class="property">class </em><tt class="descclassname">undaqTools.</tt><tt class="descname">Daq</tt><a class="headerlink" href="#undaqTools.Daq" title="Permalink to this definition">¶</a></dt>
+<dd><p class="rubric">Methods</p>
+<dl class="method">
+<dt id="undaqTools.Daq.read_daq">
+<tt class="descname">read_daq</tt><big>(</big><em>filename</em>, <em>elemlist=None</em>, <em>loaddata=True</em>, <em>process_dynobjs=True</em><big>)</big><a class="headerlink" href="#undaqTools.Daq.read_daq" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads a .daq file into object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>filename</strong> : string</p>
+<blockquote>
+<div><p>path to .daq file</p>
+</div></blockquote>
+<p><strong>elemlist</strong> : None or list_like</p>
+<blockquote>
+<div><p>None -&gt; load all elements
+list_like -&gt; load names that match list</p>
+</div></blockquote>
+<p><strong>loaddata</strong> : bool</p>
+<blockquote>
+<div><p>True -&gt; load data
+False -&gt; don&#8217;t load data</p>
+</div></blockquote>
+<p><strong>process_dynobjs</strong> : bool</p>
+<blockquote class="last">
+<div><p>True -&gt; process dynobjs and put them in self.dynobjs
+False -&gt; don&#8217;t load dynobjs</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="undaqTools.Daq.read_hd5">
+<tt class="descname">read_hd5</tt><big>(</big><em>filename</em>, <em>f0=None</em>, <em>fend=None</em><big>)</big><a class="headerlink" href="#undaqTools.Daq.read_hd5" title="Permalink to this definition">¶</a></dt>
+<dd><p>writes Daq object to HDF5 container</p>
+<p>f0 and fend specify frame range to read.
+Will export daq.dynobjs to HDF5 container</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>filename</strong> : string</p>
+<blockquote>
+<div><p>file to read</p>
+</div></blockquote>
+<p><strong>f0</strong> : None or int</p>
+<blockquote>
+<div><p>None -&gt; read from beginning of file
+int -&gt; read from this frame</p>
+</div></blockquote>
+<p><strong>fend</strong> : None or int</p>
+<blockquote class="last">
+<div><p>None -&gt; read to end of file
+int -&gt; read to this frame</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="undaqTools.Daq.write_hd5">
+<tt class="descname">write_hd5</tt><big>(</big><em>filename=None</em><big>)</big><a class="headerlink" href="#undaqTools.Daq.write_hd5" title="Permalink to this definition">¶</a></dt>
+<dd><p>writes Daq object to HDF5 container</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>filename</strong> : None or string (optional)</p>
+<blockquote class="last">
+<div><p>None : file written to daq.filename.replace(&#8216;.daq&#8217;, &#8216;.hdf5&#8217;)
+string : specify output file (will overwrite)</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="undaqTools.Daq.write_mat">
+<tt class="descname">write_mat</tt><big>(</big><em>filename=None</em>, <em>outpath=None</em><big>)</big><a class="headerlink" href="#undaqTools.Daq.write_mat" title="Permalink to this definition">¶</a></dt>
+<dd><p>writes Daq object to .mat file using scipy.io.savmat</p>
+<p>daq.dynobjs is not exported</p>
+<p>This is intended to make convert_daq backwards compatible.
+pydaqTools users should use write_hdf5. The .mat files cannot
+be used to instantiate Daq objects.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>filename</strong> : None or string (optional)</p>
+<blockquote>
+<div><p>None : file written to daq.filename.replace(&#8216;.daq&#8217;, &#8216;.hdf5&#8217;)
+string : specify output file (will overwrite)</p>
+</div></blockquote>
+<p><strong>outpath</strong> : None or string (optional)</p>
+<blockquote class="last">
+<div><p>string : directory to path</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="undaqTools.Daq.match_keys">
+<tt class="descname">match_keys</tt><big>(</big><em>wc</em><big>)</big><a class="headerlink" href="#undaqTools.Daq.match_keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of keys (element names) that match 
+the Unix-style wildcard.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>wc</strong> : string</p>
+<blockquote>
+<div><p>wildcard apply to each match</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>matches</strong> : list</p>
+<blockquote class="last">
+<div><p>names (keys to daq)</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>keys and wc both case normalized</p>
+<p>Patterns are Unix shell style:</p>
+<div class="highlight-python"><pre>*       matches everything
+?       matches any single character
+[seq]   matches any character in seq
+[!seq]  matches any char not in seq</pre>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="undaqTools.Daq.plot_ts">
+<tt class="descname">plot_ts</tt><big>(</big><em>elem_pars</em>, <em>xindx=None</em><big>)</big><a class="headerlink" href="#undaqTools.Daq.plot_ts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a time series figure containing elements specified by
+elem_pars</p>
+<p>CSSDC measures yield step plots.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>elem_pars</strong> : list of tuples</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>each tuple should contain</dt>
+<dd><dl class="first last docutils">
+<dt>name <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">element to plot</p>
+</dd>
+<dt>yindx <span class="classifier-delimiter">:</span> <span class="classifier">None, int, or slice object</span></dt>
+<dd><p class="first last">specifies the values of element to plot
+None -&gt; slice(None, None, None)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>xindx</strong> : None, slice object, FrameSlice object</p>
+<blockquote>
+<div><p>specifies the frame range to plot
+None -&gt; slice(None, None, None)</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first last"><strong>pyplot figure object</strong> :</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="undaqTools.Daq.plot_dynobjs">
+<tt class="descname">plot_dynobjs</tt><big>(</big><em>dynobj_wc='*'</em><big>)</big><a class="headerlink" href="#undaqTools.Daq.plot_dynobjs" title="Permalink to this definition">¶</a></dt>
+<dd><p>make top-down plot of dynamic object paths</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="undaqTools.stat">
+<tt class="descclassname">undaqTools.</tt><tt class="descname">stat</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#undaqTools.stat" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns an Info namedtuple instance without loading data
+so the meta information can be interogatted without having
+to read the whole file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>filename</strong> : string</p>
+<blockquote>
+<div><p>.daq file to investigate</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first last"><strong>daq</strong> : Daq instance</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="install.html"
+                        title="previous chapter">Installation Instructions</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="element.html"
+                        title="next chapter">undaqTools.Element</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/daq.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<ul class="this-page-menu">
+  <li><a href="/numpy/docs/numpy-docs/daq.rst">Edit page</a></li>
+</ul>
+
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="element.html" title="undaqTools.Element"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="install.html" title="Installation Instructions"
+             >previous</a> |</li>
+<li><a href="index.html">undaqTools 0.2.0 documentation</a> &raquo;</li>
+ 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Roger Lew.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

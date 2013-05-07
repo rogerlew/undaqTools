@@ -6,10 +6,10 @@ from __future__ import print_function
 from collections import OrderedDict
 
 from undaqTools.element import Element, FrameSlice
-from undaqTools.misc import _isint
+from undaqTools.misc.base import _isint
             
 def find_epochs(stream):
-    '''
+    """
     Pulls the starting and stopping frames for epochs defined in a logstream.
     
     Parameters
@@ -17,16 +17,21 @@ def find_epochs(stream):
     stream : Element
        sliced to just the row you are interested in
     
-    returns a OrderedDict of FrameSlice objects. FrameSlice objects are 
-    namedTuples with named fields start, stop, and step fields. Element
-    objects know how to slice relative to the frames specified by these
-    FrameSlice objects
+    Returns
+    -------
+    returns a OrderedDict of FrameSlice objects
     
+    See also
+    --------
+    Frameslice
+    
+    Notes
+    -----    
     Ignores epoch with a state of 0.
     
     Assumes that each epoch only occurs once. Raises RuntimeError if a 
     non-zero  epoch state occurs more than once.
-    '''
+    """
 
     if not isinstance(stream, Element):
         raise ValueError('stream should be Element not %s'%type(stream))
