@@ -15,7 +15,7 @@ from scipy import io as sio
 
 from undaqTools import Daq
 from undaqTools.deprecated import old_convert_daq
-from undaqToool.misc.base import _flatten
+from undaqTools.misc.base import _flatten
 
 test_file = 'data reduction_20130204125617.daq'
 
@@ -197,8 +197,8 @@ class Test_mat(unittest.TestCase):
 
     def test_load(self):
         global test_file
-        matfile = os.path.join('output', test_file[:-4]+'1.mat')
-        matfile2 = os.path.join('output', test_file[:-4]+'2.mat')
+        matfile = os.path.join('tmp', test_file[:-4]+'1.mat')
+        matfile2 = os.path.join('tmp', test_file[:-4]+'2.mat')
         
         daq = Daq()
         daq.read(os.path.join('data', test_file))
@@ -213,8 +213,8 @@ class Test_mat(unittest.TestCase):
 
     def test_load_with_elemlist(self):
         global test_file
-        matfile = os.path.join('output', test_file[:-4]+'11.mat')
-        matfile2 = os.path.join('output', test_file[:-4]+'22.mat')
+        matfile = os.path.join('tmp', test_file[:-4]+'11.mat')
+        matfile2 = os.path.join('tmp', test_file[:-4]+'22.mat')
         
         daq = Daq()
         daq.load_elemlist_fromfile('elemList2.txt')
@@ -290,7 +290,7 @@ class Test_hd5(unittest.TestCase):
     
     def test_readwrite(self):
         global test_file
-        hdf5file = os.path.join('output', test_file[:-4]+'_1.hdf5')
+        hdf5file = os.path.join('tmp', test_file[:-4]+'_1.hdf5')
                 
         daq = Daq()
         daq.read(os.path.join('data', test_file))
@@ -303,7 +303,7 @@ class Test_hd5(unittest.TestCase):
         
     def test_readwrite_with_elemlist(self):
         global test_file
-        hdf5file = os.path.join('output', test_file[:-4]+'_2.hdf5')
+        hdf5file = os.path.join('tmp', test_file[:-4]+'_2.hdf5')
         
         daq = Daq()
         daq.load_elemlist_fromfile('elemList2.txt')
@@ -317,7 +317,7 @@ class Test_hd5(unittest.TestCase):
 
     def test_readwrite_with_elemlist_f0(self):
         global test_file
-        hdf5file = os.path.join('output', test_file[:-4]+'_3.hdf5')
+        hdf5file = os.path.join('tmp', test_file[:-4]+'_3.hdf5')
                 
         daq = Daq()
         daq.load_elemlist_fromfile('elemList2.txt')
@@ -331,7 +331,7 @@ class Test_hd5(unittest.TestCase):
         
     def test_readwrite_with_elemlist_f0fend(self):
         global test_file
-        hdf5file = os.path.join('output', test_file[:-4]+'_4.hdf5')
+        hdf5file = os.path.join('tmp', test_file[:-4]+'_4.hdf5')
         
         daq = Daq()
         daq.load_elemlist_fromfile('elemList2.txt')
@@ -345,7 +345,7 @@ class Test_hd5(unittest.TestCase):
         
     def test_readwrite_no_data(self):
         global test_file
-        hdf5file = os.path.join('output', test_file[:-4]+'_5.hdf5')
+        hdf5file = os.path.join('tmp', test_file[:-4]+'_5.hdf5')
         
         daq = Daq()
         daq.read(os.path.join('data', test_file))
