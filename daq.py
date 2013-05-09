@@ -25,7 +25,7 @@ from numpy import fromfile
 from scipy import io as sio
 
 from undaqTools.misc.base import  _size_lookup, _nptype_lookup
-from undaqTools.element import Element, FrameSlice
+from undaqTools.element import Element, FrameSlice, FrameIndex
 from undaqTools.dynobj import DynObj
 from undaqTools.misc.base import _searchsorted
 from undaqTools.misc.recordtype import recordtype
@@ -171,7 +171,7 @@ class Daq(dict):
                    bytes=array('i'))
         
         if elemlist is not None:
-            self.elemlist = elemlist    
+            self.elemlist = elemlist
 
         fid = open(filename,'rb')
         read = fid.read # dots make things slow...
@@ -235,8 +235,6 @@ class Daq(dict):
         if loaddata and process_dynobjs:
             self._process_dynobjs()
             
-
-
     # create alias read for read_daq
     read = read_daq
                 
@@ -247,7 +245,6 @@ class Daq(dict):
         _header = self._header
         elemlist = self.elemlist
         frame = self.frame
-##        data = self.data
         
         def _issue_frame_read_warning(frame, name):
             msg = 'On Frame: %i, error unpacking %s'%(frame, name)
@@ -277,8 +274,8 @@ class Daq(dict):
         for name, typ, varrate, numvalues in \
             zip(_header.name, _header.type, 
                 _header.varrateflag, _header.numvalues):
-            if self.elemlist is None or \
-               any(fnmatch(name, wc) for wc in self.elemlist):
+            if elemlist is None or \
+               any(fnmatch(name, wc) for wc in elemlist):
                 if not varrate and numvalues == 1:
                     tmpdata[name] = array(typ)
                 else:
@@ -304,7 +301,9 @@ class Daq(dict):
         if elemlist is None: # elemlist empty                    
             go_nogo = [True for i in xrange(len(_header.name))]
         else: 
-            go_nogo = [name in elemlist for name in _header.name]
+            go_nogo = []
+            for name in _header.name:
+                go_nogo.append(any(fnmatch(name, wc) for wc in elemlist))
 
         # Python quirk no. 372837462: while 1 is faster than while True
         while 1:
@@ -384,8 +383,9 @@ class Daq(dict):
         # paranoid about reference counting and garbage collection not
         # functioning properly
         for name, i, rate in zip(_header.name, _header.id, _header.rate):
-            if elemlist is not None and name not in elemlist:
-                continue
+            if elemlist is not None:
+               if not any(fnmatch(name, wc) for wc in elemlist):
+                   continue
             
             # transpose Element with more than 1 row                
             if _header.numvalues[i] > 1:
@@ -433,14 +433,13 @@ class Daq(dict):
         dynamic objects so that they can be unpacked by
         DynObj.process
         """
-
-        if 'SCC_DynObj_CvedId'not in self:
+        if 'SCC_DynObj_CvedId' not in self:
             msg = "Need 'SCC_DynObj*' to build dynobjs"
             warnings.warn(msg, RuntimeWarning)
             return None
 
         frame = self.frame
-        cvedid_array = self['SCC_DynObj_CvedId']
+        cvedid = self['SCC_DynObj_CvedId']
         
         # identify the cars in the datafile and
         # identify what frames they are defined
@@ -450,7 +449,7 @@ class Daq(dict):
         # loop through frames, skipping first frame
         for i in xrange(1, len(frame.frame)):          
             
-            cveds_in_frame = cvedid_array[:,i].flatten()
+            cveds_in_frame = cvedid[:,i].flatten()
 
             for j, cved in enumerate(cveds_in_frame):
                 if cved != 0:
@@ -670,16 +669,16 @@ class Daq(dict):
         _elemid_lookup = dict(zip(_header.name, _header.id))
         
         tmpdata = {}
-        for k, v in root['data'].iteritems():
+        for name, v in root['data'].iteritems():
             
             if self.elemlist is not None:
-               if not any(fnmatch(k, wc) for wc in self.elemlist):
+               if not any(fnmatch(name, wc) for wc in self.elemlist):
                    continue
                 
-            i = _elemid_lookup[k.replace('_Frames','')]
+            i = _elemid_lookup[name.replace('_Frames','')]
             
             if _header.rate[i] == 1:
-                tmpdata[k] = v[:,i0:iend]
+                tmpdata[name] = v[:,i0:iend]
                 
             else: #CSSDC measure
                 if len(v.shape) == 1:
@@ -690,7 +689,7 @@ class Daq(dict):
                 _iend= v.shape[1]
 
                 if f0 is not None or fend is not None:
-                    _name = k.replace('_Frames','')
+                    _name = name.replace('_Frames','')
                     _all_frames = root['data/%s_Frames'%_name][:].flatten()
 
                     if f0 is not None:
@@ -701,7 +700,7 @@ class Daq(dict):
                             _iend += 1
 
                 # Now we can slice the data
-                tmpdata[k] = v[:,_i0:_iend]
+                tmpdata[name] = v[:,_i0:_iend]
 
         # hdf5 doesn't have a None type (or atleast, I don't know how
         # to use it) so None is stored as an empty string in the hdf5 file

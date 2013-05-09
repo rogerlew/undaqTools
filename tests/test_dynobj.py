@@ -61,9 +61,10 @@ class Test_dynobjs(unittest.TestCase):
         
     def test_process(self):
         global test_file_large
-                
+
         daq = Daq()
-        daq.read(os.path.join('data', test_file_large))
+        daq.read(os.path.join('data', test_file_large),
+                 elemlist=['VDS*', 'SCC_Dyn*'])
         daq.write_hd5('./tmp/dynobj_process_test.hdf5')
         
     def test_readwrite_hd5_file(self):

@@ -5,10 +5,8 @@ from __future__ import print_function
 
 import os
 import glob
-import time
-from collections import OrderedDict
-import operator
 from operator import attrgetter
+import time
 
 from matplotlib import rcParams
 rcParams['font.family'] = 'serif'
@@ -16,8 +14,7 @@ import matplotlib.pyplot as plt
 
 import numpy as np
 
-import undaqTools
-from undaqTools import Daq, logstream, frame_range
+from undaqTools import Daq, fslice, findex
 
 def mult_ado_by_pid_plot(pids, page):
     global hdf5_files, scenario_names, latin_square, get_pid
@@ -47,7 +44,7 @@ def mult_ado_by_pid_plot(pids, page):
     
         print('analyzing "%s"'%hdf5_file)
         
-        daq = undaqTools.Daq()
+        daq = Daq()
         daq.read_hd5(hdf5_file)
         pid = daq.etc['pid']
 
@@ -55,8 +52,8 @@ def mult_ado_by_pid_plot(pids, page):
         rnum = pids.index(pid)
 
         # find the relevant dynamic objects to plot
-        same_lane_ados = [do for do in daq.dynobjs.values() if 'Ado' in do.name]
-        same_lane_ados = sorted(same_lane_ados, key=operator.attrgetter('name'))
+        platoon = [do for do in daq.dynobjs.values() if 'Ado' in do.name]
+        platoon = sorted(platoon, key=attrgetter('name'))
 
         # for each trial...
         for i in xrange(10):
@@ -77,15 +74,13 @@ def mult_ado_by_pid_plot(pids, page):
             f0 = daq.etc['epochs'][i*10+1].start
             fend = daq.etc['epochs'][i*10+3].stop
 
-            # build new FrameSlice instance
-            fslice = frame_range(f0, fend)
-
             # get axis handle
             ax1 = plt.subplot(8, 10, rnum*10 + scenario + 1)
 
-            distance = daq['VDS_Veh_Dist'][0, fslice].flatten()
+            distance = daq['VDS_Veh_Dist'][0, fslice(f0, fend)].flatten()
             distance -= distance[0]
-            speed = daq['VDS_Veh_Speed'][0, fslice].flatten()
+            
+            speed = daq['VDS_Veh_Speed'][0, fslice(f0, fend)].flatten()
             
             ax1.plot(distance, speed, 'b')
             ax2 = ax1.twinx()
@@ -93,11 +88,11 @@ def mult_ado_by_pid_plot(pids, page):
             # we need to figure out when the Ados enter the passing lane
             # and exit the passing lane. To do this we need to know where
             # the passing lane starts and ends
-            pos0 = daq['VDS_Chassis_CG_Position'].state_at_frame(f0)
-            posend = daq['VDS_Chassis_CG_Position'].state_at_frame(fend)
+            pos0 = daq['VDS_Chassis_CG_Position'][:,findex(f0)]
+            posend = daq['VDS_Chassis_CG_Position'][:,findex(fend)]
 
             # loop through and plot ados
-            for j, do in enumerate(same_lane_ados):
+            for j, do in enumerate(platoon):
 
                 # each passing zone has its own set of Ados. This
                 # sorts out which are actually defined (should be 
@@ -143,19 +138,21 @@ def mult_ado_by_pid_plot(pids, page):
                 ax1.set_title(scenario_names[scenario])
                 
             if rnum == len(pids)-1:
-                ax1.set_xticklabels(['%i'%x for x in xticks], rotation='vertical')
+                ax1.set_xticklabels(['%i'%x for x in xticks], 
+                                    rotation='vertical')
             else:
                 ax1.set_xticklabels(['' for x in xticks])
 
             if not scenario:
-                ax1.text(660,35,'Participant: %03i =>'%pids[rnum], size='small')
+                ax1.text(660,35,'Participant: %03i =>'%pids[rnum], 
+                         size='small')
 
     img_name = 'do_passing_behavior__PAGE%i.png'%page
     fig.savefig(img_name, dpi=300)
     plt.close()
                 
 if __name__ == '__main__':
-     
+    t0 = time.time()
     scenario_names = ['Baseline', 
                       'Advisory', 
                       'Reg', 

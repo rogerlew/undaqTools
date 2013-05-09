@@ -16,9 +16,7 @@ import numpy as np
 
 from pyvttbl import DataFrame
 
-import undaqTools
 from   undaqTools import Daq
-from   undaqTools.logstream import find_epochs
 
 # dependent variables and indices that we want to analyze
 dvs = [('CFS_Accelerator_Pedal_Position', 0),

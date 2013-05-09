@@ -21,8 +21,7 @@ from matplotlib import rcParams
 rcParams['font.family'] = 'serif'
 import matplotlib.pyplot as plt
 
-import undaqTools
-from   undaqTools import Daq, frame_range
+from undaqTools import Daq, fslice
 
 if __name__ == '__main__':
     
@@ -66,16 +65,13 @@ if __name__ == '__main__':
             f0 = daq.etc['epochs'][i*10+1].start
             fend = daq.etc['epochs'][i*10+3].stop
 
-            # build new FrameSlice instance
-            fslice = frame_range(f0, fend)
-
             print("    on scenario %i [f%i:f%i]..."%(scenario, f0, fend))
             
             # next we need to linearly interpolate speed by distance
-            veh_dist = daq['VDS_Veh_Dist'][0, fslice].flatten()
+            veh_dist = daq['VDS_Veh_Dist'][0, fslice(f0, fend)].flatten()
             veh_dist -= veh_dist[0]
             
-            veh_spd = daq['VDS_Veh_Speed'][0, fslice].flatten()
+            veh_spd = daq['VDS_Veh_Speed'][0, fslice(f0, fend)].flatten()
             veh_spd_ip = np.interp(veh_dist_ip, veh_dist, veh_spd)
 
             # store interpolated speed so we can plot it

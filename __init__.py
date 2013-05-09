@@ -3,5 +3,5 @@
 # All rights reserved.
 
 from daq import Daq, Info, stat
-from element import Element, frame_range, FrameSlice
+from element import Element, fslice, FrameSlice, findex, FrameIndex
 from dynobj import DynObj

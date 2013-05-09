@@ -27,9 +27,21 @@ FrameSlice = _namedtuple_factory('FrameSlice', ['start', 'stop', 'step'],
     
     """)
 
-def frame_range(*args):
+FrameIndex = _namedtuple_factory('Index', ['frame'], 
+                                 docstring= \
     """
-    slice([start,] stop[, step])
+    Create a FrameIndex object for indexing Element instances
+    
+    Parameters
+    ----------
+    indx : int
+        reference frame
+    
+    """)
+    
+def fslice(*args):
+    """
+    fslice([start,] stop[, step])
     """
     start, stop, step = None, None, None
         
@@ -43,6 +55,13 @@ def frame_range(*args):
         start, stop, step = args[:3]
         
     return FrameSlice(start, stop, step)
+
+def findex(frame):
+    """
+    findex(frame)
+    """
+    return FrameIndex(frame)
+
 
 class Element(np.ndarray, object):
     def __new__(cls, data, frames, 
@@ -159,7 +178,10 @@ class Element(np.ndarray, object):
                     iend = np.searchsorted(self.frames, fend)
                     
                 indx = (indx[0], slice(i0, iend, step))
-                  
+                
+            elif isinstance(indx[1], FrameIndex):
+                return self._state_at_frame(indx[0], indx[1].frame)
+                
         obj = super(Element, self).__getitem__(indx)
 
         # we want to also index the times and frames arrays so that 
@@ -173,7 +195,7 @@ class Element(np.ndarray, object):
             
         return obj
 
-    def state_at_frame(self, frame, rowindx=None):
+    def _state_at_frame(self, rowindx, frame):
         """
         returns state (state array) of a CSSDC measure at supplied frame
 
@@ -184,10 +206,11 @@ class Element(np.ndarray, object):
         Parameters
         ----------
         frame : int
+
+        rowindx : slice instance or int
+            specifiies the row index to return
             if None then the state of elem is referenced to time
 
-        rowindx : None, slice object, int
-            specifiies the row index to return
         """
             
         indx1 = np.searchsorted(self.frames, frame)-1
@@ -197,9 +220,7 @@ class Element(np.ndarray, object):
         # before first frame        
         if indx < 0:
             return np.nan
-            
-        if rowindx is None:
-            rowindx = slice(None)
+                        
         val = np.array(self.__getitem__((rowindx, indx)), ndmin=2).transpose()
         
         if len(val) == 1:

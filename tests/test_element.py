@@ -10,7 +10,7 @@ import numpy as np
 from scipy.signal import detrend
 from numpy.testing import assert_array_equal
 
-from undaqTools import Daq, Element, frame_range
+from undaqTools import Daq, Element, fslice, findex
 
 test_file = 'data reduction_20130204125617.daq'
 
@@ -94,7 +94,7 @@ class Test_setitem(unittest.TestCase):
                     
         rs = [[-2016.,-1599.,4677.,983.,-1011.,174.,-850.,-434.,76.]]
         
-        x[:,:] = detrend(x)
+        x[:,:] = rs
         assert_array_equal(rs, x)
         assert_array_equal(range(3000, 3009), x.frames)
         
@@ -109,7 +109,7 @@ class Test_state_at_frame(unittest.TestCase):
         rs= np.array( [[11],[11],[11],[11],[ 0],[ 0],[ 0],[ 0],[ 0],[ 0]], 
                       dtype=np.int16)
     
-        ds = daq['TPR_Tire_Surf_Type'].state_at_frame(7000)
+        ds = daq['TPR_Tire_Surf_Type'][:, findex(7000)]
         
         assert_array_equal(rs, ds)
                                
@@ -122,7 +122,7 @@ class Test_state_at_frame(unittest.TestCase):
         daq = Daq()
         daq.read_hd5(os.path.join('data', hdf5file))
     
-        ds = daq['TPR_Tire_Surf_Type'].state_at_frame(0)
+        ds = daq['TPR_Tire_Surf_Type'][:,findex(0)]
         
         self.assertTrue(np.isnan(ds))
                                
@@ -136,7 +136,7 @@ class Test_state_at_frame(unittest.TestCase):
         rs= np.array( [[ 1],[ 1],[ 1],[ 1],[ 0],[ 0],[ 0],[ 0],[ 0],[ 0]], 
                       dtype=np.int16)
                       
-        ds = daq['TPR_Tire_Surf_Type'].state_at_frame(13000)
+        ds = daq['TPR_Tire_Surf_Type'][:, findex(13000)]
         assert_array_equal(rs, ds)
         self.assertFalse(isinstance(ds, Element))
    
@@ -150,7 +150,7 @@ class Test_state_at_frame(unittest.TestCase):
         rs= np.array( [[11],[11],[ 1],[ 1],[ 0],[ 0],[ 0],[ 0],[ 0],[ 0]], 
                       dtype=np.int16)
         
-        ds = daq['TPR_Tire_Surf_Type'].state_at_frame(5841)
+        ds = daq['TPR_Tire_Surf_Type'][:,findex(5841)]
         assert_array_equal(rs[:,0], ds[:,0])
         self.assertFalse(isinstance(ds, Element))
 
@@ -164,7 +164,7 @@ class Test_state_at_frame(unittest.TestCase):
         rs= np.array( [[11],[11],[ 1],[ 1],[ 0],[ 0],[ 0],[ 0],[ 0],[ 0]], 
                       dtype=np.int16)
                      
-        ds = daq['TPR_Tire_Surf_Type'].state_at_frame(5842)
+        ds = daq['TPR_Tire_Surf_Type'][:,findex(5842)]
         assert_array_equal(rs[:,0], ds[:,0])
         self.assertFalse(isinstance(ds, Element))
         
@@ -178,7 +178,7 @@ class Test_state_at_frame(unittest.TestCase):
         rs= np.array( [[1],[1],[ 1],[ 1],[ 0],[ 0],[ 0],[ 0],[ 0],[ 0]], 
                       dtype=np.int16)
         
-        ds = daq['TPR_Tire_Surf_Type'].state_at_frame(5840)
+        ds = daq['TPR_Tire_Surf_Type'][:,findex(5840)]
         assert_array_equal(rs[:,0], ds[:,0])
         self.assertFalse(isinstance(ds, Element))
         
@@ -192,7 +192,7 @@ class Test_state_at_frame(unittest.TestCase):
         rs= np.array( [[1],[1],[ 1],[ 1]], 
                       dtype=np.int16)
         
-        ds = daq['TPR_Tire_Surf_Type'].state_at_frame(5840, slice(4))
+        ds = daq['TPR_Tire_Surf_Type'][:4, findex(5840)]
         assert_array_equal(rs[:,0], ds[:,0])
         self.assertFalse(isinstance(ds, Element))
         
@@ -203,7 +203,7 @@ class Test_state_at_frame(unittest.TestCase):
         daq = Daq()
         daq.read_hd5(os.path.join('data', hdf5file))
         
-        ds = daq['TPR_Tire_Surf_Type'].state_at_frame(5840, 3)
+        ds = daq['TPR_Tire_Surf_Type'][3, findex(5840)]
         self.assertEqual(1, ds)
         
     def test8(self):
@@ -213,7 +213,7 @@ class Test_state_at_frame(unittest.TestCase):
         daq = Daq()
         daq.read_hd5(os.path.join('data', hdf5file))
         
-        ds = daq['TPR_Tire_Surf_Type'].state_at_frame(5840, 4)
+        ds = daq['TPR_Tire_Surf_Type'][4, findex(5840)]
         self.assertEqual(0, ds)
         
 class Test_frame_slice(unittest.TestCase):      
@@ -225,27 +225,27 @@ class Test_frame_slice(unittest.TestCase):
         x = self.x
         rs = np.array([[   24.,   245.,  6325.,  2435.]])
         
-        assert_array_equal(x[:, frame_range(3004)], rs)
+        assert_array_equal(x[:, fslice(3004)], rs)
         
     def test00(self):
         x = self.x
         rs = np.array([3000, 3001, 3002, 3003])
-        assert_array_equal(x[:, frame_range(3004)].frames, rs)
+        assert_array_equal(x[:, fslice(3004)].frames, rs)
         
     def test1(self):
         x = self.x
         rs = np.array([[   245.,  6325.,  2435.]])
-        assert_array_equal(x[:, frame_range(3001, 3004)], rs)
+        assert_array_equal(x[:, fslice(3001, 3004)], rs)
         
     def test2(self):
         x = self.x
         rs = np.array([[24,6325,245,14,548]])
-        assert_array_equal(x[:, frame_range(None, None, 2)], rs)
+        assert_array_equal(x[:, fslice(None, None, 2)], rs)
                 
     def test3(self):
         x = self.x
         rs = np.array([[24,245,6325,2435,245,1234,14,234,548]])
-        ds = x[:, frame_range(3000, 3009)]
+        ds = x[:, fslice(3000, 3009)]
         assert_array_equal(ds, rs)
 
 class Test_isCSSDC(unittest.TestCase):      

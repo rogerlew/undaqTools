@@ -6,15 +6,15 @@
    :hidden:
    
    install
+   gettingstarted
    daq
    element
    
-======================================
-undaqTools [*uhn-dak-tools*]
-======================================
+   
+==========================================================
+undaqTools [*uhn-dak-tools*] The Unofficial NADS Daq API
+==========================================================
 
-The Unofficial NADS Daq API
----------------------------
 undaqTools is a pythonic interface to the National Advanced
 Driving Simulator (NADS) Data AcQuisition (DAQ) files.
 
@@ -49,16 +49,9 @@ Each Element object also has a frames attribute that keeps track of
 the frames cooresponding to the element. This means that when they are
 sliced the resulting views keeps the frames in sync without 
 any additional book-keeping to the end user! The element data can 
-also be sliced using frame indices. These abstractions simplify the 
-complexity of managing these complex datasets (see class hierarchy 
-diagram below).
-
-Built in methods of Element also provide some additional conveniences
-for change state signal detection (CSSDC) measures. By providing an *isCSSDC*
-method it is easy to test whether an Element contains CSSDC data. The
-value at any frame between the first and last frame defined for a
-CSSDC Element can be obtained via the state_at_frame method. This treats
-the data as categorical and always returns the last defined state.
+also be sliced and indexed using frame indices. These abstractions 
+simplify the complexity of managing these complex datasets (see class 
+hierarchy diagram below).
 
 undaqTools can also unpack and process dynamic objects. Each dynamic
 object becomes a DynObj instance in the Daq's dynobj dict attribute.
@@ -82,7 +75,6 @@ decide how to best utilize their data.
       |                 + ...
       |               --------------------
       |                 + isCSSDC()
-      |                 + state_at_frame()
       |
       + dynobjs (dict)
       |   + [doName] -> DynObj (object)
@@ -102,16 +94,17 @@ decide how to best utilize their data.
       |   + date
       |   + ...
       |
+      | + etc (dict)
       | + ...
     --------------------------------------------
-      | + read_daq()
+      | + read_daq() <==> read()
       | + read_hd5py()
       | + write_hd5py()
       | + write_mat()
       | ...
       
 Installation
----------------
+------------
 
 View the :doc:`install`
 

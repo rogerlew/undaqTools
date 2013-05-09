@@ -90,36 +90,27 @@ class DynObj:
         # first we loop through the daq to extract the following
         # variables based on the frame and row indices provided
         frames = None
-        heading = array('f')
-        speed = array('f')
-        roll = array('f')
-        pitch = array('f')
-        pos = []
-        rollpitch = []
-
-        _heading = daq['SCC_DynObj_Heading']
-        _speed = daq['SCC_DynObj_Vel']
-        _pos = daq['SCC_DynObj_Pos']
-        _rollpitch = daq['SCC_DynObj_RollPitch']
-
-        for r,c in zip(row_indices, frame_indices):
-            heading.append(_heading[r,c])
-            speed.append(_speed[r,c])
-            pos.append(_pos[r*3:r*3+3,c])
-            rollpitch.append(_rollpitch[r*2:r*2+2,c])
-
-        # Now some book-keeping
-        pos = np.array(pos).T # (3 x *)
+        row_indices_x2 = row_indices*2
+        row_indices_x3 = row_indices*3
         
-        del _heading, _speed, _pos, _rollpitch
+        heading = daq['SCC_DynObj_Heading'][row_indices, frame_indices]
+        speed = daq['SCC_DynObj_Vel'][row_indices, frame_indices]
+        roll = daq['SCC_DynObj_RollPitch'][row_indices_x2, frame_indices]
+        pitch = daq['SCC_DynObj_RollPitch'][row_indices_x2+1, frame_indices]
+        x = daq['SCC_DynObj_Pos'][row_indices_x3, frame_indices]
+        y = daq['SCC_DynObj_Pos'][row_indices_x3+1, frame_indices]
+        z = daq['SCC_DynObj_Pos'][row_indices_x3+2, frame_indices]
+        pos = np.asarray([x,y,z])
+         
+        del x,y,z
         
         # positions are packed [y,x,z] for the dyn objects
         # here we swap x and y to make it consistent with OwnVeh
         # position.
-        temp = np.copy(pos[0,:])
+        tmp = pos[0,:]
         pos[0,:] = pos[1,:]
-        pos[1,:] = temp
-        rollpitch = np.array(rollpitch).T
+        pos[1,:] = tmp
+        del tmp
 
         # need to linearly interpolate asyncronous cveds
         if async:
@@ -127,14 +118,12 @@ class DynObj:
             heading = np.interp(_frames, frame_indices, heading)
             speed = np.interp(_frames, frame_indices, speed)
 
-            x = np.interp(_frames, frame_indices, pos[0,:])
-            y = np.interp(_frames, frame_indices, pos[1,:])
-            z = np.interp(_frames, frame_indices, pos[2,:])
+            pos = np.array([np.interp(_frames, frame_indices, pos[0,:]),
+                            np.interp(_frames, frame_indices, pos[1,:]),
+                            np.interp(_frames, frame_indices, pos[2,:])])
 
-            roll = np.interp(_frames, frame_indices, rollpitch[0,:])
-            pitch = np.interp(_frames, frame_indices, rollpitch[1,:])
-            
-            pos = np.array([x,y,z])
+            roll = np.interp(_frames, frame_indices, roll)
+            pitch = np.interp(_frames, frame_indices, pitch)
             
             # convert from indices to frames
             frames = _frames + int(daq.frame.frame[0]) 
@@ -145,10 +134,7 @@ class DynObj:
         else:
             heading = np.array(heading, ndmin=2)
             speed = np.array(speed, ndmin=2)
-
-            roll = rollpitch[0,:]
-            pitch = rollpitch[1,:]
-
+            
             # convert from indices to frames            
             frames = frame_indices + int(daq.frame.frame[0])
 
@@ -159,13 +145,10 @@ class DynObj:
 
         # calculate distance vector. At the first frame it is
         # defined, it has a distance of 0.
-        x, y, z = pos[0,:], pos[1,:], pos[2,:]
-        distance = np.cumsum(np.sqrt(np.diff(x)**2 + \
-                                     np.diff(y)**2 + \
-                                     np.diff(z)**2))        
+        distance = np.cumsum(np.sum(np.square(np.diff(pos)), axis=0))
         distance = np.concatenate(([0.], distance))
         distance = np.array(distance, ndmin=2)
-        
+
         # calculate relative distance to OwnVehicle
         #
         ###############################
@@ -210,9 +193,10 @@ class DynObj:
             d0s,imins = [],[]
             rand_indices = list(np.random.randint(low=0, high=m, size=(10,)))
             for ri in rand_indices:
-                dmin = np.sqrt((ov_pos[0,:]-x[ri])**2 + \
-                               (ov_pos[1,:]-y[ri])**2 + \
-                               (ov_pos[2,:]-z[ri])**2).flatten()
+                dmin = ov_pos - np.array(pos[:,ri], ndmin=2).T
+                dmin = np.square(dmin)
+                dmin = np.sum(dmin, axis=0)
+                dmin = np.sqrt(dmin)
                 
                 # index where OwnVeh is closest to the starting pos of the
                 # DynObject index is relative to the shorter DynObj arrays not

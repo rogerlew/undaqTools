@@ -1,0 +1,333 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Getting Started &mdash; undaqTools 0.2.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/scipy.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="undaqTools 0.2.0 documentation" href="index.html" />
+    <link rel="next" title="undaqTools.Daq" href="daq.html" />
+    <link rel="prev" title="Installation Instructions" href="install.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="daq.html" title="undaqTools.Daq"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="install.html" title="Installation Instructions"
+             accesskey="P">previous</a> |</li>
+<li><a href="index.html">undaqTools 0.2.0 documentation</a> &raquo;</li>
+ 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="getting-started">
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+<p>undaqTools uses the HDF5 (Hierarchical Data Format) data model
+to store the data contained within NAD&#8217;s DAQ files. An undaq.py
+script is provided aid in parallel batch processing DAQ files to
+HDF5. Once converted instances of undaqTools.Daq object can load
+the HDF5 files. Users can add their own analysis information to
+the Daq instances, write them to HDF5 and retrive them when
+needed.</p>
+<div class="section" id="daq-objects">
+<h2>Daq Objects<a class="headerlink" href="#daq-objects" title="Permalink to this headline">¶</a></h2>
+<p>Daq objects can be initialized in two ways. The first is to
+read the DAQ files directly.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">undaqTools</span> <span class="kn">import</span> <span class="n">Daq</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">daq</span> <span class="o">=</span> <span class="n">Daq</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">daq</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">daq_file</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Daq.read will also unpack and process any dynamic objects that might
+be present during the drive. This can be suppressed with the
+process_dynobjs keyword argument if so desired.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">daq</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">daq_file</span><span class="p">,</span> <span class="n">process_dynobjs</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The code attempts to find the relative headway distance between each
+dynamic object and the OwnVehicle (the driver). This requires some
+numerical optimization that extends the processing time. The additional
+time required depends on the number of dynamic objects in the drive.</p>
+<p>Once loaded, saving the hdf5 is as simple as:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">daq</span><span class="o">.</span><span class="n">write_hd5</span><span class="p">(</span><span class="n">hd5_file</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Once an HDF5 file has been saved it can be reloaded with:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">daq</span><span class="o">.</span><span class="n">read_hd5</span><span class="p">(</span><span class="n">hd5_file</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Reading HDF5 files is about 2 magnitude orders faster than reading
+DAQ files directly. To provide a means of inspecting DAQ files directly
+there is a stat function.</p>
+</div>
+<div class="section" id="undaqtools-stat">
+<h2>undaqTools.stat()<a class="headerlink" href="#undaqtools-stat" title="Permalink to this headline">¶</a></h2>
+<p>If you want to get metadata from a DAQ file but don&#8217;t have it converted
+to HDF5 you can use the undaqTools.stat() function to pull out the info
+metadata.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">undaqTools</span> <span class="kn">import</span> <span class="n">stat</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">info</span> <span class="o">=</span> <span class="n">stat</span><span class="p">(</span><span class="s">&#39;data reduction_20130204125617.daq&#39;</span><span class="p">)</span>
+<span class="go">Info(run=&#39;data reduction&#39;,</span>
+<span class="go">     runinst=&#39;20130204125617&#39;,</span>
+<span class="go">     title=&#39;Nads MiniSim&#39;,</span>
+<span class="go">     numentries=245,</span>
+<span class="go">     frequency=59,</span>
+<span class="go">     date=&#39;Mon Feb 04 12:56:17 2013\n&#39;,</span>
+<span class="go">     magic=&#39;7f4e3d2c&#39;,</span>
+<span class="go">     subject=&#39;part12&#39;,</span>
+<span class="go">     filename=&#39;data reduction_20130204125617.daq&#39;)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="accessing-data">
+<h2>Accessing Data<a class="headerlink" href="#accessing-data" title="Permalink to this headline">¶</a></h2>
+<p>Daq objects are dictionary objects. The keys coorespond to the
+NADS variable names in the DAQ files. The values are Element
+object instances. The Element class inherents numpy ndarrays
+and they are always 2 dimensional.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">daq</span><span class="p">[</span><span class="s">&#39;VDS_Veh_Speed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(1L, 10658L)</span>
+</pre></div>
+</div>
+<p>Because Element is a numpy.ndarray subclass they behave, for the
+most part, just like the plain old numpy arrays that you are
+(hopefully) use to.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">daq</span><span class="p">[</span><span class="s">&#39;VDS_Veh_Speed&#39;</span><span class="p">])</span>
+<span class="go">76.4363</span>
+</pre></div>
+</div>
+<p>There is some special functionality built into these Elements that
+we will get to later.</p>
+</div>
+<div class="section" id="daq-match-keys">
+<h2>Daq.match_keys()<a class="headerlink" href="#daq-match-keys" title="Permalink to this headline">¶</a></h2>
+<p>The DAQ files provide an almost overwhelming amount of data. When you
+first start getting acquainted with your driving simulator data it is
+easy to forget what contain the the things that you are interested in.
+The match_keys function makes this a little easier by allowing you to
+find keys that match Unix style wildcard patterns. The searches are
+case insensitive.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">daq</span><span class="o">.</span><span class="n">match_keys</span><span class="p">(</span><span class="s">&#39;*veh*dist*&#39;</span><span class="p">)</span>
+<span class="go">[u&#39;VDS_Veh_Dist&#39;, u&#39;SCC_OwnVeh_PathDist&#39;, u&#39;SCC_OwnVehToLeadObjDist&#39;]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="daq-etc-dict">
+<h2>Daq.etc &lt;<em>dict</em>&gt;<a class="headerlink" href="#daq-etc-dict" title="Permalink to this headline">¶</a></h2>
+<p>The data reductions are usually hypothesis driven. This means that we
+need to obtain dependent measures reflecting the conditions of independent
+variables. To perform the statistical analyses we need to keep track of
+these things as well as other metadata. Every Daq instance has an etc
+dictionary that can be used to store this metadata. Daq.write_hd5() will
+export the etc dict and Daq.read_hd5() will restore it.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">daq</span><span class="o">.</span><span class="n">etc</span><span class="p">[</span><span class="s">&#39;Gender&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;M&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">daq</span><span class="o">.</span><span class="n">etc</span><span class="p">[</span><span class="s">&#39;Factor1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">daq</span><span class="o">.</span><span class="n">etc</span><span class="p">[</span><span class="s">&#39;Factor2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;A&#39;</span><span class="p">,</span><span class="s">&#39;A&#39;</span><span class="p">,</span><span class="s">&#39;A&#39;</span><span class="p">,</span><span class="s">&#39;B&#39;</span><span class="p">,</span><span class="s">&#39;B&#39;</span><span class="p">,</span><span class="s">&#39;B&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Internal it is using repr() on every dict value to export and eval() to
+reload the values. This means you probably don&#8217;t want to load .hd5 files
+that come from an untrusted source.</p>
+</div>
+<div class="section" id="working-with-elements">
+<h2>Working with Elements<a class="headerlink" href="#working-with-elements" title="Permalink to this headline">¶</a></h2>
+<p>Element instances inherent numpy.ndarrays. They also keep track of the
+frames that their data represent. The frames are always a 1 dimensional
+and are aligned with the second axis of the Element&#8217;s data.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">veh_spd</span> <span class="o">=</span> <span class="n">daq</span><span class="p">[</span><span class="s">&#39;VDS_Veh_Speed&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">veh_spd</span><span class="o">.</span><span class="n">frames</span><span class="p">)</span>
+<span class="go">&lt;type &#39;numpy.ndarray&#39;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">veh_spd</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(10658L,)</span>
+</pre></div>
+</div>
+<p>Dynamic objects also contain attribute data as Elements and may only be
+present during a subset of the drive. Because the dynamic object data
+and the CSSDC measures are unaligned with the Elements it is not always
+possible or convenient to simply use indexes to slice Elements. We need
+to slice based on frames. This is possible with fslice()</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">daq</span><span class="p">[</span><span class="s">&#39;VDS_Veh_Speed&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="n">fslice</span><span class="p">(</span><span class="mi">4000</span><span class="p">,</span> <span class="mi">4010</span><span class="p">)]</span>
+<span class="go">Element(data = [ 42.17745972  42.3068924   42.4354744   42.56311417  42.68973923</span>
+<span class="go">                 42.81529999  42.93975449  43.06305313  43.18511963  43.3058815 ],</span>
+<span class="go">      frames = [4000 4001 4002 4003 4004 4005 4006 4007 4008 4009],</span>
+<span class="go">        name = &#39;VDS_Veh_Speed&#39;,</span>
+<span class="go">   numvalues = 1,</span>
+<span class="go">        rate = 1,</span>
+<span class="go"> varrateflag = False,</span>
+<span class="go">      nptype = float32)</span>
+</pre></div>
+</div>
+<p>As the reader can see from the string representation other metadata from
+the header block of the DAQ file gets attached to the Element.</p>
+</div>
+<div class="section" id="cssdc-elements">
+<h2>CSSDC Elements<a class="headerlink" href="#cssdc-elements" title="Permalink to this headline">¶</a></h2>
+<p>Many of the available measures are Change State Signal Detection (CSSDC)
+measures. they contains categorical data that only updates when a change
+in state is detected.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">daq</span><span class="p">[</span><span class="s">&#39;TPR_Tire_Surf_Type&#39;</span><span class="p">]</span>
+<span class="go">Element(data = [[11  1  1 11 11 11  1  1 11 11  3  3  3  3  3  3 11 11  1  1 11 11  1  1]</span>
+<span class="go">                [11  1  1 11 11 11  1  1 11 11 11 11  3  3 11 11 11 11  1  1 11 11  1  1]</span>
+<span class="go">                [11 11  1  1  1 11 11  1  1 11 11  3  3  3  3  3  3 11 11  1  1 11 11  1]</span>
+<span class="go">                [11 11  1  1 11 11 11  1  1 11 11 11 11  3  3 11 11 11 11  1  1 11 11  1]</span>
+<span class="go">                [ 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0]</span>
+<span class="go">                [ 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0]</span>
+<span class="go">                [ 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0]</span>
+<span class="go">                [ 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0]</span>
+<span class="go">                [ 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0]</span>
+<span class="go">                [ 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0]],</span>
+<span class="go">      frames = [ 2716  5519  5523  5841  5844  5845  7970  7973  8279  8284  8785  8791</span>
+<span class="go">                 8818  8824  9127  9132  9166  9171 10270 10274 10597 10600 12655 12659],</span>
+<span class="go">        name = &#39;TPR_Tire_Surf_Type&#39;,</span>
+<span class="go">   numvalues = 10,</span>
+<span class="go">        rate = -1 (CSSDC),</span>
+<span class="go"> varrateflag = False,</span>
+<span class="go">      nptype = int16)</span>
+</pre></div>
+</div>
+<p>The above example contains data pertaining to surface type for the 4 tires
+and has 6 unfilled rows for additional tires.</p>
+<p>All elements with a rate != 1 (as defined in the DAQ file) are considered
+CSSDC. We can check this with isCSSDC()</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">daq</span><span class="p">[</span><span class="s">&#39;TPR_Tire_Surf_Type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isCSSDC</span><span class="p">()</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">daq</span><span class="p">[</span><span class="s">&#39;VDS_Veh_Speed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isCSSDC</span><span class="p">()</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<p>Use findex() to get the state at a given frame (even if the frame is not defined)</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="c"># frame 5800 is not explictly defined</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">daq</span><span class="p">[</span><span class="s">&#39;TPR_Tire_Surf_Type&#39;</span><span class="p">][:</span><span class="mi">4</span><span class="p">,</span> <span class="n">findex</span><span class="p">(</span><span class="mi">5800</span><span class="p">)]</span>
+<span class="go">array( [[ 1],</span>
+<span class="go">        [ 1],</span>
+<span class="go">        [ 1],</span>
+<span class="go">        [ 1]], dtype=np.int16)</span>
+</pre></div>
+</div>
+<p>If you ask for a frame before the first defined frame you will get nan.
+If you ask for a frame after the last defined frame you will get the last
+frame.</p>
+<p>method it is easy to test whether an Element contains CSSDC data. The
+value at any frame between the first and last frame defined for a
+CSSDC Element can be obtained through slicing. This treats
+the data as categorical and always returns the last defined state.</p>
+</div>
+<div class="section" id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt><strong>The Absence of a Time is a Feature</strong></dt>
+<dd>Time is almost completly redundant with the frames data. Just start
+thinking in frames. It will soon become second nature. When you need
+time just divide the frames by the sampling rate.</dd>
+</dl>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Getting Started</a><ul>
+<li><a class="reference internal" href="#daq-objects">Daq Objects</a></li>
+<li><a class="reference internal" href="#undaqtools-stat">undaqTools.stat()</a></li>
+<li><a class="reference internal" href="#accessing-data">Accessing Data</a></li>
+<li><a class="reference internal" href="#daq-match-keys">Daq.match_keys()</a></li>
+<li><a class="reference internal" href="#daq-etc-dict">Daq.etc &lt;<em>dict</em>&gt;</a></li>
+<li><a class="reference internal" href="#working-with-elements">Working with Elements</a></li>
+<li><a class="reference internal" href="#cssdc-elements">CSSDC Elements</a></li>
+<li><a class="reference internal" href="#notes">Notes</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="install.html"
+                        title="previous chapter">Installation Instructions</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="daq.html"
+                        title="next chapter">undaqTools.Daq</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/gettingstarted.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<ul class="this-page-menu">
+  <li><a href="/numpy/docs/numpy-docs/gettingstarted.rst">Edit page</a></li>
+</ul>
+
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="daq.html" title="undaqTools.Daq"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="install.html" title="Installation Instructions"
+             >previous</a> |</li>
+<li><a href="index.html">undaqTools 0.2.0 documentation</a> &raquo;</li>
+ 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Roger Lew.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
