@@ -157,9 +157,16 @@ export the etc dict and Daq.read_hd5() will restore it.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">daq</span><span class="o">.</span><span class="n">etc</span><span class="p">[</span><span class="s">&#39;Factor2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;A&#39;</span><span class="p">,</span><span class="s">&#39;A&#39;</span><span class="p">,</span><span class="s">&#39;A&#39;</span><span class="p">,</span><span class="s">&#39;B&#39;</span><span class="p">,</span><span class="s">&#39;B&#39;</span><span class="p">,</span><span class="s">&#39;B&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
-<p>Internal it is using repr() on every dict value to export and eval() to
-reload the values. This means you probably don&#8217;t want to load .hd5 files
-that come from an untrusted source.</p>
+<p>The hdf5 file format is somewhat limited in the datatypes that it can store.
+To get data in and out of hdf5 repr is applied to the values and a modified
+version of ast.literal_eval is used to get the data back out. this is to
+avoid security vulnerabilities with untrusted hdf5 Daq representations (if
+eval was used). <strong>As a result only Python literal structures (strings, numbers,
+tuples, lists, dicts, booleans, and None) and undaqTools FrameSlice and
+FrameIndex objects can be stored.</strong> The code doesn&#8217;t check to see if the etc
+dict will export and import when the attribute changes. To get this to work
+you would have to interact with etc through getter and setter methods and it
+just doesn&#8217;t seem particularly worth the hassle.</p>
 </div>
 <div class="section" id="working-with-elements">
 <h2>Working with Elements<a class="headerlink" href="#working-with-elements" title="Permalink to this headline">¶</a></h2>
@@ -244,6 +251,33 @@ value at any frame between the first and last frame defined for a
 CSSDC Element can be obtained through slicing. This treats
 the data as categorical and always returns the last defined state.</p>
 </div>
+<div class="section" id="timeseries-plots">
+<h2>Timeseries Plots<a class="headerlink" href="#timeseries-plots" title="Permalink to this headline">¶</a></h2>
+<p>The Daq Class has some built-in visualization routines. Multipanel
+timeseries plots can be constructed with the plot_ts() method. The method
+takes a list of tuples containing the element names and row indices to
+plot. Each list argument becomes a subplot. The xindx keyword allows one
+to control the range of the x-axis across  all of the subplots.</p>
+<p>The code is smart enough to dynamically adjust its height as additional
+subplots are specified. It also knows to represent time series measures
+as step functions. The method returns a matplotlib.figure.Figure instance.</p>
+<p>Building a timeseries plot:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">elems_indxs</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&#39;CFS_Accelerator_Pedal_Position&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+               <span class="p">(</span><span class="s">&#39;SCC_Spline_Lane_Deviation&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+               <span class="p">(</span><span class="s">&#39;SCC_Spline_Lane_Deviation_Fixed&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+               <span class="p">(</span><span class="s">&#39;SCC_Spline_Lane_Deviation&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+               <span class="p">(</span><span class="s">&#39;VDS_Tire_Weight_On_Wheels&#39;</span><span class="p">,</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">4</span><span class="p">))]</span>
+
+<span class="n">daq</span> <span class="o">=</span> <span class="n">Daq</span><span class="p">()</span>
+<span class="n">daq</span><span class="o">.</span><span class="n">read_hd5</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&#39;data&#39;</span><span class="p">,</span> <span class="n">hdf5file</span><span class="p">))</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">daq</span><span class="o">.</span><span class="n">plot_ts</span><span class="p">(</span><span class="n">elems_indxs</span><span class="p">,</span> <span class="n">xindx</span><span class="o">=</span><span class="n">fslice</span><span class="p">(</span><span class="mi">6000</span><span class="p">,</span> <span class="bp">None</span><span class="p">))</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s">&#39;ts_plot.png&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Download
+[<a class="reference download internal" href="_downloads/ts_plot.png"><tt class="xref download docutils literal"><span class="pre">hi-res</span></tt></a>]</p>
+<img alt="ts_plot.png" class="align-center" src="_images/ts_plot.png" style="width: 750px;" />
+</div>
 <div class="section" id="notes">
 <h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
 <dl class="docutils">
@@ -271,6 +305,7 @@ time just divide the frames by the sampling rate.</dd>
 <li><a class="reference internal" href="#daq-etc-dict">Daq.etc &lt;<em>dict</em>&gt;</a></li>
 <li><a class="reference internal" href="#working-with-elements">Working with Elements</a></li>
 <li><a class="reference internal" href="#cssdc-elements">CSSDC Elements</a></li>
+<li><a class="reference internal" href="#timeseries-plots">Timeseries Plots</a></li>
 <li><a class="reference internal" href="#notes">Notes</a></li>
 </ul>
 </li>

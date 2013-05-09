@@ -3,10 +3,8 @@ Getting Started
 undaqTools uses the HDF5 (Hierarchical Data Format) data model 
 to store the data contained within NAD's DAQ files. An undaq.py
 script is provided aid in parallel batch processing DAQ files to
-HDF5. Once converted instances of undaqTools.Daq object can load 
-the HDF5 files. Users can add their own analysis information to 
-the Daq instances, write them to HDF5 and retrive them when 
-needed.
+HDF5. Once converted Daq instances can be loaded using the HDF5
+files in a fraction of the time. 
 
 Daq Objects
 ------------
@@ -19,15 +17,11 @@ read the DAQ files directly.
 >>> daq.read(daq_file)
 
 Daq.read will also unpack and process any dynamic objects that might
-be present during the drive. This can be suppressed with the 
+be present during the drive. This processing is computationally intensive 
+and about doubles the processing time. This can be suppressed with the 
 process_dynobjs keyword argument if so desired. 
 
 >>> daq.read(daq_file, process_dynobjs=False)
-
-The code attempts to find the relative headway distance between each 
-dynamic object and the OwnVehicle (the driver). This requires some 
-numerical optimization that extends the processing time. The additional 
-time required depends on the number of dynamic objects in the drive.
 
 Once loaded, saving the hdf5 is as simple as:
 
@@ -104,10 +98,16 @@ export the etc dict and Daq.read_hd5() will restore it.
 >>> daq.etc['Factor1'] = [ 10, 20, 10, 20, 10, 20]
 >>> daq.etc['Factor2'] = ['A','A','A','B','B','B']
 
-.. Warning::
-Internal it is using repr() on every dict value to export and eval() to 
-reload the values. This means you probably don't want to load .hd5 files 
-that come from an untrusted source. 
+The hdf5 file format is somewhat limited in the datatypes that it can store.
+To get data in and out of hdf5 repr is applied to the values and a modified
+version of ast.literal_eval is used to get the data back out. this is to 
+avoid security vulnerabilities with untrusted hdf5 Daq representations (if
+eval was used). **As a result only Python literal structures (strings, numbers, 
+tuples, lists, dicts, booleans, and None) and undaqTools FrameSlice and 
+FrameIndex objects can be stored.** The code doesn't check to see if the etc
+dict will export and import when the attribute changes. To get this to work
+you would have to interact with etc through getter and setter methods and it
+just doesn't seem particularly worth the hassle.
 
 Working with Elements
 ----------------------
@@ -196,9 +196,37 @@ the data as categorical and always returns the last defined state.
 
 Timeseries Plots
 -----------------
+The Daq Class has some built-in visualization routines. Multipanel
+timeseries plots can be constructed with the plot_ts() method. The method
+takes a list of tuples containing the element names and row indices to 
+plot. Each list argument becomes a subplot. The xindx keyword allows one
+to control the range of the x-axis across  all of the subplots. 
 
->>> fig = daq.plot_ts([('VDS_Veh_Speed', 0)])
+The code is smart enough to dynamically adjust its height as additional
+subplots are specified. It also knows to represent time series measures 
+as step functions. The method returns a matplotlib.figure.Figure instance.
 
+Building a timeseries plot::
+
+    elems_indxs = [('CFS_Accelerator_Pedal_Position', 0),
+                   ('SCC_Spline_Lane_Deviation', 1),
+                   ('SCC_Spline_Lane_Deviation_Fixed', 0),
+                   ('SCC_Spline_Lane_Deviation', 3),
+                   ('VDS_Tire_Weight_On_Wheels', slice(0,4))]
+                 
+    daq = Daq()
+    daq.read_hd5(os.path.join('data', hdf5file))
+    fig = daq.plot_ts(elems_indxs, xindx=fslice(6000, None))
+    fig.savefig('ts_plot.png')
+
+Download 
+[:download:`hi-res <_static/ts_plot.png>`]
+
+.. image:: _static/ts_plot.png 
+    :width: 750px
+    :align: center
+    :alt: ts_plot.png
+    
 Notes
 -----
 **The Absence of a Time is a Feature**

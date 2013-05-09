@@ -359,8 +359,8 @@ class Test_hd5(unittest.TestCase):
 def suite():
     return unittest.TestSuite((
             unittest.makeSuite(Test_load),
-##            unittest.makeSuite(Test_mat),
-##            unittest.makeSuite(Test_hd5)
+            unittest.makeSuite(Test_mat),
+            unittest.makeSuite(Test_hd5)
                               ))
 
 if __name__ == "__main__":

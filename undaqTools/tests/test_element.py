@@ -94,7 +94,7 @@ class Test_setitem(unittest.TestCase):
                     
         rs = [[-2016.,-1599.,4677.,983.,-1011.,174.,-850.,-434.,76.]]
         
-        x[:,:] = rs
+        x[:,:] = detrend(x)
         assert_array_equal(rs, x)
         assert_array_equal(range(3000, 3009), x.frames)
         

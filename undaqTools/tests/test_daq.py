@@ -3,6 +3,8 @@ from __future__ import print_function
 # Copyright (c) 2013, Roger Lew
 # All rights reserved.
 
+from collections import OrderedDict
+
 import time
 import glob
 
@@ -10,7 +12,7 @@ import os
 import unittest
 
 from undaqTools.daq import Daq, stat, Info
-from undaqTools.element import Element, fslice, FrameSlice
+from undaqTools.element import Element, fslice, FrameSlice, findex, FrameIndex
 
 test_file = 'data reduction_20130204125617.daq'
 
@@ -49,24 +51,19 @@ class Test_match_keys(unittest.TestCase):
         
         self.assertEqual(''.join(ds), ''.join(rs))
         
-        import numpy as np
-        print(type(daq['VDS_Veh_Speed'].frames))
-        print(daq['VDS_Veh_Speed'].frames.shape)
-        print(daq['VDS_Veh_Speed'][0, fslice(4000, 4010)])
         
-#        
-#    def test1(self):
-#        global test_file
-#        hdf5file = test_file[:-4]+'.hdf5'
-#        hdf5file = os.path.join('data', hdf5file)
-#
-#        rs = ['SCC_LogStreams']
-#        
-#        daq = Daq()
-#        daq.read_hd5(hdf5file)
-#        ds = daq.match_keys('*logstream*')
-#        
-#        self.assertEqual(''.join(ds), ''.join(rs))
+    def test1(self):
+        global test_file
+        hdf5file = test_file[:-4]+'.hdf5'
+        hdf5file = os.path.join('data', hdf5file)
+
+        rs = ['SCC_LogStreams']
+        
+        daq = Daq()
+        daq.read_hd5(hdf5file)
+        ds = daq.match_keys('*logstream*')
+        
+        self.assertEqual(''.join(ds), ''.join(rs))
 
 
 class Test_etc(unittest.TestCase):
@@ -80,14 +77,12 @@ class Test_etc(unittest.TestCase):
             os.remove(tmp_file)
             
     def test0(self):
-        global test_file
-        
         daq = Daq()
         
         daq.etc['a'] = 1
         daq.etc['b'] = [1,3]        
         daq.etc['c'] = "this is a string"
-        daq.etc['d'] = fslice(666)
+        daq.etc['d'] = findex(666)
         daq.etc['d'] = {1: fslice(100, 200),
                         2: fslice(200, 300)}
         daq.write_hd5('./tmp/etctest.hdf5')
@@ -155,11 +150,11 @@ class Test_load_elemlist_fromfile(unittest.TestCase):
         
 def suite():
     return unittest.TestSuite((
-#            unittest.makeSuite(Test_stat),
-            unittest.makeSuite(Test_match_keys),
-#            unittest.makeSuite(Test_etc),
-#            unittest.makeSuite(Test_setitem),
-#            unittest.makeSuite(Test_load_elemlist_fromfile),
+##            unittest.makeSuite(Test_stat),
+##            unittest.makeSuite(Test_match_keys),
+            unittest.makeSuite(Test_etc),
+##            unittest.makeSuite(Test_setitem),
+##            unittest.makeSuite(Test_load_elemlist_fromfile),
                               ))
 
 if __name__ == "__main__":

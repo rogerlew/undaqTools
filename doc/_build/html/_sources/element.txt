@@ -6,4 +6,4 @@ undaqTools.Element
 
 .. autoclass:: undaqTools.Element
 
-.. autofunction:: undaqTools.frame_range
+.. autofunction:: undaqTools.fslice

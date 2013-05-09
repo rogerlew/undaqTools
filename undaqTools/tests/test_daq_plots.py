@@ -8,7 +8,7 @@ import os
 import time
 import unittest
 
-from undaqTools import Daq, fslice
+from undaqTools import Daq, frame_range
     
 test_file = 'data reduction_20130204125617.daq'
 
@@ -59,7 +59,7 @@ class Test_plot(unittest.TestCase):
         daq = Daq()
         daq.read_hd5(os.path.join('data', hdf5file))
 #        print(daq['VDS_Tire_Weight_On_Wheels'].frames.shape)
-        fig = daq.plot_ts(elems_indxs, fslice(6000, None))
+        fig = daq.plot_ts(elems_indxs, frame_range(6000, None))
         fig.savefig('./output/daq_plots_test.png')
 
 def suite():
