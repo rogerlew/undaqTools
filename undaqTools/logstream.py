@@ -17,11 +17,12 @@ def find_epochs(stream):
     
     Returns
     -------
-    returns a OrderedDict of FrameSlice objects
+    fsdict : dict
+        dict of FrameSlice instances
     
     See also
     --------
-    Frameslice
+    FrameSlice
     
     Notes
     -----    
@@ -29,6 +30,7 @@ def find_epochs(stream):
     
     Assumes that each epoch only occurs once. Raises RuntimeError if a 
     non-zero  epoch state occurs more than once.
+
     """
 
     if not isinstance(stream, Element):

@@ -1,22 +1,14 @@
 .. undaqTools documentation master file
 
 .. currentmodule:: undaqTools
-
-.. toctree::
-   :hidden:
-   
-   install
-   gettingstarted
-   daq
-   element
-   
    
 ==========================================================
-undaqTools [*uhn-dak-tools*] The Unofficial NADS Daq API
+undaqTools [*uhn-dak-tools*] 
 ==========================================================
 
-undaqTools is a pythonic interface to the National Advanced
-Driving Simulator (NADS) Data AcQuisition (DAQ) files.
+undaqTools is the the unofficial pythonic interface to the 
+National Advanced Driving Simulator (NADS) Data AcQuisition 
+(DAQ) files.
 
 undaqTools (unofficial) vs. ndaqTools (official)
 ------------------------------------------------
@@ -103,13 +95,19 @@ decide how to best utilize their data.
       | + write_mat()
       | ...
       
-Installation
-------------
 
-View the :doc:`install`
+Table of Contents
+-----------------
+.. toctree::
+   
+   install
+   gettingstarted
+   daq
+   element
+   fslice
+   findex
+   dynobj
+   logstream
+   steeringentropy
 
-API
-==================
-
-* :doc:`daq`
-* :doc:`element`
+   

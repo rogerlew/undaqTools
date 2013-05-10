@@ -7,6 +7,7 @@ import glob
 import os
 import time
 import unittest
+import warnings
 
 import numpy as np
 from numpy.testing import assert_array_equal, \
@@ -66,57 +67,65 @@ class Test_load(unittest.TestCase):
         for tmp_file in tmp_files:
             os.remove(tmp_file)
 
-##    def test_load(self):
-##        global test_file
-##        
-##        daq = Daq()
-##        daq.read(os.path.join('data', test_file))
-##
-##        old_daq = old_convert_daq.read_file(os.path.join('data', test_file))
-##        self.__assert_old_daq_equals_daq(old_daq, daq)
-##
-##    def test_load_with_elemlist(self):
-##        global test_file
-##        
-##        daq = Daq()
-##        daq.load_elemlist_fromfile('elemList2.txt')
-##        daq.read(os.path.join('data', test_file))
-##        
-##        old_daq = old_convert_daq.read_file(os.path.join('data', test_file), 
-##                                            elemfile='elemList2.txt')
-##
-##        self.__assert_old_daq_equals_daq(old_daq, daq)
-##
-##    def test_load_with_wcelemlist(self):
-##        global test_file
-##        rs = ['VDS_Veh_Dynamic_Pres',
-##              'SCC_DynObj_CvedId',
-##              'VDS_Veh_Eng_RPM',
-##              'SCC_DynObj_RollPitch',
-##              'SCC_DynObj_ColorIndex',
-##              'VDS_Veh_Eng_Torque',
-##              'SCC_DynObj_AudioVisualState',
-##              'SCC_DynObj_Vel',
-##              'SCC_DynObj_DataSize',
-##              'VDS_Veh_Dist',
-##              'VDS_Veh_Heading',
-##              'SCC_DynObj_HcsmType',
-##              'SCC_DynObj_SolId',
-##              'SCC_DynObj_Pos',
-##              'VDS_Veh_Speed',
-##              'SCC_DynObj_Heading',
-##              'SCC_DynObj_Name']
-##        
-##        daq = Daq()
-##        daq.read(os.path.join('data', test_file),
-##                 elemlist=['VDS_Veh*','SCC_Dyn*'])
-##        
-##        assert_array_equal(rs, daq.keys())
+    def test_load(self):
+        global test_file
+        
+        daq = Daq()
+        daq.read(os.path.join('data', test_file))
+
+        old_daq = old_convert_daq.read_file(os.path.join('data', test_file))
+        self.__assert_old_daq_equals_daq(old_daq, daq)
+
+    def test_load_with_elemlist(self):
+        global test_file
+        
+        daq = Daq()
+        daq.load_elemlist_fromfile('elemList2.txt')
+
+        # something about nose makes catching the warnings not work
+        with warnings.catch_warnings(record=True) as w:
+            daq.read(os.path.join('data', test_file))
+
+        old_daq = old_convert_daq.read_file(os.path.join('data', test_file), 
+                                            elemfile='elemList2.txt')
+
+        self.__assert_old_daq_equals_daq(old_daq, daq)
+
+    def test_load_with_wcelemlist(self):
+        global test_file
+        rs = ['VDS_Veh_Dynamic_Pres',
+              'SCC_DynObj_CvedId',
+              'VDS_Veh_Eng_RPM',
+              'SCC_DynObj_RollPitch',
+              'SCC_DynObj_ColorIndex',
+              'VDS_Veh_Eng_Torque',
+              'SCC_DynObj_AudioVisualState',
+              'SCC_DynObj_Vel',
+              'SCC_DynObj_DataSize',
+              'VDS_Veh_Dist',
+              'VDS_Veh_Heading',
+              'SCC_DynObj_HcsmType',
+              'SCC_DynObj_SolId',
+              'SCC_DynObj_Pos',
+              'VDS_Veh_Speed',
+              'SCC_DynObj_Heading',
+              'SCC_DynObj_Name']
+        
+        daq = Daq()
+        daq.read(os.path.join('data', test_file),
+                 elemlist=['VDS_Veh*','SCC_Dyn*']) 
+            
+        assert_array_equal(rs, daq.keys())
 
     def test_load_partial(self):
         global test_file
 
-##        old_daq = old_convert_daq.read_file(os.path.join('data', partial))
+        try:
+            with open(os.path.join('data', partial)):
+                pass
+        except:
+            return
+        
         daq = Daq()
         daq.read(os.path.join('data', partial))
 
@@ -210,7 +219,8 @@ class Test_mat(unittest.TestCase):
         matfile2 = os.path.join('tmp', test_file[:-4]+'2.mat')
         
         daq = Daq()
-        daq.read(os.path.join('data', test_file))
+        daq.read(os.path.join('data', test_file),
+                 process_dynobjs=False)
         daq.write_mat(matfile)
         del daq
         daqmat = sio.loadmat(matfile)
@@ -227,7 +237,17 @@ class Test_mat(unittest.TestCase):
         
         daq = Daq()
         daq.load_elemlist_fromfile('elemList2.txt')
-        daq.read(os.path.join('data', test_file))
+
+        with warnings.catch_warnings(record=True) as w:
+            
+            daq.read(os.path.join('data', test_file),
+                     process_dynobjs=False)
+
+            msg = "Need 'SCC_Spline_Lane_Deviation' to fix lane "\
+                  "deviation (did not fix lane deviation)"
+                  
+            self.assertEqual(msg, str(w[0].message))
+            
         daq.write_mat(matfile)
         del daq
         daqmat = sio.loadmat(matfile)
@@ -304,7 +324,18 @@ class Test_hd5(unittest.TestCase):
         
         daq = Daq()
         daq.load_elemlist_fromfile('elemList2.txt')
-        daq.read(os.path.join('data', test_file))
+        with warnings.catch_warnings(record=True) as w:
+            daq.read(os.path.join('data', test_file)) 
+            
+            msg = "Need 'SCC_Spline_Lane_Deviation' to fix lane "\
+                  "deviation (did not fix lane deviation)"
+                  
+            self.assertEqual(msg, str(w[0].message))
+            
+            msg = "Need 'SCC_DynObj*' to build dynobjs (did not build dynobjs)"
+                  
+            self.assertEqual(msg, str(w[1].message))
+                              
         daq.write_hd5(hdf5file)
 
         daq2 = Daq()
@@ -318,7 +349,9 @@ class Test_hd5(unittest.TestCase):
                 
         daq = Daq()
         daq.load_elemlist_fromfile('elemList2.txt')
-        daq.read(os.path.join('data', test_file))
+        with warnings.catch_warnings(record=True) as w:
+            daq.read(os.path.join('data', test_file)) 
+                              
         daq.write_hd5(hdf5file)
 
         daq2 = Daq()
@@ -332,7 +365,9 @@ class Test_hd5(unittest.TestCase):
         
         daq = Daq()
         daq.load_elemlist_fromfile('elemList2.txt')
-        daq.read(os.path.join('data', test_file))
+        with warnings.catch_warnings(record=True) as w:
+            daq.read(os.path.join('data', test_file)) 
+                              
         daq.write_hd5(hdf5file)
 
         daq2 = Daq()
@@ -356,8 +391,8 @@ class Test_hd5(unittest.TestCase):
 def suite():
     return unittest.TestSuite((
             unittest.makeSuite(Test_load),
-##            unittest.makeSuite(Test_mat),
-##            unittest.makeSuite(Test_hd5)
+            unittest.makeSuite(Test_mat),
+            unittest.makeSuite(Test_hd5)
                               ))
 
 if __name__ == "__main__":

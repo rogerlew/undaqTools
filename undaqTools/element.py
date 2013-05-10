@@ -13,35 +13,36 @@ from undaqTools.misc.base import _size_lookup, \
 FrameSlice = _namedtuple_factory('FrameSlice', ['start', 'stop', 'step'], 
                                  docstring= \
     """
-    Create a FrameSlice object for slicing Element instances
-    
-    Parameters
-    ----------
-    start : int or None
-        starting frame
-        
-    stop : int
-        endng frame
-        
-    step : int or None
-    
+    Immutable FrameSlice object for slicing Element instances
     """)
 
 FrameIndex = _namedtuple_factory('Index', ['frame'], 
                                  docstring= \
     """
-    Create a FrameIndex object for indexing Element instances
-    
-    Parameters
-    ----------
-    indx : int
-        reference frame
-    
+    Immutable FrameIndex object for indexing Element instances
     """)
     
 def fslice(*args):
     """
     fslice([start,] stop[, step])
+
+    generates an immutable FrameSlice Instance
+    
+    Parameters
+    ----------
+
+    start : int or None, optional
+        start frame
+
+    stop : int or None
+        stop frame
+
+    step : into or None, optional
+        steps between frames
+
+    Returns
+    -------
+    fs : FrameSlice
     """
     start, stop, step = None, None, None
         
@@ -59,24 +60,73 @@ def fslice(*args):
 def findex(frame):
     """
     findex(frame)
+
+    generates an immutable FrameIndex Instance
+    
+    Parameters
+    ----------
+
+    frame : int
+        frame to index
+
+    Returns
+    -------
+    findx : FrameIndex
     """
     return FrameIndex(frame)
 
 
 class Element(np.ndarray, object):
-    def __new__(cls, data, frames, 
-                rate=None, name=None, 
-                dtype=None, varrateflag=0, 
-                elemid=None, units='', order=None):
+    """
+    Container to hold NADS DAQ cell data
+    """
+    def __new__(cls, data, frames, **kwds):
         """
-       Creates a new Element from scratch.
-
-        Developer Notes
-        ---------------
-        |   subclassing Numpy objects are a little different from subclassing 
-        |   other objects.
-        |   see: http://docs.scipy.org/doc/numpy/user/basics.subclassing.html
+        Element(data, frames[, **kwds])
+        
+        Create a new Element instance.
+        
+        Parameters
+        ----------
+        data : array_like
+            shape should be (numvalues X number of samples)
+        
+        frames : array_like
+            shape should be (number of samples,)
+            
+        rate : int, optional
+            specifies whether measure is CSSDC
+        
+        name : string, optional
+            specifies the name of the cell
+            
+        dtype : string or numpy type, optional
+            type of data
+            
+        varrateflag : int, optional
+            specifies whether data is collected at a variable rate
+            
+        elemid : int, optional
+            specifies index in _header dict. Important in the MATLAB
+            toolkit ndaqTools. Not so important here.
+            
+        units : string
+             should probably be a list cooresponding 
+             to the rows or a string depending on the cell
+             
+        order : string
+            specifies the column order. Needed to write the
+            mat files. Shouldn't be important to most end users.
+             
+        See Also
+        --------
+        :doc:`fslice` : FrameSlice factory for slicing Element by frames
+        :doc:`findex` : FrameIndex factory for indexing Element by a frame
         """
+        
+        dtype = kwds.get('dtype', None)
+        order = kwds.get('order', None)
+        
         # array can handle the letter dtypes, as well as None and the np.type
         # objects
         obj = np.array(data, ndmin=2, dtype=dtype, order=order).view(cls)
@@ -87,11 +137,11 @@ class Element(np.ndarray, object):
         
         # set or find other attributes
         obj.numvalues = obj.shape[0]
-        obj.name = name
-        obj.id = elemid   
-        obj.units = units
-        obj.varrateflag = varrateflag
-        
+        obj.name = kwds.get('name', None)
+        obj.id = kwds.get('elemid', None)   
+        obj.units = kwds.get('units', '')
+        obj.varrateflag = kwds.get('varrateflag', 0)
+
         obj.type, obj.nptype == None, None 
         if dtype is None:
             obj.nptype = obj.dtype
@@ -108,6 +158,7 @@ class Element(np.ndarray, object):
         
         obj.bytes = _size_lookup[obj.type]
         
+        rate = kwds.get('rate', None)
         if rate is None:
             if obj.frames[-1] - obj.frames[0] > len(obj.frames):
                 # missing frames
@@ -137,18 +188,26 @@ class Element(np.ndarray, object):
     def __getitem__(self, indx):
         """
         Return the item described by indx, as an Element
+        
+        elem.__getitem__(indx) <==> elem[indx]
 
-           args:
-              indx: index to array
-                    can be int, tuple(int, int), tuple(slice, int),
-                    tuple(int, slice) or tuple(slice, slice)
+        Parameters
+        ----------
+        indx : None, int, slice, tuple
+            first arg of tuple must be None, int, or slice object.
+            second arg can also be a FrameSlice or FrameIndex instance            
+            
+        Returns
+        -------
+        view : Element or possibly float
+            the requested data
+            
+            when Element is a CSSDC measure and a FrameIndex is supplied:
 
-                    x[int] <==> x[int,:]
-
-           returns:
-              indexed Element
-
-        |   x.__getitem__(indx) <==> x[indx]
+            If frame is not defined it returns the last defined state.
+            If shape of the state is (1,1) the state is returned as a scalar.
+            If frame < elem.frames[0] then nan is returned.
+        
         """
         # if a tuple is specified we need to check the second index to see
         # if it is a FrameSlice object. If it is, we need to figure out the
@@ -231,6 +290,19 @@ class Element(np.ndarray, object):
     def toarray(self, ndmin=1, order=None):
         """
         cast data to plain old numpy array
+        
+        Parameters
+        ----------
+        ndmin : int
+            the minimum dimension of the resulting array
+            
+        order : None or string
+            the column order of the resulting array
+            
+        Returns
+        -------
+        x : np.ndarray
+            the Element data as a numpy array
         """
         return np.array(self, ndmin=ndmin, order=order)
 
@@ -277,4 +349,13 @@ class Element(np.ndarray, object):
                             .replace('array', 'np.array')
 
     def isCSSDC(self):
+        """
+        evaluates whether element is a CSSDC measure
+        
+        Returns
+        -------
+        answer : bool
+            True if it is a CSSDC measure, False otherwise
+        """
         return self.rate != 1
+        

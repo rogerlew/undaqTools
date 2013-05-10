@@ -1,13 +1,58 @@
 Getting Started
 ==========================
 undaqTools uses the HDF5 (Hierarchical Data Format) data model 
-to store the data contained within NAD's DAQ files. An undaq.py
-script is provided aid in parallel batch processing DAQ files to
-HDF5. Once converted instances of undaqTools.Daq object can load 
-the HDF5 files. Users can add their own analysis information to 
-the Daq instances, write them to HDF5 and retrive them when 
-needed.
+to store the data contained within NAD's DAQ files. The undaq.py
+script allows you to parallel batch processing DAQ files to
+HDF5. Once converted Daq instances can be loaded from HDF5 in a 
+fraction of the time. 
 
+undaq.py
+--------
+Ussage is pretty straight forward. You give it a wild card argument and it
+searches for daq files that meet that wildcard. For example you wish to 
+convert all daq files in the current directory::
+
+    $ undaq.py *
+    
+If each participant has there own folder from parent folder you could
+specify::
+
+    $ undaq.py */*
+    
+By default undaq will only run with 1 cpu. If you wish to convert daqs
+in parallel use the -n or --numcpu flag::
+
+    $ undaq.py */* -n 6
+    
+This would tell undaq to convert all the daq files one level down using
+6 cores. Keep in mind you might run out of memory before you run out of
+CPU cores. Even the fastest computers don't work very well when they 
+run out of memory!
+
+By default undaq.py will only convert daq files that haven't already been
+converted to hdf5. The idea being that you will probably be incrementally 
+looking at the data as you accumulate participants. If you need to rebuild
+all of the hdf5 files you can use the -r or --rebuild flag.::
+
+    $ undaq.py */* -n 6 -r
+    
+if you want to output mat files for ndaqTools you can use -o mat or 
+--output mat::
+
+    $ undaq.py */* -n 6 -o mat
+    
+lastly there is a flag print debugging information -d or --debug::
+ 
+    $ undaq.py */* -n 6 -d
+    
+There are multiple level of error checking so the batch processing should
+never completely fail (knock-on-wood, don't forget the caveat about memory
+ussage), but sometimes warnings might get thrown if the daq is missing 
+frames or ends abruptly. When these things occur undaq does its best to
+fix what went wrong and make the interaction with the Daq files consistent.
+To make the output more readable these warnings are suppressed until the 
+batch processing has finished and only display if in debug mode.
+    
 Daq Objects
 ------------
 
@@ -19,15 +64,11 @@ read the DAQ files directly.
 >>> daq.read(daq_file)
 
 Daq.read will also unpack and process any dynamic objects that might
-be present during the drive. This can be suppressed with the 
+be present during the drive. This processing is computationally intensive 
+and about doubles the processing time. This can be suppressed with the 
 process_dynobjs keyword argument if so desired. 
 
 >>> daq.read(daq_file, process_dynobjs=False)
-
-The code attempts to find the relative headway distance between each 
-dynamic object and the OwnVehicle (the driver). This requires some 
-numerical optimization that extends the processing time. The additional 
-time required depends on the number of dynamic objects in the drive.
 
 Once loaded, saving the hdf5 is as simple as:
 
@@ -41,7 +82,7 @@ Reading HDF5 files is about 2 magnitude orders faster than reading
 DAQ files directly. To provide a means of inspecting DAQ files directly
 there is a stat function.
 
-undaqTools.stat()
+stat()
 ------------------
 If you want to get metadata from a DAQ file but don't have it converted
 to HDF5 you can use the undaqTools.stat() function to pull out the info
@@ -233,9 +274,8 @@ Download
     :align: center
     :alt: ts_plot.png
     
-Notes
------
-**The Absence of a Time is a Feature**
-    Time is almost completly redundant with the frames data. Just start 
-    thinking in frames. It will soon become second nature. When you need 
-    time just divide the frames by the sampling rate.
+Lastly: The Absence of a Time is a Feature
+-------------------------------------------
+Time is almost completly redundant with the frames data. Just start 
+thinking in frames. It will soon become second nature. When you need 
+time just divide the frames by the sampling rate.

@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>undaqTools.Element &mdash; undaqTools 0.2.0 documentation</title>
+    <title>Element &mdash; undaqTools 0.2.0 documentation</title>
     
     <link rel="stylesheet" href="_static/scipy.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -26,7 +26,8 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="undaqTools 0.2.0 documentation" href="index.html" />
-    <link rel="prev" title="undaqTools.Daq" href="daq.html" /> 
+    <link rel="next" title="fslice" href="fslice.html" />
+    <link rel="prev" title="Daq" href="daq.html" /> 
   </head>
   <body>
     <div class="related">
@@ -36,7 +37,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="daq.html" title="undaqTools.Daq"
+          <a href="fslice.html" title="fslice"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="daq.html" title="Daq"
              accesskey="P">previous</a> |</li>
 <li><a href="index.html">undaqTools 0.2.0 documentation</a> &raquo;</li>
  
@@ -48,18 +52,152 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="undaqtools-element">
-<h1>undaqTools.Element<a class="headerlink" href="#undaqtools-element" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="element">
+<h1>Element<a class="headerlink" href="#element" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="undaqTools.Element">
 <em class="property">class </em><tt class="descclassname">undaqTools.</tt><tt class="descname">Element</tt><a class="headerlink" href="#undaqTools.Element" title="Permalink to this definition">¶</a></dt>
-<dd><p class="rubric">Methods</p>
+<dd><p>Container to hold NADS DAQ cell data</p>
+<p class="rubric">Methods</p>
+<dl class="staticmethod">
+<dt id="undaqTools.Element.__new__">
+<em class="property">static </em><tt class="descname">__new__</tt><big>(</big><em>data</em>, <em>frames</em><span class="optional">[</span>, <em>**kwds</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#undaqTools.Element.__new__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new Element instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>data</strong> : array_like</p>
+<blockquote>
+<div><p>shape should be (numvalues X number of samples)</p>
+</div></blockquote>
+<p><strong>frames</strong> : array_like</p>
+<blockquote>
+<div><p>shape should be (number of samples,)</p>
+</div></blockquote>
+<p><strong>rate</strong> : int, optional</p>
+<blockquote>
+<div><p>specifies whether measure is CSSDC</p>
+</div></blockquote>
+<p><strong>name</strong> : string, optional</p>
+<blockquote>
+<div><p>specifies the name of the cell</p>
+</div></blockquote>
+<p><strong>dtype</strong> : string or numpy type, optional</p>
+<blockquote>
+<div><p>type of data</p>
+</div></blockquote>
+<p><strong>varrateflag</strong> : int, optional</p>
+<blockquote>
+<div><p>specifies whether data is collected at a variable rate</p>
+</div></blockquote>
+<p><strong>elemid</strong> : int, optional</p>
+<blockquote>
+<div><p>specifies index in _header dict. Important in the MATLAB
+toolkit ndaqTools. Not so important here.</p>
+</div></blockquote>
+<p><strong>units</strong> : string</p>
+<blockquote>
+<div><p>should probably be a list cooresponding 
+to the rows or a string depending on the cell</p>
+</div></blockquote>
+<p><strong>order</strong> : string</p>
+<blockquote class="last">
+<div><p>specifies the column order. Needed to write the
+mat files. Shouldn&#8217;t be important to most end users.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<dl class="last docutils">
+<dt><a class="reference internal" href="fslice.html"><em>fslice</em></a></dt>
+<dd>FrameSlice factory for slicing Element by frames</dd>
+<dt><a class="reference internal" href="findex.html"><em>findex</em></a></dt>
+<dd>FrameIndex factory for indexing Element by a frame</dd>
+</dl>
+</div>
 </dd></dl>
 
-<dl class="function">
-<dt id="undaqTools.fslice">
-<tt class="descclassname">undaqTools.</tt><tt class="descname">fslice</tt><big>(</big><span class="optional">[</span><em>start</em><span class="optional">]</span>, <em>stop</em><span class="optional">[</span>, <em>step</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#undaqTools.fslice" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dl class="method">
+<dt id="undaqTools.Element.__getitem__">
+<tt class="descname">__getitem__</tt><big>(</big><em>indx</em><big>)</big><a class="headerlink" href="#undaqTools.Element.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the item described by indx, as an Element</p>
+<p>elem.__getitem__(indx) &lt;==&gt; elem[indx]</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>indx</strong> : None, int, slice, tuple</p>
+<blockquote>
+<div><p>first arg of tuple must be None, int, or slice object.
+second arg can also be a FrameSlice or FrameIndex instance</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>view</strong> : Element or possibly float</p>
+<blockquote class="last">
+<div><p>the requested data</p>
+<p>when Element is a CSSDC measure and a FrameIndex is supplied:</p>
+<p>If frame is not defined it returns the last defined state.
+If shape of the state is (1,1) the state is returned as a scalar.
+If frame &lt; elem.frames[0] then nan is returned.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="undaqTools.Element.toarray">
+<tt class="descname">toarray</tt><big>(</big><em>ndmin=1</em>, <em>order=None</em><big>)</big><a class="headerlink" href="#undaqTools.Element.toarray" title="Permalink to this definition">¶</a></dt>
+<dd><p>cast data to plain old numpy array</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>ndmin</strong> : int</p>
+<blockquote>
+<div><p>the minimum dimension of the resulting array</p>
+</div></blockquote>
+<p><strong>order</strong> : None or string</p>
+<blockquote>
+<div><p>the column order of the resulting array</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>x</strong> : np.ndarray</p>
+<blockquote class="last">
+<div><p>the Element data as a numpy array</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="undaqTools.Element.isCSSDC">
+<tt class="descname">isCSSDC</tt><big>(</big><big>)</big><a class="headerlink" href="#undaqTools.Element.isCSSDC" title="Permalink to this definition">¶</a></dt>
+<dd><p>evaluates whether element is a CSSDC measure</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>answer</strong> : bool</p>
+<blockquote class="last">
+<div><p>True if it is a CSSDC measure, False otherwise</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
 
 </div>
 
@@ -71,7 +209,10 @@
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
   <p class="topless"><a href="daq.html"
-                        title="previous chapter">undaqTools.Daq</a></p>
+                        title="previous chapter">Daq</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="fslice.html"
+                        title="next chapter">fslice</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/element.txt"
@@ -106,7 +247,10 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="daq.html" title="undaqTools.Daq"
+          <a href="fslice.html" title="fslice"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="daq.html" title="Daq"
              >previous</a> |</li>
 <li><a href="index.html">undaqTools 0.2.0 documentation</a> &raquo;</li>
  

@@ -1,0 +1,352 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>steeringentropy &mdash; undaqTools 0.2.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/scipy.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="undaqTools 0.2.0 documentation" href="index.html" />
+    <link rel="prev" title="logstream" href="logstream.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="logstream.html" title="logstream"
+             accesskey="P">previous</a> |</li>
+<li><a href="index.html">undaqTools 0.2.0 documentation</a> &raquo;</li>
+ 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="steeringentropy">
+<h1>steeringentropy<a class="headerlink" href="#steeringentropy" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="undaqTools.steeringentropy.SteeringEntropyModel">
+<em class="property">class </em><tt class="descclassname">undaqTools.steeringentropy.</tt><tt class="descname">SteeringEntropyModel</tt><big>(</big><em>**kwds</em><big>)</big><a class="headerlink" href="#undaqTools.steeringentropy.SteeringEntropyModel" title="Permalink to this definition">¶</a></dt>
+<dd><p class="rubric">Methods</p>
+<dl class="method">
+<dt id="undaqTools.steeringentropy.SteeringEntropyModel.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>**kwds</em><big>)</big><a class="headerlink" href="#undaqTools.steeringentropy.SteeringEntropyModel.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Steering Entropy Model as described by Boer, Rakauskas, Ward, and
+Goodrich (2005).</p>
+<p>Model is calibrated to the unique spectral characteristics of the
+driver. This makes it sensitive to a variety of coping strategies
+employed by drivers in response to increased workload demands.</p>
+<p>A model should be built for each participant. A baseline segment
+of steering angle data is needed to fit the model via the baseline
+method. This segment of data should be at least 2 minutes.
+baseline() will raise an exception if less than 1 minute of data
+is supplied.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>resample_fs</strong> : float, optional</p>
+<blockquote>
+<div><p>Rate in Hz to resample input data. Default is 4. According to
+Borg et al. this rate is optimizes the senstivity of the
+entropy estimates.</p>
+</div></blockquote>
+<p><strong>alpha</strong> : float, optional</p>
+<blockquote>
+<div><p>controls the spacing of the bins used to estimate the
+prediction errors distribution. Must be between 0-1. The
+default value is 0.2. According to Borg et al. this rate
+is optimizes the senstivity of the entropy estimates.</p>
+</div></blockquote>
+<p><strong>M</strong> : int, optional</p>
+<blockquote>
+<div><p>Controls the number of bins used to estimate the prediction
+errors distribution. Number of bins is 2*M + 2. Default is 6
+(resulting in 14 bins). This is set to avoid having an
+excess of empty counts when the data set is small.</p>
+</div></blockquote>
+<p><strong>b_pe</strong> : array, optional</p>
+<blockquote>
+<div><p>AR coefficients
+(initialized when fit_baseline is called)</p>
+</div></blockquote>
+<p><strong>pkbas</strong> : array, optional</p>
+<blockquote>
+<div><p>baseline prediction error density coefficients
+cooresponding to bins (initialized when fit_baseline is called)</p>
+</div></blockquote>
+<p><strong>bin_edges</strong> : array, optional</p>
+<blockquote>
+<div><p>baseline prediction error density bin edges corresponding
+to pkbas (initialized when fit_baseline is called)</p>
+<p>len(bins) == len(pkbas) + 1</p>
+</div></blockquote>
+<p><strong>hbas</strong> : float, optional</p>
+<blockquote>
+<div><p>baseline entropy estimate (initialized when fit_baseline is called)</p>
+</div></blockquote>
+<p><strong>cdf</strong> : CDF, optional</p>
+<blockquote class="last">
+<div><p>Object holding the cumulative density function data of the
+baseline prediction errors. Used to build bins.
+(initialized when fit_baseline is called)</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Expecting data to be in degrees. It may not matter but small
+values will sometimes cause overflow errors in arburg. If you
+your steering data is in radians it might be better to convert
+it to degrees.</p>
+<p>Loosely based off of Chris&#8217; SteeringEntropy.m script in ndaqTools.
+Users familiar with ndaqTools should note that the steeringentropy
+function in ndaqTools (Chris&#8217; matlab) uses the first 60 s to find
+the AR coeffs and the second 60 s to find baseline prediction error
+distribution. This module splits the baseline data in half. This
+class applies a 5th order lowpass to 3/7 the resample_fs as
+suggested by Boer et al. before resampling. The ndaqTools algorithm
+just applies an integer factor downsample. Because of these slight
+differences entropy estimates may differ.</p>
+<p class="rubric">References</p>
+<dl class="docutils">
+<dt>Boer, E. R., Rakauskas, M. E., Ward, N. J., and Goodrich. M. A.</dt>
+<dd>(2005). Steering Entropy Revisited.  Proceedings of the
+Third International Driving Symposium on Human Factors in
+Driver Assessment, Training and Vehicle Design.  June 27-30,
+2005.  Rockport, Maine.</dd>
+<dt>Boer, E. R., Behavioral entropy as an index of workload</dt>
+<dd>Proceedings of the IEA 2000 /  HFES 2000 Congress.</dd>
+<dt>Nakayama, O., Futami, T., Nakamura T., and Boer, E. R.,</dt>
+<dd>Development of a steering entropy method for evaluating
+driver workload. SAE Technical Paper Series #1999-01-0892.
+Presented at the International Congress and Exposition,
+Detriot, Michigan. March 1-4, 1999.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="undaqTools.steeringentropy.SteeringEntropyModel.get_entropy">
+<tt class="descname">get_entropy</tt><big>(</big><em>self, x[, fs=60.][, _pedistplot=False]</em><big>)</big><a class="headerlink" href="#undaqTools.steeringentropy.SteeringEntropyModel.get_entropy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns steering entropy from given data vector. Specify fs if not
+collected at 60 Hz.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>x</strong> : array_like</p>
+<blockquote>
+<div><p>Input data. Should specify steering wheel angle over at least 60 s</p>
+</div></blockquote>
+<p><strong>fs</strong> : float</p>
+<blockquote>
+<div><p>sampling rate of x in Hz. Default is 60 Hz.
+Be sure to specify fs if x was not sampled at 60 Hz.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>hbas</strong> : float</p>
+<blockquote class="last">
+<div><p>baseline entropy</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="undaqTools.steeringentropy.SteeringEntropyModel.bode">
+<tt class="descname">bode</tt><big>(</big><big>)</big><a class="headerlink" href="#undaqTools.steeringentropy.SteeringEntropyModel.bode" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns bode plot of AR coeffs filter</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><strong>None</strong> :</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><strong>fig</strong> : matplotlib.figure.Figure</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="undaqTools.steeringentropy.SteeringEntropyModel._build_lpfilter">
+<tt class="descname">_build_lpfilter</tt><big>(</big><em>fs</em><big>)</big><a class="headerlink" href="#undaqTools.steeringentropy.SteeringEntropyModel._build_lpfilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>builds low-pass filter with a cutoff frequency of 3/7th the resample
+frequency. The filter should be down 40 dB at 1.5 times the cutoff
+frequency (6/7th) the resample frequency.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>fs</strong> : the base sampling rate</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>b, a</strong> : array_like</p>
+<blockquote class="last">
+<div><p>Numerator (b) and denominator (a) polynomials of the IIR filter.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="undaqTools.steeringentropy.SteeringEntropyModel._resample">
+<tt class="descname">_resample</tt><big>(</big><em>x</em>, <em>fs</em><big>)</big><a class="headerlink" href="#undaqTools.steeringentropy.SteeringEntropyModel._resample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Private method applies 5th low-pass Butterworth filter to x
+and resamples and returns x at self.resample_fs.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>x</strong> : array_like</p>
+<blockquote>
+<div><p>Input data.</p>
+</div></blockquote>
+<p><strong>fs</strong> : float</p>
+<blockquote>
+<div><p>sampling rate of x in Hz</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>x_resampled</strong> : np.ndarray</p>
+<blockquote class="last">
+<div><p>low-passed and resampled copy of x</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="undaqTools.steeringentropy.SteeringEntropyModel._baseline_tsplot">
+<tt class="descname">_baseline_tsplot</tt><big>(</big><em>x</em>, <em>_x</em>, <em>PE</em>, <em>fs</em><big>)</big><a class="headerlink" href="#undaqTools.steeringentropy.SteeringEntropyModel._baseline_tsplot" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns ts plot to fit_baseline so it can be
+returned indirectly to user</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>x</strong> : array_like</p>
+<blockquote>
+<div><p>unfiltered data</p>
+</div></blockquote>
+<p><strong>_x</strong> : array_like</p>
+<blockquote>
+<div><p>lowpassed and downsampled data</p>
+</div></blockquote>
+<p><strong>PE</strong> : array_like</p>
+<blockquote>
+<div><p>prediction errors</p>
+</div></blockquote>
+<p><strong>fs</strong> : float</p>
+<blockquote>
+<div><p>base sampling rate</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first last"><strong>fig</strong> : matplotlib.figure.Figure</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="undaqTools.steeringentropy.SteeringEntropyModel._pedistplot">
+<tt class="descname">_pedistplot</tt><big>(</big><em>Pk</em><big>)</big><a class="headerlink" href="#undaqTools.steeringentropy.SteeringEntropyModel._pedistplot" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns plot to get_entropy so it can be
+returned indirectly to user</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="logstream.html"
+                        title="previous chapter">logstream</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/steeringentropy.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<ul class="this-page-menu">
+  <li><a href="/numpy/docs/numpy-docs/steeringentropy.rst">Edit page</a></li>
+</ul>
+
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="logstream.html" title="logstream"
+             >previous</a> |</li>
+<li><a href="index.html">undaqTools 0.2.0 documentation</a> &raquo;</li>
+ 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Roger Lew.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

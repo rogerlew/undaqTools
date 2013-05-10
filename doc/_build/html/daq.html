@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>undaqTools.Daq &mdash; undaqTools 0.2.0 documentation</title>
+    <title>Daq &mdash; undaqTools 0.2.0 documentation</title>
     
     <link rel="stylesheet" href="_static/scipy.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -26,7 +26,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="undaqTools 0.2.0 documentation" href="index.html" />
-    <link rel="next" title="undaqTools.Element" href="element.html" />
+    <link rel="next" title="Element" href="element.html" />
     <link rel="prev" title="Getting Started" href="gettingstarted.html" /> 
   </head>
   <body>
@@ -37,7 +37,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="element.html" title="undaqTools.Element"
+          <a href="element.html" title="Element"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="gettingstarted.html" title="Getting Started"
@@ -52,16 +52,17 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="undaqtools-daq">
-<h1>undaqTools.Daq<a class="headerlink" href="#undaqtools-daq" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="daq">
+<h1>Daq<a class="headerlink" href="#daq" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="undaqTools.Daq">
 <em class="property">class </em><tt class="descclassname">undaqTools.</tt><tt class="descname">Daq</tt><a class="headerlink" href="#undaqTools.Daq" title="Permalink to this definition">¶</a></dt>
 <dd><p class="rubric">Methods</p>
 <dl class="method">
 <dt id="undaqTools.Daq.read_daq">
-<tt class="descname">read_daq</tt><big>(</big><em>filename</em>, <em>elemlist=None</em>, <em>loaddata=True</em>, <em>process_dynobjs=True</em><big>)</big><a class="headerlink" href="#undaqTools.Daq.read_daq" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">read_daq</tt><big>(</big><em>filename[, elemlist=None] [, loaddata=True][, process_dynobjs=True]</em><big>)</big><a class="headerlink" href="#undaqTools.Daq.read_daq" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads a .daq file into object</p>
+<p>read &lt;==&gt; read_daq</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -93,7 +94,7 @@ False -&gt; don&#8217;t load dynobjs</p>
 
 <dl class="method">
 <dt id="undaqTools.Daq.read_hd5">
-<tt class="descname">read_hd5</tt><big>(</big><em>filename</em>, <em>f0=None</em>, <em>fend=None</em><big>)</big><a class="headerlink" href="#undaqTools.Daq.read_hd5" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">read_hd5</tt><big>(</big><em>filename[, f0=None][, fend=None]</em><big>)</big><a class="headerlink" href="#undaqTools.Daq.read_hd5" title="Permalink to this definition">¶</a></dt>
 <dd><p>writes Daq object to HDF5 container</p>
 <p>f0 and fend specify frame range to read.
 Will export daq.dynobjs to HDF5 container</p>
@@ -142,7 +143,7 @@ string : specify output file (will overwrite)</p>
 
 <dl class="method">
 <dt id="undaqTools.Daq.write_mat">
-<tt class="descname">write_mat</tt><big>(</big><em>filename=None</em>, <em>outpath=None</em><big>)</big><a class="headerlink" href="#undaqTools.Daq.write_mat" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">write_mat</tt><big>(</big><em>[filename=None][, outpath=None]</em><big>)</big><a class="headerlink" href="#undaqTools.Daq.write_mat" title="Permalink to this definition">¶</a></dt>
 <dd><p>writes Daq object to .mat file using scipy.io.savmat</p>
 <p>daq.dynobjs is not exported</p>
 <p>This is intended to make convert_daq backwards compatible.
@@ -202,7 +203,7 @@ the Unix-style wildcard.</p>
 
 <dl class="method">
 <dt id="undaqTools.Daq.plot_ts">
-<tt class="descname">plot_ts</tt><big>(</big><em>elem_pars</em>, <em>xindx=None</em><big>)</big><a class="headerlink" href="#undaqTools.Daq.plot_ts" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">plot_ts</tt><big>(</big><em>self</em>, <em>elem_pars</em><span class="optional">[</span>, <em>xindx=None</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#undaqTools.Daq.plot_ts" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a time series figure containing elements specified by
 elem_pars</p>
 <p>CSSDC measures yield step plots.</p>
@@ -233,7 +234,10 @@ None -&gt; slice(None, None, None)</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first last"><strong>pyplot figure object</strong> :</p>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>fig</strong> : matplotlib.figure.Figure</p>
+<blockquote class="last">
+<div><p>the plot</p>
+</div></blockquote>
 </td>
 </tr>
 </tbody>
@@ -242,33 +246,29 @@ None -&gt; slice(None, None, None)</p>
 
 <dl class="method">
 <dt id="undaqTools.Daq.plot_dynobjs">
-<tt class="descname">plot_dynobjs</tt><big>(</big><em>dynobj_wc='*'</em><big>)</big><a class="headerlink" href="#undaqTools.Daq.plot_dynobjs" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">plot_dynobjs</tt><big>(</big><em>self</em><span class="optional">[</span>, <em>dynobj_wc='*'</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#undaqTools.Daq.plot_dynobjs" title="Permalink to this definition">¶</a></dt>
 <dd><p>make top-down plot of dynamic object paths</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="function">
-<dt id="undaqTools.stat">
-<tt class="descclassname">undaqTools.</tt><tt class="descname">stat</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#undaqTools.stat" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns an Info namedtuple instance without loading data
-so the meta information can be interogatted without having
-to read the whole file</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>filename</strong> : string</p>
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>dynobj_wc</strong> : string</p>
 <blockquote>
-<div><p>.daq file to investigate</p>
+<div><p>wildcard pattern to apply to dynamic object names using fnmatch
+(case normalized, shell-style matching)</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first last"><strong>daq</strong> : Daq instance</p>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>fig</strong> : matplotlib.figure.Figure</p>
+<blockquote class="last">
+<div><p>the plot</p>
+</div></blockquote>
 </td>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -284,7 +284,7 @@ to read the whole file</p>
                         title="previous chapter">Getting Started</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="element.html"
-                        title="next chapter">undaqTools.Element</a></p>
+                        title="next chapter">Element</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/daq.txt"
@@ -319,7 +319,7 @@ to read the whole file</p>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="element.html" title="undaqTools.Element"
+          <a href="element.html" title="Element"
              >next</a> |</li>
         <li class="right" >
           <a href="gettingstarted.html" title="Getting Started"

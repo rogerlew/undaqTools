@@ -1,5 +1,5 @@
 
-undaqTools.Daq
+Daq
 ===============================================
 
 .. currentmodule:: undaqTools
@@ -9,4 +9,3 @@ undaqTools.Daq
              write_mat, load_elemlist_fromfile, 
              match_keys, plot_ts, plot_dynobjs
              
-.. autofunction:: stat

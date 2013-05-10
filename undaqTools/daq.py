@@ -140,7 +140,12 @@ class Daq(dict):
     def read_daq(self, filename, elemlist=None,
                  loaddata=True, process_dynobjs=True):
         """
+        read_daq(filename[, elemlist=None]
+                 [, loaddata=True][, process_dynobjs=True])
+                 
         Reads a .daq file into object
+
+        read <==> read_daq
 
         Parameters
         ----------
@@ -609,6 +614,8 @@ class Daq(dict):
 
     def read_hd5(self, filename, f0=None, fend=None):
         """
+        read_hd5(filename[, f0=None][, fend=None])
+
         writes Daq object to HDF5 container
 
         f0 and fend specify frame range to read.
@@ -818,6 +825,8 @@ class Daq(dict):
 
     def write_hd5(self, filename=None):
         """
+        write_hd5(filename=None)
+        
         writes Daq object to HDF5 container
 
         Parameters
@@ -915,6 +924,8 @@ class Daq(dict):
 
     def write_mat(self, filename=None, outpath=None):
         """
+        write_mat([filename=None][, outpath=None])
+        
         writes Daq object to .mat file using scipy.io.savmat
 
         daq.dynobjs is not exported
@@ -935,8 +946,6 @@ class Daq(dict):
         Return
         ------
         None
-
-
         """
         
         if filename is None:
@@ -974,6 +983,8 @@ class Daq(dict):
 
     def plot_ts(self, elem_pars, xindx=None):
         """
+        plot_ts(self, elem_pars[, xindx=None])
+
         Returns a time series figure containing elements specified by
         elem_pars
 
@@ -995,7 +1006,8 @@ class Daq(dict):
 
         Returns
         -------
-        pyplot figure object
+        fig : matplotlib.figure.Figure
+            the plot
         """
         # initialize variables and figure
 
@@ -1065,8 +1077,20 @@ class Daq(dict):
 
     def plot_dynobjs(self, dynobj_wc='*'):
         """
+        plot_dynobjs(self[, dynobj_wc='*'])
+
         make top-down plot of dynamic object paths
 
+        Parameters
+        ----------
+        dynobj_wc : string
+            wildcard pattern to apply to dynamic object names using fnmatch
+            (case normalized, shell-style matching)
+
+        Returns
+        -------
+        fig : matplotlib.figure.Figure
+            the plot
         """
   
         # make top down plot

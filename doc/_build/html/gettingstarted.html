@@ -26,7 +26,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="undaqTools 0.2.0 documentation" href="index.html" />
-    <link rel="next" title="undaqTools.Daq" href="daq.html" />
+    <link rel="next" title="Daq" href="daq.html" />
     <link rel="prev" title="Installation Instructions" href="install.html" /> 
   </head>
   <body>
@@ -37,7 +37,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="daq.html" title="undaqTools.Daq"
+          <a href="daq.html" title="Daq"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="install.html" title="Installation Instructions"
@@ -55,12 +55,50 @@
   <div class="section" id="getting-started">
 <h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
 <p>undaqTools uses the HDF5 (Hierarchical Data Format) data model
-to store the data contained within NAD&#8217;s DAQ files. An undaq.py
-script is provided aid in parallel batch processing DAQ files to
-HDF5. Once converted instances of undaqTools.Daq object can load
-the HDF5 files. Users can add their own analysis information to
-the Daq instances, write them to HDF5 and retrive them when
-needed.</p>
+to store the data contained within NAD&#8217;s DAQ files. The undaq.py
+script allows you to parallel batch processing DAQ files to
+HDF5. Once converted Daq instances can be loaded from HDF5 in a
+fraction of the time.</p>
+<div class="section" id="undaq-py">
+<h2>undaq.py<a class="headerlink" href="#undaq-py" title="Permalink to this headline">¶</a></h2>
+<p>Ussage is pretty straight forward. You give it a wild card argument and it
+searches for daq files that meet that wildcard. For example you wish to
+convert all daq files in the current directory:</p>
+<div class="highlight-python"><pre>$ undaq.py *</pre>
+</div>
+<p>If each participant has there own folder from parent folder you could
+specify:</p>
+<div class="highlight-python"><pre>$ undaq.py */*</pre>
+</div>
+<p>By default undaq will only run with 1 cpu. If you wish to convert daqs
+in parallel use the -n or &#8211;numcpu flag:</p>
+<div class="highlight-python"><pre>$ undaq.py */* -n 6</pre>
+</div>
+<p>This would tell undaq to convert all the daq files one level down using
+6 cores. Keep in mind you might run out of memory before you run out of
+CPU cores. Even the fastest computers don&#8217;t work very well when they
+run out of memory!</p>
+<p>By default undaq.py will only convert daq files that haven&#8217;t already been
+converted to hdf5. The idea being that you will probably be incrementally
+looking at the data as you accumulate participants. If you need to rebuild
+all of the hdf5 files you can use the -r or &#8211;rebuild flag.:</p>
+<div class="highlight-python"><pre>$ undaq.py */* -n 6 -r</pre>
+</div>
+<p>if you want to output mat files for ndaqTools you can use -o mat or
+&#8211;output mat:</p>
+<div class="highlight-python"><pre>$ undaq.py */* -n 6 -o mat</pre>
+</div>
+<p>lastly there is a flag print debugging information -d or &#8211;debug:</p>
+<div class="highlight-python"><pre>$ undaq.py */* -n 6 -d</pre>
+</div>
+<p>There are multiple level of error checking so the batch processing should
+never completely fail (knock-on-wood, don&#8217;t forget the caveat about memory
+ussage), but sometimes warnings might get thrown if the daq is missing
+frames or ends abruptly. When these things occur undaq does its best to
+fix what went wrong and make the interaction with the Daq files consistent.
+To make the output more readable these warnings are suppressed until the
+batch processing has finished and only display if in debug mode.</p>
+</div>
 <div class="section" id="daq-objects">
 <h2>Daq Objects<a class="headerlink" href="#daq-objects" title="Permalink to this headline">¶</a></h2>
 <p>Daq objects can be initialized in two ways. The first is to
@@ -71,15 +109,12 @@ read the DAQ files directly.</p>
 </pre></div>
 </div>
 <p>Daq.read will also unpack and process any dynamic objects that might
-be present during the drive. This can be suppressed with the
+be present during the drive. This processing is computationally intensive
+and about doubles the processing time. This can be suppressed with the
 process_dynobjs keyword argument if so desired.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">daq</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">daq_file</span><span class="p">,</span> <span class="n">process_dynobjs</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The code attempts to find the relative headway distance between each
-dynamic object and the OwnVehicle (the driver). This requires some
-numerical optimization that extends the processing time. The additional
-time required depends on the number of dynamic objects in the drive.</p>
 <p>Once loaded, saving the hdf5 is as simple as:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">daq</span><span class="o">.</span><span class="n">write_hd5</span><span class="p">(</span><span class="n">hd5_file</span><span class="p">)</span>
 </pre></div>
@@ -92,8 +127,8 @@ time required depends on the number of dynamic objects in the drive.</p>
 DAQ files directly. To provide a means of inspecting DAQ files directly
 there is a stat function.</p>
 </div>
-<div class="section" id="undaqtools-stat">
-<h2>undaqTools.stat()<a class="headerlink" href="#undaqtools-stat" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="stat">
+<h2>stat()<a class="headerlink" href="#stat" title="Permalink to this headline">¶</a></h2>
 <p>If you want to get metadata from a DAQ file but don&#8217;t have it converted
 to HDF5 you can use the undaqTools.stat() function to pull out the info
 metadata.</p>
@@ -278,14 +313,11 @@ as step functions. The method returns a matplotlib.figure.Figure instance.</p>
 [<a class="reference download internal" href="_downloads/ts_plot.png"><tt class="xref download docutils literal"><span class="pre">hi-res</span></tt></a>]</p>
 <img alt="ts_plot.png" class="align-center" src="_images/ts_plot.png" style="width: 750px;" />
 </div>
-<div class="section" id="notes">
-<h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
-<dl class="docutils">
-<dt><strong>The Absence of a Time is a Feature</strong></dt>
-<dd>Time is almost completly redundant with the frames data. Just start
+<div class="section" id="lastly-the-absence-of-a-time-is-a-feature">
+<h2>Lastly: The Absence of a Time is a Feature<a class="headerlink" href="#lastly-the-absence-of-a-time-is-a-feature" title="Permalink to this headline">¶</a></h2>
+<p>Time is almost completly redundant with the frames data. Just start
 thinking in frames. It will soon become second nature. When you need
-time just divide the frames by the sampling rate.</dd>
-</dl>
+time just divide the frames by the sampling rate.</p>
 </div>
 </div>
 
@@ -298,15 +330,16 @@ time just divide the frames by the sampling rate.</dd>
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Getting Started</a><ul>
+<li><a class="reference internal" href="#undaq-py">undaq.py</a></li>
 <li><a class="reference internal" href="#daq-objects">Daq Objects</a></li>
-<li><a class="reference internal" href="#undaqtools-stat">undaqTools.stat()</a></li>
+<li><a class="reference internal" href="#stat">stat()</a></li>
 <li><a class="reference internal" href="#accessing-data">Accessing Data</a></li>
 <li><a class="reference internal" href="#daq-match-keys">Daq.match_keys()</a></li>
 <li><a class="reference internal" href="#daq-etc-dict">Daq.etc &lt;<em>dict</em>&gt;</a></li>
 <li><a class="reference internal" href="#working-with-elements">Working with Elements</a></li>
 <li><a class="reference internal" href="#cssdc-elements">CSSDC Elements</a></li>
 <li><a class="reference internal" href="#timeseries-plots">Timeseries Plots</a></li>
-<li><a class="reference internal" href="#notes">Notes</a></li>
+<li><a class="reference internal" href="#lastly-the-absence-of-a-time-is-a-feature">Lastly: The Absence of a Time is a Feature</a></li>
 </ul>
 </li>
 </ul>
@@ -316,7 +349,7 @@ time just divide the frames by the sampling rate.</dd>
                         title="previous chapter">Installation Instructions</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="daq.html"
-                        title="next chapter">undaqTools.Daq</a></p>
+                        title="next chapter">Daq</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/gettingstarted.txt"
@@ -351,7 +384,7 @@ time just divide the frames by the sampling rate.</dd>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="daq.html" title="undaqTools.Daq"
+          <a href="daq.html" title="Daq"
              >next</a> |</li>
         <li class="right" >
           <a href="install.html" title="Installation Instructions"

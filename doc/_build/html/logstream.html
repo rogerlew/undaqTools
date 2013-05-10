@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Installation Instructions &mdash; undaqTools 0.2.0 documentation</title>
+    <title>logstream &mdash; undaqTools 0.2.0 documentation</title>
     
     <link rel="stylesheet" href="_static/scipy.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -26,8 +26,8 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="undaqTools 0.2.0 documentation" href="index.html" />
-    <link rel="next" title="Getting Started" href="gettingstarted.html" />
-    <link rel="prev" title="undaqTools [uhn-dak-tools] The Unofficial NADS Daq API" href="index.html" /> 
+    <link rel="next" title="steeringentropy" href="steeringentropy.html" />
+    <link rel="prev" title="findex" href="findex.html" /> 
   </head>
   <body>
     <div class="related">
@@ -37,10 +37,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="gettingstarted.html" title="Getting Started"
+          <a href="steeringentropy.html" title="steeringentropy"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="index.html" title="undaqTools [uhn-dak-tools] The Unofficial NADS Daq API"
+          <a href="findex.html" title="findex"
              accesskey="P">previous</a> |</li>
 <li><a href="index.html">undaqTools 0.2.0 documentation</a> &raquo;</li>
  
@@ -52,37 +52,40 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="installation-instructions">
-<h1>Installation Instructions<a class="headerlink" href="#installation-instructions" title="Permalink to this headline">¶</a></h1>
-<p>The requirements for using undaqTools are:</p>
-<ol class="arabic simple">
-<li><strong>Python 2.7.x</strong></li>
-<li><strong>SciPy</strong></li>
-<li><strong>NumPy</strong></li>
-<li><strong>Matplotlib</strong></li>
-<li><strong>h5py</strong></li>
-<li><strong>Ipython</strong> is recommended</li>
-</ol>
-<p>Options to install undaqTools</p>
-<ol class="arabic simple">
-<li>manual install from gitHub. Still need to build install.</li>
-</ol>
-<p>To develop undaqTools you should also have:</p>
-<ol class="arabic simple">
-<li><strong>nose</strong></li>
-<li><strong>Sphinx</strong></li>
-<li><strong>numpydoc</strong></li>
-</ol>
+  <div class="section" id="logstream">
+<h1>logstream<a class="headerlink" href="#logstream" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="undaqTools.logstream.find_epochs">
+<tt class="descclassname">undaqTools.logstream.</tt><tt class="descname">find_epochs</tt><big>(</big><em>stream</em><big>)</big><a class="headerlink" href="#undaqTools.logstream.find_epochs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pulls the starting and stopping frames for epochs defined in a logstream.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>stream</strong> : Element</p>
+<blockquote>
+<div><p>sliced to just the row you are interested in</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>fsdict</strong> : dict</p>
+<blockquote class="last">
+<div><p>dict of FrameSlice instances</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><tt class="xref py py-obj docutils literal"><span class="pre">FrameSlice</span></tt></p>
 </div>
-<div class="section" id="recommended-system-requirements">
-<h1>Recommended System Requirements<a class="headerlink" href="#recommended-system-requirements" title="Permalink to this headline">¶</a></h1>
-<ol class="arabic simple">
-<li>at least 8 GB of memory, the more the better</li>
-<li>solid state drive for holding data files.</li>
-<li>CPU is less important. You are better off opting
-for more memory or a solid state drive as opposed
-to a faster CPU.</li>
-</ol>
+<p class="rubric">Notes</p>
+<p>Ignores epoch with a state of 0.</p>
+<p>Assumes that each epoch only occurs once. Raises RuntimeError if a 
+non-zero  epoch state occurs more than once.</p>
+</dd></dl>
+
 </div>
 
 
@@ -91,25 +94,19 @@ to a faster CPU.</li>
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Installation Instructions</a></li>
-<li><a class="reference internal" href="#recommended-system-requirements">Recommended System Requirements</a></li>
-</ul>
-
   <h4>Previous topic</h4>
-  <p class="topless"><a href="index.html"
-                        title="previous chapter">undaqTools [<em>uhn-dak-tools</em>] The Unofficial NADS Daq API</a></p>
+  <p class="topless"><a href="findex.html"
+                        title="previous chapter">findex</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="gettingstarted.html"
-                        title="next chapter">Getting Started</a></p>
+  <p class="topless"><a href="steeringentropy.html"
+                        title="next chapter">steeringentropy</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
-    <li><a href="_sources/install.txt"
+    <li><a href="_sources/logstream.txt"
            rel="nofollow">Show Source</a></li>
   </ul>
 <ul class="this-page-menu">
-  <li><a href="/numpy/docs/numpy-docs/install.rst">Edit page</a></li>
+  <li><a href="/numpy/docs/numpy-docs/logstream.rst">Edit page</a></li>
 </ul>
 
 <div id="searchbox" style="display: none">
@@ -137,10 +134,10 @@ to a faster CPU.</li>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="gettingstarted.html" title="Getting Started"
+          <a href="steeringentropy.html" title="steeringentropy"
              >next</a> |</li>
         <li class="right" >
-          <a href="index.html" title="undaqTools [uhn-dak-tools] The Unofficial NADS Daq API"
+          <a href="findex.html" title="findex"
              >previous</a> |</li>
 <li><a href="index.html">undaqTools 0.2.0 documentation</a> &raquo;</li>
  

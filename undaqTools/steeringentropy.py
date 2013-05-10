@@ -15,9 +15,10 @@ from undaqTools.misc.cdf import percentile
 warnings.filterwarnings('ignore',category=BadCoefficients)
 
 class SteeringEntropyModel:
-    def __init__(self, resample_fs=4., alpha=0.2, M=6,
-                 b_pe=None, pkbas=None, bin_edges=None, hbas=None, cdf=None):
+    def __init__(**kwds):
         """
+        SteeringEntropyModel(**kwds)
+        
         Steering Entropy Model as described by Boer, Rakauskas, Ward, and
         Goodrich (2005).
 
@@ -33,59 +34,46 @@ class SteeringEntropyModel:
 
         Parameters
         ----------
-        resample_fs : float (optional)
+        resample_fs : float, optional
             Rate in Hz to resample input data. Default is 4. According to
             Borg et al. this rate is optimizes the senstivity of the
             entropy estimates.
 
-        alpha : float (optional)
+        alpha : float, optional
             controls the spacing of the bins used to estimate the
             prediction errors distribution. Must be between 0-1. The
             default value is 0.2. According to Borg et al. this rate
             is optimizes the senstivity of the entropy estimates.
 
-        M : int (optional)
+        M : int, optional
             Controls the number of bins used to estimate the prediction
             errors distribution. Number of bins is 2*M + 2. Default is 6
             (resulting in 14 bins). This is set to avoid having an
             excess of empty counts when the data set is small. 
 
-        (Remaining parameters are initialized when fit_baseline is called)            
-
-        b_pe : array (optional)
+        b_pe : array, optional
             AR coefficients
+            (initialized when fit_baseline is called)
 
-        pkbas : array (optional)
+        pkbas : array, optional
             baseline prediction error density coefficients
-            cooresponding to bins
+            cooresponding to bins (initialized when fit_baseline is called)
+            
 
-        bin_edges : array (optional)
+        bin_edges : array, optional
             baseline prediction error density bin edges corresponding
-            to pkbas
+            to pkbas (initialized when fit_baseline is called)
 
             len(bins) == len(pkbas) + 1
+            
 
-        hbas : float (optional)
-            baseline entropy estimate
+        hbas : float, optional
+            baseline entropy estimate (initialized when fit_baseline is called)
 
-        cdf : CDF (optional)
+        cdf : CDF, optional
             Object holding the cumulative density function data of the
             baseline prediction errors. Used to build bins.
-
-        Methods
-        -------
-        fit_baseline(...)
-            Finds AR coefficients to build prediction errors and
-            estimates baseline prediction errors distribution.
-            Specify fs if not collected at 60 Hz.
-        
-        get_entropy(...)
-            returns steering entropy from given data vector.
-            Specify fs if not collected at 60 Hz.
-
-        _resample(...)
-            private method applies 5th low-pass Butterworth filter to x
-            and resamples and returns x at self.resample_fs.
+            (initialized when fit_baseline is called)
 
         Example
         -------
@@ -128,16 +116,30 @@ class SteeringEntropyModel:
         just applies an integer factor downsample. Because of these slight
         differences entropy estimates may differ.
         """
-        self.resample_fs = resample_fs
-        self.alpha = alpha
-        self.M = M
-        self.b_pe = b_pe
-        self.pkbas = pkbas
-        self.bin_edges = bin_edges
-        self.hbas = hbas
-        self.cdf = cdf
+        self.resample_fs = kwds.get('resample_fs', 4.)
+        self.alpha = kwds.get('alpha', 0.2)
+        self.M = kwds.get('M', 6)
+        self.b_pe = kwds.get('b_pe', None)
+        self.pkbas = kwds.get('pkbas', None)
+        self.bin_edges = kwds.get('bin_edges', None)
+        self.hbas = kwds.get('hbas', None)
+        self.cdf = kwds.get('cdf', None)
 
     def _build_lpfilter(self, fs):
+        """
+        builds low-pass filter with a cutoff frequency of 3/7th the resample
+        frequency. The filter should be down 40 dB at 1.5 times the cutoff
+        frequency (6/7th) the resample frequency.
+
+        Parameters
+        ----------
+        fs : the base sampling rate
+
+        Returns
+        -------
+        b, a : array_like
+            Numerator (b) and denominator (a) polynomials of the IIR filter. 
+        """
         nyq = fs/2. # nyquist frequency
         cutoff = (3./7.)*self.resample_fs # cutoff freq defined by Boer
         wp = cutoff * nyq # pass edge freq (pi radians / sample)
@@ -172,6 +174,8 @@ class SteeringEntropyModel:
         
     def fit_baseline(self, x, fs=60., _tsplot=False):
         """
+        fit_baseline(self, x[, fs=60.][, _tsplot=False])
+
         Finds AR coefficients to build prediction errors and estimates baseline
         prediction errors distribution. Returns the baseline entropy.
 
@@ -246,6 +250,8 @@ class SteeringEntropyModel:
         
     def get_entropy(self, x, fs=60., _pedistplot=False):
         """
+        get_entropy(self, x[, fs=60.][, _pedistplot=False])
+
         Returns steering entropy from given data vector. Specify fs if not
         collected at 60 Hz.
 
@@ -292,7 +298,16 @@ class SteeringEntropyModel:
     def _lpfilter_bode(self):
         """
         returns bode plot of the lp filter applied before downsampling
+        
+        Parameters
+        ----------
+        None
+        
+        Returns
+        -------
+        fig : matplotlib.figure.Figure
         """
+
         b, a = self._build_lpfilter(60.)        
         w, mag, phase = lti(b,a).bode()
 
@@ -330,6 +345,24 @@ class SteeringEntropyModel:
         """
         returns ts plot to fit_baseline so it can be
         returned indirectly to user
+        
+        Parameters
+        ----------
+        x : array_like
+            unfiltered data
+            
+        _x : array_like
+            lowpassed and downsampled data
+        
+        PE : array_like
+            prediction errors
+        
+        fs : float
+            base sampling rate
+        
+        Returns
+        -------
+        fig : matplotlib.figure.Figure
         """
         pe_alpha = self.bin_edges[8] - self.bin_edges[7]
         bin_edges = self.bin_edges
@@ -396,6 +429,15 @@ class SteeringEntropyModel:
     def bode(self):
         """
         returns bode plot of AR coeffs filter
+
+        Parameters
+        ----------
+        None
+        
+        Returns
+        -------
+        fig : matplotlib.figure.Figure
+        
         """
         b_pe = self.b_pe
         w, mag, phase = lti(b_pe, [1,1,1,1]).bode()

@@ -14,10 +14,91 @@ import numpy as np
 from undaqTools.element import Element
 
 class DynObj:
+    """
+    class to represent AI controlled dynamic objects.
+
+    The simulator `only` keeps track of the nearest 20 dynamic objects
+    and packs them into the Daq in a haphazard fashion. Daq._process_dynobjs
+    and DynObj.process sort out this data and create a DynObj instance for
+    each dynamic object recorded during the drive.
+
+    Attributes
+    ----------
+    hcsmType : int
+        don't know what this is
+        
+    colorIndex : int
+        the color of the vehicle
+        
+    solId : int
+        vehicle type
+        
+    cvedId : int
+        id unique to drive
+        
+    name : string
+        name defined in Isat "Ado..."
+        
+    interpolated : bool (int)
+        whether the data was interpolated
+        
+    frames : np.ndarray
+       
+    heading : Element
+        global heading in rads (rotated 90 degrees, need to fix.)
+        
+    speed : Element
+        vehicle speed in mph
+    
+    roll : Element
+        roll
+        
+    pitch : Element
+        pitch
+        
+    pos : Element
+        global x, y, z coordinates in feet
+        
+    distance : Element
+        distance traveled since intialized
+    
+    relative_distance : Element
+        headway distance
+        
+    relative_distance_err : float
+        error in relative distance estimate
+        (assuming you know apriori the dynamic object travels the same path
+        as the OwnVehicle)
+    """
     def __init__(self):
         self.name = ''
 
     def process(self, cvedId, frame_indices, row_indices, daq):
+        """
+        unpacks data from the SCC_DynObj* Elements
+
+        Parameters
+        ----------
+        cvedId : int
+            numerical id of the dynamic object. Used to sort out what rows and
+            columns in the SCC_DynObj* Elements coorespond to this vehicle
+
+        frame_indices : array_like
+            indices in the parent daq that contain information relevent
+            to the dynamic object
+
+        row_indices : array_like
+            column by column indices specifying which rows coorespond to the
+            dynamic object
+
+        daq : Daq
+            pointer to the parent Daq instance
+    
+        Notes
+        -----
+        This should really be a private method.
+        
+        """
 
         self.parent_filename = daq.info.filename
         self.i0 = i0 = frame_indices[0]      # this is the first index relative
@@ -235,6 +316,19 @@ class DynObj:
             self.relative_distance_err = relative_distance_err
         
     def write_hd5(self, filename=None, root=None):
+        """
+        write_hd5(self[, filename=None][, root=None])
+        
+        writes DynObj to hdf5.
+
+        Parameters
+        ----------
+        filename : string
+            path to write to
+
+        root : h5py.File
+            handle to group
+        """
         close_root = root is None
         
         if filename is None and root is None:
@@ -270,6 +364,19 @@ class DynObj:
             root.close()
 
     def read_hd5(self, filename=None, root=None):
+        """
+        read_hd5(self[, filename=None][, root=None])
+        
+        reads a DynObj from a hdf5 file.
+
+        Parameters
+        ----------
+        filename : string
+            path to write to
+
+        root : h5py.File
+            handle to group
+        """
         close_root = root is None
         
         if filename is None and root is None:
@@ -313,6 +420,9 @@ class DynObj:
     # define __getitem__, __setitem__, and __delitem__ so DynObj can have
     # a more consistenet interface with Daq
     def __getitem__(self, indx):
+        """
+        provides dicionary-esque access to the Element Attributes
+        """
         if indx == 'Heading':
             return self.heading
         elif indx == 'Speed':
@@ -329,6 +439,9 @@ class DynObj:
             return self.relative_distance
             
     def __setitem__(self, indx, value):
+        """
+        provides dicionary-esque access to the Element Attributes
+        """
         if indx == 'Heading':
             self.heading = value
         elif indx == 'Speed':
@@ -345,6 +458,9 @@ class DynObj:
             self.relative_distance = value
             
     def __delitem__(self, indx):
+        """
+        provides dicionary-esque access to the Element Attributes
+        """
         if indx == 'Heading':
             self.heading = None
         elif indx == 'Speed':
