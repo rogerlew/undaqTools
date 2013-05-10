@@ -199,7 +199,7 @@ if __name__ == '__main__':
     if not all(matches):
         print('\nWarning: Not all subject names match!')
 
-    print('\nstat-ing daqs took %.1f s'%(time.time()-t0))
+    print('\nstat-ing daqs took %.3f s'%(time.time()-t0))
 
     #
     # undaqTools.logstream.find_epochs
@@ -218,6 +218,6 @@ if __name__ == '__main__':
     # the code doesn't make it any faster
     for hd5_file in hd5_files:
         elapsed = attach_metadata(hd5_file)
-        print('  processed %s in %.1f s'%(hd5_file, elapsed))
+        print("  processed '%s' in %.1f s"%(hd5_file, elapsed))
         
     print('\nDone.\n\nbuilding etc dicts took %.1f s'%(time.time()-t0))        

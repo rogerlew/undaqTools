@@ -13,37 +13,6 @@ import numpy as np
 
 from undaqTools.element import Element
 
-def _modefilter(x, window=15):
-    '''
-    calculates running mode of x.
-    x should be 1-d iterable
-    windows should be an odd integer.
-
-    result is returned as 1d numpy array
-    '''
-
-    # scipy.stats.mstats.mode is awefully slow
-    # this is about 100 times faster
-    def _mode(y):
-        return Counter(y).most_common(1)[0][0]
-
-    if window % 2. != 1.:
-        raise ValueError('window must be odd integer')
-
-    n = (window-1)/2
-    n1 = n+1
-
-    _r = _mode(x[:window])
-    r = array('f', [_r for i in xrange(n)])
-
-    for i in xrange(n, len(x)-n):
-        r.append(_mode(x[i-n:i+n1]))
-
-    _r = _mode(x[-window:])
-    r.extend([_r for i in xrange(n)])
-
-    return np.array(r)
-
 class DynObj:
     def __init__(self):
         self.name = ''
@@ -91,6 +60,9 @@ class DynObj:
         # variables based on the frame and row indices provided
         frames = None
 
+        row_indices_x2 = row_indices*2
+        row_indices_x3 = row_indices*3
+        
         heading = daq['SCC_DynObj_Heading'][row_indices, frame_indices]
         speed = daq['SCC_DynObj_Vel'][row_indices, frame_indices]
         roll = daq['SCC_DynObj_RollPitch'][row_indices_x2, frame_indices]
@@ -105,20 +77,19 @@ class DynObj:
         # positions are packed [y,x,z] for the dyn objects
         # here we swap x and y to make it consistent with OwnVeh
         # position.
-        temp = np.copy(pos[0,:])
+        tmp = np.copy(pos[0,:])
         pos[0,:] = pos[1,:]
-        pos[1,:] = temp
-        rollpitch = np.array(rollpitch).T
-
+        pos[1,:] = tmp
+        
         # need to linearly interpolate asyncronous cveds
         if async:
             _frames = np.arange(i0, iend+1, dtype='i4')
             heading = np.interp(_frames, frame_indices, heading)
             speed = np.interp(_frames, frame_indices, speed)
 
-            pos = np.array(np.interp(_frames, frame_indices, pos[0,:]),
-                           np.interp(_frames, frame_indices, pos[1,:]),
-                           np.interp(_frames, frame_indices, pos[2,:]))
+            pos = np.array([np.interp(_frames, frame_indices, pos[0,:]),
+                            np.interp(_frames, frame_indices, pos[1,:]),
+                            np.interp(_frames, frame_indices, pos[2,:])])
 
             roll = np.interp(_frames, frame_indices, roll)
             pitch = np.interp(_frames, frame_indices, pitch)
@@ -191,8 +162,8 @@ class DynObj:
             d0s,imins = [],[]
             rand_indices = list(np.random.randint(low=0, high=m, size=(10,)))
             for ri in rand_indices:
-            
-                dmin = np.sqrt(np.sum(np.square(ov_pos - pos[:,ri]), axis=0))
+                dmin = ov_pos - np.array(pos[:,ri], ndmin=2).T
+                dmin = np.sqrt(np.sum(np.square(dmin), axis=0))
 
                 # index where OwnVeh is closest to the starting pos of the
                 # DynObject index is relative to the shorter DynObj arrays not
@@ -223,11 +194,6 @@ class DynObj:
             # for OwnVeh heading is in VDS_Veh_Heading and has degree units
             ov_h = np.radians(daq['VDS_Veh_Heading'][0,i0:i0+m])
             ov_h = np.unwrap(ov_h)
-    
-            # heading for the DynObjects is in radians but can be a little 
-            # messy. We will unwrap and then apply mode filter
-            heading = np.unwrap(_modefilter(heading[0,:]))
-            heading = np.array(heading, ndmin=2)
     
             # compare the heading direction of OwnVehicle at its closest point
             # to the dyn object to the heading direction of the dyn object at

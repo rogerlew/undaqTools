@@ -6,6 +6,8 @@ from __future__ import print_function
 """
 Parallel batch process .daq files to .hdf5 or .mat
 
+By default warnings are suppressed but can be attained with the -d or --debug
+
 Example Usage
 -------------
 To convert all .daq files current directory to .hdf5 using 6 CPUs::
@@ -31,6 +33,7 @@ import os
 import glob
 import time
 import multiprocessing
+import warnings
 
 import undaqTools
     
@@ -39,7 +42,7 @@ def convert_daq(tupledArgs):
     """
     converts a daq file to hdf5 or mat file
     
-    arguments passed as tuple to make it work with multiprocessin pool
+    arguments passed as tuple to make it work with multiprocessing pool
     
     Parameters
     ----------
@@ -63,21 +66,25 @@ def convert_daq(tupledArgs):
     t0 = time.time()  
     
     try:
-        daq = undaqTools.Daq()        
-        if elemfile is not None:
-            daq.load_elemlist_fromfile(elemfile)
-            
-        if ext == 'mat':
-            daq.read(daq_file, process_dynobjs=False)
-            daq.write_mat(daq_file.replace('.daq', '.mat'))
-        else:
-            daq.read(daq_file) 
-            daq.write_hd5(daq_file.replace('.daq', '.hdf5'))
-            
-        del daq
-        return time.time()-t0
+        with warnings.catch_warnings(record=True) as ws:
+            daq = undaqTools.Daq()        
+            if elemfile is not None:
+                daq.load_elemlist_fromfile(elemfile)
+                
+            if ext == 'mat':
+                daq.read(daq_file, process_dynobjs=False)
+                daq.write_mat(daq_file.replace('.daq', '.mat'))
+            else:
+                daq.read(daq_file) 
+                daq.write_hd5(daq_file.replace('.daq', '.hdf5'))
+                
+            del daq
+
+            retcode = ([str(w.message) for w in ws], 1)[ws==[]]
+            return time.time()-t0, retcode
     except:
-        return -1
+        # this shoudld happen
+        return time.time()-t0, -1
         
 if __name__ == '__main__':
 
@@ -91,7 +98,9 @@ if __name__ == '__main__':
     parser.add_argument('-e', '--elemfile', 
                         help='path to elemlist file     ("")')
     parser.add_argument('-r', '--rebuild',  
-                        help='Overwrite existing files', action='store_true')    
+                        help='Overwrite existing files', action='store_true') 
+    parser.add_argument('-d', '--debug',  
+                        help='Print the return codes', action='store_true')    
     args = parser.parse_args()
 
     path = args.path
@@ -100,6 +109,7 @@ if __name__ == '__main__':
     ext = ext.strip().replace('.','').replace('hd5','hdf5')
     elemfile = args.elemfile
     rebuild = args.rebuild
+    debug = args.debug
 
     # parallel worker pool
     pool = multiprocessing.Pool(numcpu)
@@ -116,7 +126,8 @@ if __name__ == '__main__':
     # print a a summary table of what we have found
     print('\nGlob Summary')
     print('-'*(43+13+12))
-    print('{:<43}{:>13}{:>12}'.format('daq', 'size (KB)', '%s exists'%ext))
+    print(' '*(43+13+5), ext)
+    print('{:<43}{:>13}{:>12}'.format('daq', 'size (KB)', 'exists'))
     print('-'*(43+13+12))
     for daq in daq_files:
         size = os.stat(daq).st_size/1024
@@ -130,34 +141,55 @@ if __name__ == '__main__':
     else:
         daqs2convert = \
             [(daq, ext, elemfile) for daq in daq_files \
-             if daq[:-3]+ext not in out_files]
+             if daq.endswith(ext) not in out_files]
     
     # ready to roll.
-    print('\n\nConverting daqs (this may take awhile)...')    
+    print('\n\ndebug =', debug)
+    print('rebuild =', rebuild)
+    print('\nConverting daqs with %i cpus (this may take awhile)...'%numcpu)    
     t0 = time.time() # start global time clock 
 
     # this launches the batch processing of the daq files
-    times = pool.imap(convert_daq, daqs2convert)
+    results = pool.imap(convert_daq, daqs2convert)
 
     # this provides feedback as the sets of files complete. Using imap 
     # guarentees that the times are in the same order as daqs2convert but
     # delays receiving feedback
-    for i, elapsed_time in enumerate(times):
-        last = ('(%.1f s)'%elapsed_time, 'Failed')[elapsed_time == -1]
-        print('  %s -> .%s %s'%(daqs2convert[i][0], ext, last))
-              
+    #
+    # results is an iterator! you can only traverse it once.
+    retcodes = []
+    for i, (elapsed, retcode) in enumerate(results):
+        print('  %s -> .%s (%.1f s)'%(daqs2convert[i][0], ext, elapsed),
+              ('', ' Unknown Error')[retcode == -1])
+        retcodes.append(retcode)
+
+    # close multiprocessing pool
+    pool.close()
+    pool.join()
+
+    if debug:
+        print('\n\nDebug Summary')
+        for tupleArg, retcode in zip(daqs2convert, retcodes):
+            if retcode != 1:
+                print(' ',tupleArg[0])
+
+                # retcode is an int or a list of warning message strings
+                try:
+                    for w in retcode:
+                        print('    Warning:', w)
+                except:
+                    if retcode == -1:
+                        print('    Error: Unknown Failure.')
+                print()
+            
     elapsed_time = time.time() - t0 + 1e-6 # so throughput calc doesn't bomb
                                            # when daq2convert is empty
                                            
-    # close multiprocessing pool
-    pool.close()
-    pool.join() 
-    
     # calculate the amount of data that was converted in MB
     tot_mb = sum(os.stat(daq[0]).st_size/(1024*1024.) for daq in daqs2convert)
     
     # provide some feedback to the user
-    print('\nDone.\n')
+    print('\nBatch processing completed.\n')
     print('-'*(43+13+12))
     print('Conversion Summary')
     print('-'*(43+13+12))

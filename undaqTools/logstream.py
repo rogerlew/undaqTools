@@ -3,8 +3,6 @@ from __future__ import print_function
 # Copyright (c) 2013, Roger Lew
 # All rights reserved.
 
-from collections import OrderedDict
-
 from undaqTools.element import Element, FrameSlice
 from undaqTools.misc.base import _isint
             
@@ -41,7 +39,7 @@ def find_epochs(stream):
     
     # we will return an OrderedDict so that the epochs match the order 
     # that they occured but can also be mapped 
-    epochs = OrderedDict()
+    epochs = {}
     
     # declare a, b in this scope so we can use them afterward
     # they hold a state and the subsequent state

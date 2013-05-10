@@ -236,8 +236,6 @@ class Daq(dict):
         if loaddata and process_dynobjs:
             self._process_dynobjs()
             
-
-
     # create alias read for read_daq
     read = read_daq
                 
@@ -248,12 +246,7 @@ class Daq(dict):
         _header = self._header
         elemlist = self.elemlist
         frame = self.frame
-##        data = self.data
         
-        def _issue_frame_read_warning(frame, name):
-            msg = 'On Frame: %i, error unpacking %s'%(frame, name)
-            warnings.warn(msg, RuntimeWarning)
-
         def nans(numitems):
             return [np.nan for i in xrange(numitems)]
 
@@ -278,8 +271,7 @@ class Daq(dict):
         for name, typ, varrate, numvalues in \
             zip(_header.name, _header.type, 
                 _header.varrateflag, _header.numvalues):
-            if self.elemlist is None or \
-               any(fnmatch(name, wc) for wc in self.elemlist):
+            if elemlist is None or any(fnmatch(name, wc) for wc in elemlist):
                 if not varrate and numvalues == 1:
                     tmpdata[name] = array(typ)
                 else:
@@ -303,81 +295,102 @@ class Daq(dict):
         # have to look through the elemlist for every variable on
         # every frame
         if elemlist is None: # elemlist empty                    
-            go_nogo = [True for i in xrange(len(_header.name))]
-        else: 
-            go_nogo = [name in elemlist for name in _header.name]
+            mask = [True for i in xrange(len(_header.name))]
+        else:
+            mask = []
+            for name in _header.name:
+                mask.append(any(fnmatch(name, wc) for wc in elemlist))
 
+        bombed = False
         # Python quirk no. 372837462: while 1 is faster than while True
         while 1:
             try:
                 frame.code.append(unpack('i',read(4))[0])
-            except:
-                raise Exception('error unpacking frame code')
-                break
-            
-            if frame.code[-1] == -2:
-                break
-            
-            frame.frame.append(unpack('i', read(4))[0])
-            frame.count.append(unpack('i', read(4))[0])
-
-            # xrange (2.7, range in 3) is faster than range
-            for j in xrange(frame.count[-1]):
-
-                # stuff performed in this loop use to be appendtmpdata
-                # function call overhead is kind of high with python so
-                # it is moved here for performance
-                #
-                # this code use to be under one try/except
-                # Now only the unpacking is protected. If it fails NAN 
-                # should be filled and a warning provided
-                # Warnings could be supressed with the warnings module
-                i = unpack('i', read(4))[0]
-
-                if _header.varrateflag[i]:
-                    numitems = unpack('i', read(4))[0]
-                else:
-                    numitems = _header.numvalues[i]
-                            
-                size = _header.bytes[i]
-                    
-##                    if 'ET_filtered_gaze_object_name' in name:
-##                        pdb.set_trace()
+                if frame.code[-1] == -2:
+                    break
                 
-                if go_nogo[i]:
-                    name = _header.name[i]
-                    
-                    if numitems == 1:
-                        typ = _header.type[i]
-                        try:
+                frame.frame.append(unpack('i', read(4))[0])
+                frame.count.append(unpack('i', read(4))[0])
+
+                # xrange (2.7, range in 3) is faster than range
+                for j in xrange(frame.count[-1]):
+                    i = unpack('i', read(4))[0]
+
+                    if _header.varrateflag[i]:
+                        numitems = unpack('i', read(4))[0]
+                    else:
+                        numitems = _header.numvalues[i]
+                                
+                    size = _header.bytes[i]
+                        
+                    if mask[i]:
+                        name = _header.name[i]
+                        
+                        if numitems == 1:
+                            typ = _header.type[i]
                             tmpdata[name].append(unpack(typ,read(size))[0])
-                        except:
-                            _issue_frame_read_warning(frame.frame[-1], name)
-                            tmpdata[name].append(np.nan)
-                            
-                    else: # numitems > 1
-                        typ = _header.nptype[i]
-                        try:
+                                
+                        else: # numitems > 1
+                            typ = _header.nptype[i]
                             tmpdata[name].append(fromfile(fid,typ,numitems))
-                        except:
-                            _issue_frame_read_warning(frame.frame[-1], name)                             
-                            tmpdata[name].append(nans(numitems))
-                        
-                    if _header.rate[i] != 1:
-                        tmpdata[name+'_Frames'].append(frame.frame[-1])
-                        
-                else: # we don't need to read this element
-                    read(numitems*size) # seek is slow...
-                                        # reduce calls to read
+                            
+                        if _header.rate[i] != 1:
+                            tmpdata[name+'_Frames'].append(frame.frame[-1])
+                            
+                    else: # we don't need to read this element
+                        read(numitems*size) # seek is slow...
+                                            # reduce calls to read
+            except:
+                msg = 'Failed loading file on frame %i.'%frame
+                msg += ' (stopped reading file)'
+                warnings.warn(msg, RuntimeWarning)
+                bombed = True
+                break
 
         fid.close()
 
         # We made it through the daq file.
         # Now it is time to do some bookkeeping.
         frame.frame = np.array(frame.frame)
-        self.f0 = frame.frame[0]
-        self.fend = frame.frame[-1]
-        
+        self.f0 = f0 = frame.frame[0]
+        self.fend = fend = frame.frame[-1]
+
+        # If we bombed unpacking a frame we need to make sure
+        # everything is aligned before we intialize Elements
+        if bombed:
+            # we will strip off the last frame just to make sure
+            # everything is kosher
+            n = min(len(frame.code),len(frame.frame),len(frame.count))-1
+            frame.code = frame.code[:n]
+            frame.frame = frame.frame[:n]
+            frame.count = frame.count[:n]
+            
+            for name in tmpdata:
+                if name.endswith('_Frames'):
+                    continue
+
+                val = tmpdata[name]
+                i = _elemid_lookup[name]
+                if _header.rate[i] != 1:
+                    # CSSDC measures should always be okay. If they have 1
+                    # value they use read, if they have multiple values they
+                    # use fromfile. In either case if the unpacking fails
+                    # nothing will get appended to tmpdata and it will exit
+                    # before appending to the cooresponding _Frames array.
+                    #
+                    # At least that is what my mental interpreter thinks.
+                    # we will assert just to be on the safe side.
+                    assert len(tmpdata[name]) == len(tmpdata[name+'_Frames'])
+                    
+                else:
+                    tmpdata[name] = np.array(tmpdata[name][:n], ndmin=2)
+                    
+                    # gets transposed in next for loop if numvalues > 1
+                    if _header.numvalues[i] > 1:
+                        assert tmpdata[name].shape[0] == frame.frame.shape[0]
+                    else:
+                        assert tmpdata[name].shape[1] == frame.frame.shape[0]
+
         # cast as Element objects
         # 'varrateflag' variables remain lists of lists
         #
@@ -385,8 +398,9 @@ class Daq(dict):
         # paranoid about reference counting and garbage collection not
         # functioning properly
         for name, i, rate in zip(_header.name, _header.id, _header.rate):
-            if elemlist is not None and name not in elemlist:
-                continue
+            if elemlist is not None:
+                if not any(fnmatch(name, wc) for wc in elemlist):
+                    continue
             
             # transpose Element with more than 1 row                
             if _header.numvalues[i] > 1:
@@ -417,17 +431,51 @@ class Daq(dict):
 
                 # delete tmpdata arrays as we go to save memory
                 del tmpdata[name]
-
-
+        
         del _header, self._header
         self._header = None
-
-        if self.fend - self.f0 > len(frame.frame):
-            msg = "'%s' contains missing frames"%self.info.filename
+                    
+                    
+        # interpolate if frames are missing after building Elements
+        if fend - f0 >= len(frame.frame):
+            msg = "Missing frames. (interpolated missing frames)"
             warnings.warn(msg, RuntimeWarning)
-            
-        # todo: interpolate if frames are missing after building Elements
 
+            self._interpolate_missing_frames()
+
+    def _interpolate_missing_frames(self):
+        """
+        interpolates over missing frames for non-CSSDC measures
+        
+        """
+        f0, fend = self.f0, self.fend
+        old_frames = self.frame.frame[:]
+        new_frames = np.linspace(f0, fend, fend - f0 + 1)
+        
+        # np.interp can only handle 1-d arrays
+        for elem in self.values():
+            if elem.isCSSDC() or elem.type == 'c':
+                continue
+
+                # todo: should really apply interpolation
+                # to non-CSSDC string measures. I don't
+                # see an immediate need for it.
+            
+            x = [np.interp(new_frames, old_frames, elem[j,:])
+                 for j in xrange(elem.numvalues)]
+            
+            self[elem.name] = \
+                Element(x, new_frames,
+                        rate=elem.rate,
+                        varrateflag=elem.varrateflag,
+                        elemid=elem.id,
+                        units=elem.units)
+
+        self.frame.frame = new_frames
+
+        # did we fix the problem?
+        assert fend - f0 + 1 == len(new_frames)
+        
     def _process_dynobjs(self):
         """
         figure out what rows and frames relate to particular
@@ -436,7 +484,7 @@ class Daq(dict):
         """
 
         if 'SCC_DynObj_CvedId'not in self:
-            msg = "Need 'SCC_DynObj*' to build dynobjs"
+            msg = "Need 'SCC_DynObj*' to build dynobjs (did not build dynobjs)"
             warnings.warn(msg, RuntimeWarning)
             return None
 
@@ -474,7 +522,6 @@ class Daq(dict):
         del frame_indiceses
         del row_indiceses
         
-        
     def __setitem__(self, name, elem):
         if not isinstance(elem, Element):
             raise(TypeError, 'Value must be Element')
@@ -486,8 +533,9 @@ class Daq(dict):
             elem.name = name
             
         if name != elem.name:
-            msg = "key:'%s' does not equal elem.name'%s'\nCannot set value."
-            raise(KeyError, msg%(name, elem.name))
+            msg = "key:'%s' does not equal elem.name'%s'\nCannot set value."\
+                  %(name, elem.name)
+            raise(KeyError, msg)
             
         if name is None:
             msg = "name cannot be None"
@@ -499,6 +547,7 @@ class Daq(dict):
 
         if 'SCC_Spline_Lane_Deviation'not in self:
             msg = "Need 'SCC_Spline_Lane_Deviation' to fix lane deviation"
+            msg += ' (did not fix lane deviation)'
             warnings.warn(msg, RuntimeWarning)
             return None
             
@@ -854,12 +903,12 @@ class Daq(dict):
         for (name, obj) in self.etc.items():
             s = _literal_repr(obj)
             
-##            try:
-##                _literal_eval(s)
-##            except:
-##                root.close()
-##                msg = "'%s' is not a Python literal, FrameSlice, or FrameIndex"%str(obj)
-##                raise ValueError(msg)
+            try:
+                _literal_eval(s)
+            except:
+                root.close()
+                msg = "'%s' is not a Python literal, FrameSlice, or FrameIndex"%str(obj)
+                raise ValueError(msg)
             root['etc'].attrs[name] = s
             
         root.close()
