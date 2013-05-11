@@ -1,0 +1,235 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Example 01: Daq, and multiprocessing pool &mdash; undaqTools 0.2.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/scipy.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="undaqTools 0.2.0 documentation" href="index.html" />
+    <link rel="up" title="Examples Overview" href="examples_index.html" />
+    <link rel="next" title="Example 02: stat, logstream, and Daq.etc" href="example02.html" />
+    <link rel="prev" title="Examples Overview" href="examples_index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="example02.html" title="Example 02: stat, logstream, and Daq.etc"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="examples_index.html" title="Examples Overview"
+             accesskey="P">previous</a> |</li>
+<li><a href="index.html">undaqTools 0.2.0 documentation</a> &raquo;</li>
+
+          <li><a href="examples_index.html" accesskey="U">Examples Overview</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="example-01-daq-and-multiprocessing-pool">
+<h1>Example 01: Daq, and multiprocessing pool<a class="headerlink" href="#example-01-daq-and-multiprocessing-pool" title="Permalink to this headline">¶</a></h1>
+<p>This is actually an early version of <cite>undaq.py</cite>
+The multiprocessing is easier to follow in this version before
+all the bells and whistles were attached.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span>
+
+<span class="kn">import</span> <span class="nn">undaqTools</span>
+
+<span class="c"># define a function to convert a daq to hdf5</span>
+<span class="k">def</span> <span class="nf">convert_daq</span><span class="p">(</span><span class="n">daq_file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    converts a daqfile to hdf5</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    daq_file : string</span>
+<span class="sd">        relative path to daq_file</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    elapsed_time : float</span>
+<span class="sd">        returns the time it took to complete converting daq or -1 if the</span>
+<span class="sd">        conversion fails.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="c"># both multiprocessing and ipython cluster mask Exceptions</span>
+    <span class="c"># This way we can at least identify what file fails and the batch</span>
+    <span class="c"># processing continues</span>
+    <span class="c">#</span>
+    <span class="c"># Discovered this is needed the hard way. During an experimental trial</span>
+    <span class="c"># our MiniSim ran out of harddrive space and the resulting Daq failed to</span>
+    <span class="c"># load.</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">daq</span> <span class="o">=</span> <span class="n">undaqTools</span><span class="o">.</span><span class="n">Daq</span><span class="p">()</span>
+        <span class="n">daq</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">daq_file</span><span class="p">)</span>
+        <span class="n">daq</span><span class="o">.</span><span class="n">write_hd5</span><span class="p">(</span><span class="n">daq_file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;.daq&#39;</span><span class="p">,</span> <span class="s">&#39;.hdf5&#39;</span><span class="p">))</span>
+        <span class="k">del</span> <span class="n">daq</span>
+        <span class="k">return</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">t0</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+
+    <span class="c"># data is on a local SSD drive. This is very important for performance.</span>
+    <span class="n">data_dir</span> <span class="o">=</span> <span class="s">&#39;C:</span><span class="se">\\</span><span class="s">LocalData</span><span class="se">\\</span><span class="s">Left Lane</span><span class="se">\\</span><span class="s">&#39;</span>
+
+    <span class="c"># change the directory of the kernel</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Changing wd to &#39;</span><span class="si">%s</span><span class="s">&quot;</span><span class="o">%</span><span class="n">data_dir</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span>
+
+    <span class="c"># specifies whether to convert all the daqs or only the ones that haven&#39;t</span>
+    <span class="c"># been created. Unless you muck with the Daq or DynObj classes there it</span>
+    <span class="c"># should be fine to leave this False</span>
+    <span class="n">rebuild_all</span> <span class="o">=</span> <span class="bp">False</span>
+
+    <span class="c"># The clients may be RAM limited. In this example the machine has 8 cores</span>
+    <span class="c"># but we are only using 6 to convert the daq files (with this particular</span>
+    <span class="c"># dataset) (Machine has 32GB of memory and daqfiles are ~ 1.5 GB each,</span>
+    <span class="c"># memory peaks at about 29 GB with no other applications.)</span>
+    <span class="n">numcpus</span> <span class="o">=</span> <span class="mi">6</span>
+
+    <span class="c"># parallel worker pool</span>
+    <span class="n">pool</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">numcpus</span><span class="p">)</span>
+
+    <span class="c"># find all hdf5 files and all the daq files</span>
+    <span class="c"># we don&#39;t want to convert the daq files unless we have to</span>
+    <span class="c">#</span>
+    <span class="c"># data is organized such that every participant has his or her</span>
+    <span class="c"># own folder. Casting as tuples isn&#39;t strictly necessary. But this way</span>
+    <span class="c"># this ensures they are immutable.</span>
+    <span class="n">hd5_files</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s">&#39;*/*.hdf5&#39;</span><span class="p">))</span>
+    <span class="n">daq_files</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s">&#39;*/*.daq&#39;</span><span class="p">))</span>
+
+    <span class="c"># need to build list of daq_files to convert to pass to convert_daq</span>
+    <span class="k">if</span> <span class="n">rebuild_all</span><span class="p">:</span>
+        <span class="n">daqs2convert</span> <span class="o">=</span> <span class="n">daq_files</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">daqs2convert</span> <span class="o">=</span> \
+            <span class="p">[</span><span class="n">daq</span> <span class="k">for</span> <span class="n">daq</span> <span class="ow">in</span> <span class="n">daq_files</span> <span class="k">if</span> <span class="n">daq</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span><span class="o">+</span><span class="s">&#39;hdf5&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hd5_files</span><span class="p">]</span>
+
+    <span class="c"># ready to roll.</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">Converting daqs (this may take awhile)...&#39;</span><span class="p">)</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="c"># start global time clock</span>
+
+    <span class="c"># this launches the batch processing of the daq files</span>
+    <span class="n">times</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">imap</span><span class="p">(</span><span class="n">convert_daq</span><span class="p">,</span> <span class="n">daqs2convert</span><span class="p">)</span>
+
+    <span class="c"># this provides feedback as the sets of files complete. Using imap</span>
+    <span class="c"># guarentees that the times are in the same order as daqs2convert but</span>
+    <span class="c"># delays receiving feedback</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">elapsed_time</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">times</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;    {:&lt;43}{:.1f} s&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">daqs2convert</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">elapsed_time</span><span class="p">))</span>
+
+    <span class="n">elapsed_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span> <span class="o">+</span> <span class="mf">1e-6</span> <span class="c"># so throughput calc doesn&#39;t bomb</span>
+                                           <span class="c"># when daq2convert is empty</span>
+
+    <span class="c"># close multiprocessing pool</span>
+    <span class="n">pool</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">pool</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Example Output:</p>
+<div class="highlight-python"><pre>Changing wd to './
+
+Converting daqs (this may take awhile)...
+    pid01\Alaska_0_20130301142422.daq            59.3 s
+    pid02\data reduction_20130204125617.daq      4.8 s
+    pid03\Left_11_20130429102407.daq             45.7 s</pre>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="examples_index.html"
+                        title="previous chapter">Examples Overview</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="example02.html"
+                        title="next chapter">Example 02: stat, logstream, and Daq.etc</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/example01.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<ul class="this-page-menu">
+  <li><a href="/numpy/docs/numpy-docs/example01.rst">Edit page</a></li>
+</ul>
+
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="example02.html" title="Example 02: stat, logstream, and Daq.etc"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="examples_index.html" title="Examples Overview"
+             >previous</a> |</li>
+<li><a href="index.html">undaqTools 0.2.0 documentation</a> &raquo;</li>
+
+          <li><a href="examples_index.html" >Examples Overview</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Roger Lew.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

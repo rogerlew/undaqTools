@@ -1,0 +1,530 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Example 05: Ado headway distance visualization &mdash; undaqTools 0.2.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/scipy.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="undaqTools 0.2.0 documentation" href="index.html" />
+    <link rel="up" title="Examples Overview" href="examples_index.html" />
+    <link rel="prev" title="Example 04: Multipanel ensemble plot" href="example04.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="example04.html" title="Example 04: Multipanel ensemble plot"
+             accesskey="P">previous</a> |</li>
+<li><a href="index.html">undaqTools 0.2.0 documentation</a> &raquo;</li>
+
+          <li><a href="examples_index.html" accesskey="U">Examples Overview</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="example-05-ado-headway-distance-visualization">
+<h1>Example 05: Ado headway distance visualization<a class="headerlink" href="#example-05-ado-headway-distance-visualization" title="Permalink to this headline">¶</a></h1>
+<p>Example multiple subplot ensemble figure of equidistantly interpolated speed.
+In this example each subplot represents the level of independent conditions.</p>
+<p><strong>The Script</strong>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">attrgetter</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">rcParams</span>
+<span class="n">rcParams</span><span class="p">[</span><span class="s">&#39;font.family&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;serif&#39;</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">undaqTools</span> <span class="kn">import</span> <span class="n">Daq</span><span class="p">,</span> <span class="n">fslice</span><span class="p">,</span> <span class="n">findex</span>
+
+<span class="k">def</span> <span class="nf">mult_ado_by_pid_plot</span><span class="p">(</span><span class="n">pids</span><span class="p">,</span> <span class="n">page</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">hdf5_files</span><span class="p">,</span> <span class="n">scenario_names</span><span class="p">,</span> <span class="n">latin_square</span><span class="p">,</span> <span class="n">get_pid</span>
+
+    <span class="c"># initialize plot</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">11</span><span class="o">*</span><span class="mf">1.75</span><span class="p">,</span> <span class="mf">8.5</span><span class="o">*</span><span class="mf">1.75</span><span class="p">))</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">left</span><span class="o">=.</span><span class="mo">04</span><span class="p">,</span> <span class="n">right</span><span class="o">=.</span><span class="mi">96</span><span class="p">,</span>
+                        <span class="n">bottom</span><span class="o">=.</span><span class="mo">05</span><span class="p">,</span> <span class="n">top</span><span class="o">=.</span><span class="mi">97</span><span class="p">,</span>
+                        <span class="n">wspace</span><span class="o">=.</span><span class="mo">04</span><span class="p">,</span> <span class="n">hspace</span><span class="o">=.</span><span class="mo">04</span><span class="p">)</span>
+
+    <span class="c"># plot will have 2 axis. One is for Vehicle Speed, the other is</span>
+    <span class="c"># for relative distance of the DynObjs</span>
+    <span class="n">xticks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">660</span><span class="p">,</span><span class="mi">5280</span><span class="o">*</span><span class="mf">1.25</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">xlim</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5280</span><span class="o">*</span><span class="mf">1.25</span><span class="p">]</span>
+
+    <span class="c"># speed in MPH</span>
+    <span class="n">yticks1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">35</span><span class="p">,</span><span class="mi">75</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">ylim1</span> <span class="o">=</span> <span class="p">[</span><span class="mi">30</span><span class="p">,</span><span class="mi">80</span><span class="p">]</span>
+
+    <span class="c"># relative distance in Feet</span>
+    <span class="n">yticks2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">1500</span><span class="p">,</span><span class="mi">1500</span><span class="p">,</span><span class="mi">7</span><span class="p">)</span>
+    <span class="n">ylim2</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">1750</span><span class="p">,</span><span class="mi">1750</span><span class="p">]</span>
+
+    <span class="c"># loop through the hdf5_files that contain</span>
+    <span class="c"># data for the requested participants</span>
+    <span class="k">for</span> <span class="n">hdf5_file</span> <span class="ow">in</span> <span class="p">[</span><span class="n">hd</span> <span class="k">for</span> <span class="n">hd</span> <span class="ow">in</span> <span class="n">hdf5_files</span> <span class="k">if</span> <span class="n">get_pid</span><span class="p">(</span><span class="n">hd</span><span class="p">)</span> <span class="ow">in</span> <span class="n">pids</span><span class="p">]:</span>
+
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;analyzing &quot;</span><span class="si">%s</span><span class="s">&quot;&#39;</span><span class="o">%</span><span class="n">hdf5_file</span><span class="p">)</span>
+
+        <span class="n">daq</span> <span class="o">=</span> <span class="n">Daq</span><span class="p">()</span>
+        <span class="n">daq</span><span class="o">.</span><span class="n">read_hd5</span><span class="p">(</span><span class="n">hdf5_file</span><span class="p">)</span>
+        <span class="n">pid</span> <span class="o">=</span> <span class="n">daq</span><span class="o">.</span><span class="n">etc</span><span class="p">[</span><span class="s">&#39;pid&#39;</span><span class="p">]</span>
+
+        <span class="c"># figure out row number</span>
+        <span class="n">rnum</span> <span class="o">=</span> <span class="n">pids</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">pid</span><span class="p">)</span>
+
+        <span class="c"># find the relevant dynamic objects to plot</span>
+        <span class="n">platoon</span> <span class="o">=</span> <span class="p">[</span><span class="n">do</span> <span class="k">for</span> <span class="n">do</span> <span class="ow">in</span> <span class="n">daq</span><span class="o">.</span><span class="n">dynobjs</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="s">&#39;Ado&#39;</span> <span class="ow">in</span> <span class="n">do</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+        <span class="n">platoon</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">platoon</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">attrgetter</span><span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">))</span>
+
+        <span class="c"># for each trial...</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span> <span class="n">i</span><span class="o">*</span><span class="mi">10</span><span class="o">+</span><span class="mi">1</span> <span class="ow">in</span> <span class="n">daq</span><span class="o">.</span><span class="n">etc</span><span class="p">[</span><span class="s">&#39;epochs&#39;</span><span class="p">]</span> <span class="ow">and</span> \
+                     <span class="n">i</span><span class="o">*</span><span class="mi">10</span><span class="o">+</span><span class="mi">3</span> <span class="ow">in</span> <span class="n">daq</span><span class="o">.</span><span class="n">etc</span><span class="p">[</span><span class="s">&#39;epochs&#39;</span><span class="p">]):</span>
+
+                <span class="c"># encountered partial trial</span>
+                <span class="k">continue</span>
+
+            <span class="n">scenario</span> <span class="o">=</span> <span class="n">daq</span><span class="o">.</span><span class="n">etc</span><span class="p">[</span><span class="s">&#39;scen_order&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">scenario_name</span> <span class="o">=</span> <span class="n">scenario_names</span><span class="p">[</span><span class="n">scenario</span><span class="p">]</span>
+
+            <span class="k">print</span><span class="p">(</span><span class="s">&#39;  PID: </span><span class="si">%03i</span><span class="s">, Passing zone: </span><span class="si">%i</span><span class="s"> (</span><span class="si">%s</span><span class="s">)&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">scenario_name</span><span class="p">))</span>
+
+            <span class="c"># unpack the start frame of the 1-to-2 lane addition transition</span>
+            <span class="c"># and the stop frame of the 2-to-1 lane reduction transition</span>
+            <span class="n">f0</span> <span class="o">=</span> <span class="n">daq</span><span class="o">.</span><span class="n">etc</span><span class="p">[</span><span class="s">&#39;epochs&#39;</span><span class="p">][</span><span class="n">i</span><span class="o">*</span><span class="mi">10</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">start</span>
+            <span class="n">fend</span> <span class="o">=</span> <span class="n">daq</span><span class="o">.</span><span class="n">etc</span><span class="p">[</span><span class="s">&#39;epochs&#39;</span><span class="p">][</span><span class="n">i</span><span class="o">*</span><span class="mi">10</span><span class="o">+</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">stop</span>
+
+            <span class="c"># get axis handle</span>
+            <span class="n">ax1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">rnum</span><span class="o">*</span><span class="mi">10</span> <span class="o">+</span> <span class="n">scenario</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+            <span class="n">distance</span> <span class="o">=</span> <span class="n">daq</span><span class="p">[</span><span class="s">&#39;VDS_Veh_Dist&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="n">fslice</span><span class="p">(</span><span class="n">f0</span><span class="p">,</span> <span class="n">fend</span><span class="p">)]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+            <span class="n">distance</span> <span class="o">-=</span> <span class="n">distance</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="n">speed</span> <span class="o">=</span> <span class="n">daq</span><span class="p">[</span><span class="s">&#39;VDS_Veh_Speed&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="n">fslice</span><span class="p">(</span><span class="n">f0</span><span class="p">,</span> <span class="n">fend</span><span class="p">)]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+            <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">distance</span><span class="p">,</span> <span class="n">speed</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">)</span>
+            <span class="n">ax2</span> <span class="o">=</span> <span class="n">ax1</span><span class="o">.</span><span class="n">twinx</span><span class="p">()</span>
+
+            <span class="c"># we need to figure out when the Ados enter the passing lane</span>
+            <span class="c"># and exit the passing lane. To do this we need to know where</span>
+            <span class="c"># the passing lane starts and ends</span>
+            <span class="n">pos0</span> <span class="o">=</span> <span class="n">daq</span><span class="p">[</span><span class="s">&#39;VDS_Chassis_CG_Position&#39;</span><span class="p">][:,</span><span class="n">findex</span><span class="p">(</span><span class="n">f0</span><span class="p">)]</span>
+            <span class="n">posend</span> <span class="o">=</span> <span class="n">daq</span><span class="p">[</span><span class="s">&#39;VDS_Chassis_CG_Position&#39;</span><span class="p">][:,</span><span class="n">findex</span><span class="p">(</span><span class="n">fend</span><span class="p">)]</span>
+
+            <span class="c"># loop through and plot ados</span>
+            <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">do</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">platoon</span><span class="p">):</span>
+
+                <span class="c"># each passing zone has its own set of Ados. This</span>
+                <span class="c"># sorts out which are actually defined (should be</span>
+                <span class="c"># defined) for this trial.</span>
+                <span class="k">if</span> <span class="n">i</span><span class="o">*</span><span class="mi">10</span> <span class="o">&lt;=</span> <span class="nb">int</span><span class="p">(</span><span class="n">do</span><span class="o">.</span><span class="n">name</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:])</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="mi">10</span><span class="p">:</span>
+
+                    <span class="c"># figure out when the ado enters the</span>
+                    <span class="n">d0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">do</span><span class="o">.</span><span class="n">pos</span> <span class="o">-</span> <span class="n">pos0</span><span class="p">)</span><span class="o">**</span><span class="mf">2.</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">**.</span><span class="mi">5</span>
+                    <span class="n">dend</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">do</span><span class="o">.</span><span class="n">pos</span> <span class="o">-</span> <span class="n">posend</span><span class="p">)</span><span class="o">**</span><span class="mf">2.</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">**.</span><span class="mi">5</span>
+
+                    <span class="c"># indexes relative to do arrays</span>
+                    <span class="n">imin0</span> <span class="o">=</span> <span class="n">d0</span><span class="o">.</span><span class="n">argmin</span><span class="p">()</span>
+                    <span class="n">iminend</span> <span class="o">=</span> <span class="n">dend</span><span class="o">.</span><span class="n">argmin</span><span class="p">()</span>
+
+                    <span class="c"># now we can plot the Ados relative distance to the</span>
+                    <span class="c"># vehicle as a function of distance over the passing</span>
+                    <span class="c"># lane</span>
+                    <span class="n">distance</span> <span class="o">=</span> <span class="n">do</span><span class="o">.</span><span class="n">distance</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">imin0</span><span class="p">:</span><span class="n">iminend</span><span class="p">]</span>
+                    <span class="n">distance</span> <span class="o">-=</span> <span class="n">distance</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">rel_distance</span> <span class="o">=</span> <span class="n">do</span><span class="o">.</span><span class="n">relative_distance</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">imin0</span><span class="p">:</span><span class="n">iminend</span><span class="p">]</span>
+                    <span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">distance</span><span class="p">,</span> <span class="n">rel_distance</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;g&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
+
+            <span class="c"># make things pretty</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">ylim1</span><span class="p">)</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="n">yticks1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">scenario</span><span class="p">:</span>
+                <span class="n">ax1</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">([</span><span class="s">&#39;&#39;</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">yticks1</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ax1</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">yticks1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;b&#39;</span><span class="p">)</span>
+
+            <span class="n">ax2</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;k&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s">&#39;:&#39;</span><span class="p">)</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">ylim2</span><span class="p">)</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="n">yticks2</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">scenario</span> <span class="o">!=</span> <span class="mi">9</span><span class="p">:</span>
+                <span class="n">ax2</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">([</span><span class="s">&#39;&#39;</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">yticks2</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ax2</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">yticks2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;g&#39;</span><span class="p">)</span>
+
+            <span class="n">ax2</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">xlim</span><span class="p">)</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">xticks</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">rnum</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">scenario_names</span><span class="p">[</span><span class="n">scenario</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="n">rnum</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">pids</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">ax1</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">([</span><span class="s">&#39;</span><span class="si">%i</span><span class="s">&#39;</span><span class="o">%</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xticks</span><span class="p">],</span>
+                                    <span class="n">rotation</span><span class="o">=</span><span class="s">&#39;vertical&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ax1</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">([</span><span class="s">&#39;&#39;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xticks</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">scenario</span><span class="p">:</span>
+                <span class="n">ax1</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mi">660</span><span class="p">,</span><span class="mi">35</span><span class="p">,</span><span class="s">&#39;Participant: </span><span class="si">%03i</span><span class="s"> =&gt;&#39;</span><span class="o">%</span><span class="n">pids</span><span class="p">[</span><span class="n">rnum</span><span class="p">],</span>
+                         <span class="n">size</span><span class="o">=</span><span class="s">&#39;small&#39;</span><span class="p">)</span>
+
+    <span class="n">img_name</span> <span class="o">=</span> <span class="s">&#39;do_passing_behavior__PAGE</span><span class="si">%i</span><span class="s">.png&#39;</span><span class="o">%</span><span class="n">page</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">img_name</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">scenario_names</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;Baseline&#39;</span><span class="p">,</span>
+                      <span class="s">&#39;Advisory&#39;</span><span class="p">,</span>
+                      <span class="s">&#39;Reg&#39;</span><span class="p">,</span>
+                      <span class="s">&#39;Reg + Adv&#39;</span><span class="p">,</span>
+                      <span class="s">&#39;Chevrons&#39;</span><span class="p">,</span>
+                      <span class="s">&#39;Lines&#39;</span><span class="p">,</span>
+                      <span class="s">&#39;Narrowing&#39;</span><span class="p">,</span>
+                      <span class="s">&#39;Parallax&#39;</span><span class="p">,</span>
+                      <span class="s">&#39;Force Rh&#39;</span><span class="p">,</span>
+                      <span class="s">&#39;Lines w/ mid&#39;</span><span class="p">]</span>
+
+    <span class="n">n</span> <span class="o">=</span> <span class="mi">8</span> <span class="c"># number of pids per page</span>
+
+    <span class="c"># data is on a local SSD drive. This is very important for performance.</span>
+    <span class="n">data_dir</span> <span class="o">=</span> <span class="s">&#39;C:</span><span class="se">\\</span><span class="s">LocalData</span><span class="se">\\</span><span class="s">Left Lane</span><span class="se">\\</span><span class="s">&#39;</span>
+
+    <span class="c"># change the directory of the kernel</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Changing wd to &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span><span class="o">%</span><span class="n">data_dir</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span>
+
+    <span class="n">get_pid</span> <span class="o">=</span> <span class="k">lambda</span>  <span class="n">fname</span> <span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">fname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\\</span><span class="s">&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">4</span><span class="p">:])</span>
+    <span class="n">hdf5_files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s">&#39;*/*.hdf5&#39;</span><span class="p">)</span>
+    <span class="n">pids</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">get_pid</span><span class="p">(</span><span class="n">hf</span><span class="p">)</span> <span class="k">for</span> <span class="n">hf</span> <span class="ow">in</span> <span class="n">hdf5_files</span><span class="p">])))</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">pids</span><span class="p">)</span><span class="o">/</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">mult_ado_by_pid_plot</span><span class="p">(</span><span class="n">pids</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">n</span><span class="p">:</span><span class="n">i</span><span class="o">*</span><span class="n">n</span><span class="o">+</span><span class="n">n</span><span class="p">],</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">Done.</span><span class="se">\n\n</span><span class="s">Making multipanel plot took </span><span class="si">%.1f</span><span class="s"> s&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">t0</span><span class="p">))</span>
+</pre></div>
+</div>
+<p><strong>The plots</strong></p>
+<p>Download
+[<a class="reference download internal" href="_downloads/ensemble_speed.png"><tt class="xref download docutils literal"><span class="pre">hi-res</span></tt></a>]</p>
+<a class="reference internal image-reference" href="_images/ensemble_speed.png"><img alt="ensemble_speed.png" class="align-center" src="_images/ensemble_speed.png" style="width: 750px;" /></a>
+<p><strong>Example Output</strong>:</p>
+<div class="highlight-python"><pre>Changing wd to 'C:\LocalData\Left Lane\'
+analyzing "Part01\Left_01_20130424102744.hdf5"
+  PID: 001, Passing zone: 0 (Baseline)
+  PID: 001, Passing zone: 1 (Advisory)
+  PID: 001, Passing zone: 2 (Lines w/ mid)
+    Ado28 did not drive through passing zone
+  PID: 001, Passing zone: 3 (Reg)
+  PID: 001, Passing zone: 4 (Force Rh)
+  PID: 001, Passing zone: 5 (Reg + Adv)
+  PID: 001, Passing zone: 6 (Parallax)
+  PID: 001, Passing zone: 7 (Chevrons)
+  PID: 001, Passing zone: 8 (Narrowing)
+  PID: 001, Passing zone: 9 (Lines)
+analyzing "Part02\Left_02_20130425084730.hdf5"
+  PID: 002, Passing zone: 0 (Advisory)
+  PID: 002, Passing zone: 1 (Reg)
+  PID: 002, Passing zone: 2 (Baseline)
+  PID: 002, Passing zone: 3 (Reg + Adv)
+  PID: 002, Passing zone: 4 (Lines w/ mid)
+  PID: 002, Passing zone: 5 (Chevrons)
+  PID: 002, Passing zone: 6 (Force Rh)
+  PID: 002, Passing zone: 7 (Lines)
+  PID: 002, Passing zone: 8 (Parallax)
+  PID: 002, Passing zone: 9 (Narrowing)
+analyzing "Part03\Left_03_20130425102301.hdf5"
+  PID: 003, Passing zone: 0 (Reg)
+  PID: 003, Passing zone: 1 (Reg + Adv)
+  PID: 003, Passing zone: 2 (Advisory)
+  PID: 003, Passing zone: 3 (Chevrons)
+  PID: 003, Passing zone: 4 (Baseline)
+  PID: 003, Passing zone: 5 (Lines)
+  PID: 003, Passing zone: 6 (Lines w/ mid)
+  PID: 003, Passing zone: 7 (Narrowing)
+  PID: 003, Passing zone: 8 (Force Rh)
+  PID: 003, Passing zone: 9 (Parallax)
+analyzing "Part04\Left_04_20130425142804.hdf5"
+  PID: 004, Passing zone: 0 (Reg + Adv)
+  PID: 004, Passing zone: 1 (Chevrons)
+  PID: 004, Passing zone: 2 (Reg)
+  PID: 004, Passing zone: 3 (Lines)
+  PID: 004, Passing zone: 4 (Advisory)
+  PID: 004, Passing zone: 5 (Narrowing)
+  PID: 004, Passing zone: 6 (Baseline)
+  PID: 004, Passing zone: 7 (Parallax)
+  PID: 004, Passing zone: 8 (Lines w/ mid)
+  PID: 004, Passing zone: 9 (Force Rh)
+analyzing "Part05\Left_05_20130425161122.hdf5"
+  PID: 005, Passing zone: 0 (Chevrons)
+  PID: 005, Passing zone: 1 (Lines)
+  PID: 005, Passing zone: 2 (Reg + Adv)
+  PID: 005, Passing zone: 3 (Narrowing)
+  PID: 005, Passing zone: 4 (Reg)
+  PID: 005, Passing zone: 5 (Parallax)
+  PID: 005, Passing zone: 6 (Advisory)
+  PID: 005, Passing zone: 7 (Force Rh)
+  PID: 005, Passing zone: 8 (Baseline)
+  PID: 005, Passing zone: 9 (Lines w/ mid)
+analyzing "Part06\Left_06_20130426111502.hdf5"
+  PID: 006, Passing zone: 0 (Lines)
+  PID: 006, Passing zone: 1 (Narrowing)
+  PID: 006, Passing zone: 2 (Chevrons)
+  PID: 006, Passing zone: 3 (Parallax)
+  PID: 006, Passing zone: 4 (Reg + Adv)
+  PID: 006, Passing zone: 5 (Force Rh)
+  PID: 006, Passing zone: 6 (Reg)
+  PID: 006, Passing zone: 7 (Lines w/ mid)
+  PID: 006, Passing zone: 8 (Advisory)
+  PID: 006, Passing zone: 9 (Baseline)
+analyzing "Part07\Left_07_20130426143846.hdf5"
+  PID: 007, Passing zone: 0 (Narrowing)
+  PID: 007, Passing zone: 1 (Parallax)
+  PID: 007, Passing zone: 2 (Lines)
+  PID: 007, Passing zone: 3 (Force Rh)
+  PID: 007, Passing zone: 4 (Chevrons)
+  PID: 007, Passing zone: 5 (Lines w/ mid)
+  PID: 007, Passing zone: 6 (Reg + Adv)
+  PID: 007, Passing zone: 7 (Baseline)
+  PID: 007, Passing zone: 8 (Reg)
+    Ado82 did not drive through passing zone
+  PID: 007, Passing zone: 9 (Advisory)
+analyzing "Part08\Left_08_20130426164114.hdf5"
+analyzing "Part08\Left_08_20130426164301.hdf5"
+  PID: 008, Passing zone: 0 (Parallax)
+  PID: 008, Passing zone: 1 (Force Rh)
+  PID: 008, Passing zone: 2 (Narrowing)
+  PID: 008, Passing zone: 3 (Lines w/ mid)
+  PID: 008, Passing zone: 4 (Lines)
+  PID: 008, Passing zone: 5 (Baseline)
+  PID: 008, Passing zone: 6 (Chevrons)
+  PID: 008, Passing zone: 7 (Advisory)
+  PID: 008, Passing zone: 8 (Reg + Adv)
+  PID: 008, Passing zone: 9 (Reg)
+analyzing "Part09\Left09_20130423155149.hdf5"
+  PID: 009, Passing zone: 0 (Force Rh)
+  PID: 009, Passing zone: 1 (Lines w/ mid)
+  PID: 009, Passing zone: 2 (Parallax)
+  PID: 009, Passing zone: 3 (Baseline)
+  PID: 009, Passing zone: 4 (Narrowing)
+  PID: 009, Passing zone: 5 (Advisory)
+  PID: 009, Passing zone: 6 (Lines)
+  PID: 009, Passing zone: 7 (Reg)
+  PID: 009, Passing zone: 8 (Chevrons)
+  PID: 009, Passing zone: 9 (Reg + Adv)
+analyzing "Part10\Left10_20130423155149.hdf5"
+  PID: 010, Passing zone: 0 (Lines w/ mid)
+  PID: 010, Passing zone: 1 (Baseline)
+  PID: 010, Passing zone: 2 (Force Rh)
+  PID: 010, Passing zone: 3 (Advisory)
+  PID: 010, Passing zone: 4 (Parallax)
+  PID: 010, Passing zone: 5 (Reg)
+  PID: 010, Passing zone: 6 (Narrowing)
+  PID: 010, Passing zone: 7 (Reg + Adv)
+  PID: 010, Passing zone: 8 (Lines)
+  PID: 010, Passing zone: 9 (Chevrons)
+analyzing "Part12\Left_12_20130429163745.hdf5"
+  PID: 012, Passing zone: 0 (Advisory)
+  PID: 012, Passing zone: 1 (Reg)
+  PID: 012, Passing zone: 2 (Baseline)
+  PID: 012, Passing zone: 3 (Reg + Adv)
+  PID: 012, Passing zone: 4 (Lines w/ mid)
+  PID: 012, Passing zone: 5 (Chevrons)
+  PID: 012, Passing zone: 6 (Force Rh)
+  PID: 012, Passing zone: 7 (Lines)
+  PID: 012, Passing zone: 8 (Parallax)
+  PID: 012, Passing zone: 9 (Narrowing)
+analyzing "Part13\Left_13_20130429182923.hdf5"
+  PID: 013, Passing zone: 0 (Reg)
+  PID: 013, Passing zone: 1 (Reg + Adv)
+  PID: 013, Passing zone: 2 (Advisory)
+  PID: 013, Passing zone: 3 (Chevrons)
+  PID: 013, Passing zone: 4 (Baseline)
+  PID: 013, Passing zone: 5 (Lines)
+  PID: 013, Passing zone: 6 (Lines w/ mid)
+  PID: 013, Passing zone: 7 (Narrowing)
+  PID: 013, Passing zone: 8 (Force Rh)
+  PID: 013, Passing zone: 9 (Parallax)
+analyzing "Part14\Left_14_20130430102504.hdf5"
+  PID: 014, Passing zone: 0 (Reg + Adv)
+  PID: 014, Passing zone: 1 (Chevrons)
+  PID: 014, Passing zone: 2 (Reg)
+  PID: 014, Passing zone: 3 (Lines)
+  PID: 014, Passing zone: 4 (Advisory)
+  PID: 014, Passing zone: 5 (Narrowing)
+  PID: 014, Passing zone: 6 (Baseline)
+  PID: 014, Passing zone: 7 (Parallax)
+  PID: 014, Passing zone: 8 (Lines w/ mid)
+  PID: 014, Passing zone: 9 (Force Rh)
+analyzing "Part15\Left_15_20130430171947.hdf5"
+  PID: 015, Passing zone: 0 (Chevrons)
+  PID: 015, Passing zone: 1 (Lines)
+  PID: 015, Passing zone: 2 (Reg + Adv)
+  PID: 015, Passing zone: 3 (Narrowing)
+  PID: 015, Passing zone: 4 (Reg)
+  PID: 015, Passing zone: 5 (Parallax)
+  PID: 015, Passing zone: 6 (Advisory)
+  PID: 015, Passing zone: 7 (Force Rh)
+  PID: 015, Passing zone: 8 (Baseline)
+  PID: 015, Passing zone: 9 (Lines w/ mid)
+analyzing "Part16\Left_16_20130501103917.hdf5"
+  PID: 016, Passing zone: 0 (Lines)
+  PID: 016, Passing zone: 1 (Narrowing)
+  PID: 016, Passing zone: 2 (Chevrons)
+  PID: 016, Passing zone: 3 (Parallax)
+  PID: 016, Passing zone: 4 (Reg + Adv)
+  PID: 016, Passing zone: 5 (Force Rh)
+  PID: 016, Passing zone: 6 (Reg)
+  PID: 016, Passing zone: 7 (Lines w/ mid)
+  PID: 016, Passing zone: 8 (Advisory)
+  PID: 016, Passing zone: 9 (Baseline)
+analyzing "Part18\Left_18_20130502084422.hdf5"
+  PID: 018, Passing zone: 0 (Parallax)
+  PID: 018, Passing zone: 1 (Force Rh)
+  PID: 018, Passing zone: 2 (Narrowing)
+analyzing "Part18\Left_18_reset_20130502090909.hdf5"
+  PID: 018, Passing zone: 3 (Lines w/ mid)
+  PID: 018, Passing zone: 4 (Lines)
+  PID: 018, Passing zone: 5 (Baseline)
+  PID: 018, Passing zone: 6 (Chevrons)
+  PID: 018, Passing zone: 7 (Advisory)
+  PID: 018, Passing zone: 8 (Reg + Adv)
+  PID: 018, Passing zone: 9 (Reg)
+analyzing "Part111\Left_11_20130430081052.hdf5"
+  PID: 111, Passing zone: 0 (Baseline)
+  PID: 111, Passing zone: 1 (Advisory)
+  PID: 111, Passing zone: 2 (Lines w/ mid)
+  PID: 111, Passing zone: 3 (Reg)
+  PID: 111, Passing zone: 4 (Force Rh)
+  PID: 111, Passing zone: 5 (Reg + Adv)
+  PID: 111, Passing zone: 6 (Parallax)
+  PID: 111, Passing zone: 7 (Chevrons)
+  PID: 111, Passing zone: 8 (Narrowing)
+  PID: 111, Passing zone: 9 (Lines)
+analyzing "Part170\Left_17_20130501163745.hdf5"
+  PID: 170, Passing zone: 0 (Lines w/ mid)
+  PID: 170, Passing zone: 1 (Baseline)
+  PID: 170, Passing zone: 2 (Force Rh)
+  PID: 170, Passing zone: 3 (Advisory)
+  PID: 170, Passing zone: 4 (Parallax)
+  PID: 170, Passing zone: 5 (Reg)
+  PID: 170, Passing zone: 6 (Narrowing)
+  PID: 170, Passing zone: 7 (Reg + Adv)
+  PID: 170, Passing zone: 8 (Lines)
+  PID: 170, Passing zone: 9 (Chevrons)
+analyzing "Part19\Left_19_20130502153547.hdf5"
+  PID: 019, Passing zone: 0 (Force Rh)
+  PID: 019, Passing zone: 1 (Lines w/ mid)
+  PID: 019, Passing zone: 2 (Parallax)
+  PID: 019, Passing zone: 3 (Baseline)
+  PID: 019, Passing zone: 4 (Narrowing)
+  PID: 019, Passing zone: 5 (Advisory)
+  PID: 019, Passing zone: 6 (Lines)
+  PID: 019, Passing zone: 7 (Reg)
+  PID: 019, Passing zone: 8 (Chevrons)
+  PID: 019, Passing zone: 9 (Reg + Adv)
+analyzing "Part200\Left_20_20130509094509.hdf5"
+  PID: 200, Passing zone: 0 (Lines w/ mid)
+  PID: 200, Passing zone: 1 (Baseline)
+  PID: 200, Passing zone: 2 (Force Rh)
+  PID: 200, Passing zone: 3 (Advisory)
+  PID: 200, Passing zone: 4 (Parallax)
+  PID: 200, Passing zone: 5 (Reg)
+  PID: 200, Passing zone: 6 (Narrowing)
+  PID: 200, Passing zone: 7 (Reg + Adv)
+  PID: 200, Passing zone: 8 (Lines)
+  PID: 200, Passing zone: 9 (Chevrons)
+
+Done.
+
+Making multipanel plot took 205.4 s</pre>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="example04.html"
+                        title="previous chapter">Example 04: Multipanel ensemble plot</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/example05.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<ul class="this-page-menu">
+  <li><a href="/numpy/docs/numpy-docs/example05.rst">Edit page</a></li>
+</ul>
+
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="example04.html" title="Example 04: Multipanel ensemble plot"
+             >previous</a> |</li>
+<li><a href="index.html">undaqTools 0.2.0 documentation</a> &raquo;</li>
+
+          <li><a href="examples_index.html" >Examples Overview</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Roger Lew.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

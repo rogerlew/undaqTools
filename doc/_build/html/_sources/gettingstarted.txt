@@ -41,6 +41,10 @@ if you want to output mat files for ndaqTools you can use -o mat or
 
     $ undaq.py */* -n 6 -o mat
     
+By default undaq will process all the dynamic objects in the drive. If you
+wish to supress this use the -p or -process_dynobjs. The presence of the
+flag turns the processing off.
+
 lastly there is a flag print debugging information -d or --debug::
  
     $ undaq.py */* -n 6 -d
@@ -49,10 +53,124 @@ There are multiple level of error checking so the batch processing should
 never completely fail (knock-on-wood, don't forget the caveat about memory
 ussage), but sometimes warnings might get thrown if the daq is missing 
 frames or ends abruptly. When these things occur undaq does its best to
-fix what went wrong and make the interaction with the Daq files consistent.
-To make the output more readable these warnings are suppressed until the 
-batch processing has finished and only display if in debug mode.
-    
+fix what went wrong fix the Daq files.
+
+The output::
+
+    C:\LocalData\Left Lane>undaq.py */* -n 6 -r -d
+
+    Glob Summary
+    --------------------------------------------------------------------
+                                                                  hdf5
+    daq                                            size (KB)      exists
+    --------------------------------------------------------------------
+    Part01\Left_01_20130424102744.daq              1,535,587        True
+    Part02\Left_02_20130425084730.daq              1,543,370        True
+    Part03\Left_03_20130425102301.daq              1,518,779        True
+    Part04\Left_04_20130425142804.daq              1,387,550        True
+    Part05\Left_05_20130425161122.daq              1,609,689        True
+    Part06\Left_06_20130426111502.daq              1,364,879        True
+    Part07\Left_07_20130426143846.daq              1,509,513        True
+    Part08\Left_08_20130426164114.daq                  4,565        True
+    Part08\Left_08_20130426164301.daq              1,426,507        True
+    Part09\Left09_20130423155149.daq               1,339,437        True
+    Part10\Left10_20130423155149.daq               1,339,437        True
+    Part11\Left_11_20130429102407.daq                410,624        True
+    Part111\Left_11_20130430081052.daq             1,463,012        True
+    Part12\Left_12_20130429163745.daq              1,431,765        True
+    Part13\Left_13_20130429182923.daq              1,507,542        True
+    Part14\Left_14_20130430102504.daq              1,502,793        True
+    Part15\Left_15_20130430171947.daq              1,669,443        True
+    Part16\Left_16_20130501103917.daq              1,341,214        True
+    Part170\Left_17_20130501163745.daq             1,552,098        True
+    Part18\Left_18_20130502084422.daq                416,873        True
+    Part18\Left_18_reset_20130502090909.daq        1,128,833        True
+    Part19\Left_19_20130502153547.daq              1,526,510        True
+    Part200\Left_20_20130509094509.daq             1,572,357        True
+    --------------------------------------------------------------------
+
+
+    debug = True
+    rebuild = True
+    process_dynobjs = True
+
+    Converting daqs with 6 cpus (this may take awhile)...
+      Part01\Left_01_20130424102744.daq -> .hdf5 (292.7 s)
+      Part02\Left_02_20130425084730.daq -> .hdf5 (294.6 s)
+      Part03\Left_03_20130425102301.daq -> .hdf5 (226.8 s)
+      Part04\Left_04_20130425142804.daq -> .hdf5 (219.1 s)
+      Part05\Left_05_20130425161122.daq -> .hdf5 (207.7 s)
+      Part06\Left_06_20130426111502.daq -> .hdf5 (270.2 s)
+      Part07\Left_07_20130426143846.daq -> .hdf5 (252.5 s)
+      Part08\Left_08_20130426164114.daq -> .hdf5 (0.7 s)
+      Part08\Left_08_20130426164301.daq -> .hdf5 (238.6 s)
+      Part09\Left09_20130423155149.daq -> .hdf5 (170.3 s)
+      Part10\Left10_20130423155149.daq -> .hdf5 (168.4 s)
+      Part11\Left_11_20130429102407.daq -> .hdf5 (68.1 s)
+      Part111\Left_11_20130430081052.daq -> .hdf5 (187.1 s)
+      Part12\Left_12_20130429163745.daq -> .hdf5 (182.5 s)
+      Part13\Left_13_20130429182923.daq -> .hdf5 (194.8 s)
+      Part14\Left_14_20130430102504.daq -> .hdf5 (186.4 s)
+      Part15\Left_15_20130430171947.daq -> .hdf5 (207.4 s)
+      Part16\Left_16_20130501103917.daq -> .hdf5 (176.2 s)
+      Part170\Left_17_20130501163745.daq -> .hdf5 (194.0 s)
+      Part18\Left_18_20130502084422.daq -> .hdf5 (52.0 s)
+      Part18\Left_18_reset_20130502090909.daq -> .hdf5 (130.2 s)
+      Part19\Left_19_20130502153547.daq -> .hdf5 (201.5 s)
+      Part200\Left_20_20130509094509.daq -> .hdf5 (198.1 s)
+
+
+    Debug Summary
+      Part01\Left_01_20130424102744.daq
+        Warning: Missing frames. (interpolated missing frames)
+
+      Part02\Left_02_20130425084730.daq
+        Warning: Missing frames. (interpolated missing frames)
+
+      Part06\Left_06_20130426111502.daq
+        Warning: Missing frames. (interpolated missing frames)
+
+      Part07\Left_07_20130426143846.daq
+        Warning: Missing frames. (interpolated missing frames)
+
+      Part08\Left_08_20130426164301.daq
+        Warning: Missing frames. (interpolated missing frames)
+
+      Part11\Left_11_20130429102407.daq
+        Warning: Failed loading file on frame 615180. (stopped reading file)
+
+
+    Batch processing completed.
+
+    --------------------------------------------------------------------
+    Conversion Summary
+    --------------------------------------------------------------------
+    Total elapsed time: 823.7 s
+    Data converted: 29,396.864 MB
+    Data throughput: 35.7 MB/s
+    --------------------------------------------------------------------
+
+    C:\LocalData\Left Lane>
+
+The Glob summary is emitted immediately. It allows users to see what files
+undaq has found and see whether it already has a cooresponding daq or hdf5
+file converted.
+
+After the summary undaq will tell you whether it is in debug mode, as well
+as whether it is in rebuild mode.
+
+Then it will produce a running log alerting users as their daqs finish. 
+The multiprocessing maintains the order from the glob summary so the output
+may be delayed until other files in its multiprocessing cohort complete.
+
+To make the output more readable undaq catches and supresses the warnings 
+until the batch processing has finished, and then only display if in debug 
+mode.
+ 
+Lastly, a conversion summary is provided. From this we can see it processed
+almost 30 Gb of data in 789.7 seconds at a rate of 35.7 MB/s. These 
+particular files have several hundred Ados that have to be unpacked.
+ 
 Daq Objects
 ------------
 
@@ -254,7 +372,9 @@ subplots are specified. It also knows to represent time series measures
 as step functions. The method returns a matplotlib.figure.Figure instance.
 
 Building a timeseries plot::
-
+    import matplotlib.pyplot as plt
+    from undaqTools import Daq
+    
     elems_indxs = [('CFS_Accelerator_Pedal_Position', 0),
                    ('SCC_Spline_Lane_Deviation', 1),
                    ('SCC_Spline_Lane_Deviation_Fixed', 0),
@@ -262,10 +382,11 @@ Building a timeseries plot::
                    ('VDS_Tire_Weight_On_Wheels', slice(0,4))]
                  
     daq = Daq()
-    daq.read_hd5(os.path.join('data', hdf5file))
+    daq.read_hd5(hdf5file)
     fig = daq.plot_ts(elems_indxs, xindx=fslice(6000, None))
     fig.savefig('ts_plot.png')
-
+    plt.close('all')
+    
 Download 
 [:download:`hi-res <_static/ts_plot.png>`]
 
@@ -274,8 +395,35 @@ Download
     :align: center
     :alt: ts_plot.png
     
+DynObjs Plots
+-----------------
+The Daq Class also has a routine to visualize the pathes taken by the 
+OwnVehicle and dynamic objects.
+
+dynobjs plot::
+
+    import matplotlib.pyplot as plt
+    from undaqTools import Daq
+    
+                 
+    daq = Daq()
+    daq.read_hd5(hdf5file)
+    fig = daq.plot_dynobjs('Ado*')
+    fig.savefig('dynobjs_plot.png')
+    plt.close('all')
+
+Download 
+[:download:`hi-res <_static/dynobjs_plot.png>`]
+
+.. image:: _static/dynobjs_plot.png 
+    :width: 750px
+    :align: center
+    :alt: dynobjs_plot.png
+    
 Lastly: The Absence of a Time is a Feature
 -------------------------------------------
-Time is almost completly redundant with the frames data. Just start 
-thinking in frames. It will soon become second nature. When you need 
-time just divide the frames by the sampling rate.
+Time is almost completly redundant with the frames data for most things. 
+Just start thinking in frames. It will soon become second nature.
+
+If you do need time there is the 'SCC_Graphics_Wall_Clock_Time' data. It
+an int32 Element with millisecond units. It doesn't start at 0.

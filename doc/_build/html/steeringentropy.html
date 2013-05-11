@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -15,7 +13,7 @@
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
+        URL_ROOT:    './',
         VERSION:     '0.2.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -26,6 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="undaqTools 0.2.0 documentation" href="index.html" />
+    <link rel="next" title="Examples Overview" href="examples_index.html" />
     <link rel="prev" title="logstream" href="logstream.html" /> 
   </head>
   <body>
@@ -35,6 +34,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="examples_index.html" title="Examples Overview"
+             accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="logstream.html" title="logstream"
              accesskey="P">previous</a> |</li>
@@ -153,104 +155,6 @@ Detriot, Michigan. March 1-4, 1999.</dd>
 </dd></dl>
 
 <dl class="method">
-<dt id="undaqTools.steeringentropy.SteeringEntropyModel.get_entropy">
-<tt class="descname">get_entropy</tt><big>(</big><em>self, x[, fs=60.][, _pedistplot=False]</em><big>)</big><a class="headerlink" href="#undaqTools.steeringentropy.SteeringEntropyModel.get_entropy" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns steering entropy from given data vector. Specify fs if not
-collected at 60 Hz.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>x</strong> : array_like</p>
-<blockquote>
-<div><p>Input data. Should specify steering wheel angle over at least 60 s</p>
-</div></blockquote>
-<p><strong>fs</strong> : float</p>
-<blockquote>
-<div><p>sampling rate of x in Hz. Default is 60 Hz.
-Be sure to specify fs if x was not sampled at 60 Hz.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>hbas</strong> : float</p>
-<blockquote class="last">
-<div><p>baseline entropy</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="undaqTools.steeringentropy.SteeringEntropyModel.bode">
-<tt class="descname">bode</tt><big>(</big><big>)</big><a class="headerlink" href="#undaqTools.steeringentropy.SteeringEntropyModel.bode" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns bode plot of AR coeffs filter</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><strong>None</strong> :</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><strong>fig</strong> : matplotlib.figure.Figure</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="undaqTools.steeringentropy.SteeringEntropyModel._build_lpfilter">
-<tt class="descname">_build_lpfilter</tt><big>(</big><em>fs</em><big>)</big><a class="headerlink" href="#undaqTools.steeringentropy.SteeringEntropyModel._build_lpfilter" title="Permalink to this definition">¶</a></dt>
-<dd><p>builds low-pass filter with a cutoff frequency of 3/7th the resample
-frequency. The filter should be down 40 dB at 1.5 times the cutoff
-frequency (6/7th) the resample frequency.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>fs</strong> : the base sampling rate</p>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>b, a</strong> : array_like</p>
-<blockquote class="last">
-<div><p>Numerator (b) and denominator (a) polynomials of the IIR filter.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="undaqTools.steeringentropy.SteeringEntropyModel._resample">
-<tt class="descname">_resample</tt><big>(</big><em>x</em>, <em>fs</em><big>)</big><a class="headerlink" href="#undaqTools.steeringentropy.SteeringEntropyModel._resample" title="Permalink to this definition">¶</a></dt>
-<dd><p>Private method applies 5th low-pass Butterworth filter to x
-and resamples and returns x at self.resample_fs.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>x</strong> : array_like</p>
-<blockquote>
-<div><p>Input data.</p>
-</div></blockquote>
-<p><strong>fs</strong> : float</p>
-<blockquote>
-<div><p>sampling rate of x in Hz</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>x_resampled</strong> : np.ndarray</p>
-<blockquote class="last">
-<div><p>low-passed and resampled copy of x</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
 <dt id="undaqTools.steeringentropy.SteeringEntropyModel._baseline_tsplot">
 <tt class="descname">_baseline_tsplot</tt><big>(</big><em>x</em>, <em>_x</em>, <em>PE</em>, <em>fs</em><big>)</big><a class="headerlink" href="#undaqTools.steeringentropy.SteeringEntropyModel._baseline_tsplot" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns ts plot to fit_baseline so it can be
@@ -285,10 +189,108 @@ returned indirectly to user</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="undaqTools.steeringentropy.SteeringEntropyModel._build_lpfilter">
+<tt class="descname">_build_lpfilter</tt><big>(</big><em>fs</em><big>)</big><a class="headerlink" href="#undaqTools.steeringentropy.SteeringEntropyModel._build_lpfilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>builds low-pass filter with a cutoff frequency of 3/7th the resample
+frequency. The filter should be down 40 dB at 1.5 times the cutoff
+frequency (6/7th) the resample frequency.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>fs</strong> : the base sampling rate</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>b, a</strong> : array_like</p>
+<blockquote class="last">
+<div><p>Numerator (b) and denominator (a) polynomials of the IIR filter.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="undaqTools.steeringentropy.SteeringEntropyModel._pedistplot">
 <tt class="descname">_pedistplot</tt><big>(</big><em>Pk</em><big>)</big><a class="headerlink" href="#undaqTools.steeringentropy.SteeringEntropyModel._pedistplot" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns plot to get_entropy so it can be
 returned indirectly to user</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="undaqTools.steeringentropy.SteeringEntropyModel._resample">
+<tt class="descname">_resample</tt><big>(</big><em>x</em>, <em>fs</em><big>)</big><a class="headerlink" href="#undaqTools.steeringentropy.SteeringEntropyModel._resample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Private method applies 5th low-pass Butterworth filter to x
+and resamples and returns x at self.resample_fs.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>x</strong> : array_like</p>
+<blockquote>
+<div><p>Input data.</p>
+</div></blockquote>
+<p><strong>fs</strong> : float</p>
+<blockquote>
+<div><p>sampling rate of x in Hz</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>x_resampled</strong> : np.ndarray</p>
+<blockquote class="last">
+<div><p>low-passed and resampled copy of x</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="undaqTools.steeringentropy.SteeringEntropyModel.bode">
+<tt class="descname">bode</tt><big>(</big><big>)</big><a class="headerlink" href="#undaqTools.steeringentropy.SteeringEntropyModel.bode" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns bode plot of AR coeffs filter</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><strong>None</strong> :</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><strong>fig</strong> : matplotlib.figure.Figure</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="undaqTools.steeringentropy.SteeringEntropyModel.get_entropy">
+<tt class="descname">get_entropy</tt><big>(</big><em>self, x[, fs=60.][, _pedistplot=False]</em><big>)</big><a class="headerlink" href="#undaqTools.steeringentropy.SteeringEntropyModel.get_entropy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns steering entropy from given data vector. Specify fs if not
+collected at 60 Hz.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>x</strong> : array_like</p>
+<blockquote>
+<div><p>Input data. Should specify steering wheel angle over at least 60 s</p>
+</div></blockquote>
+<p><strong>fs</strong> : float</p>
+<blockquote>
+<div><p>sampling rate of x in Hz. Default is 60 Hz.
+Be sure to specify fs if x was not sampled at 60 Hz.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>hbas</strong> : float</p>
+<blockquote class="last">
+<div><p>baseline entropy</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -304,6 +306,9 @@ returned indirectly to user</p>
   <h4>Previous topic</h4>
   <p class="topless"><a href="logstream.html"
                         title="previous chapter">logstream</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="examples_index.html"
+                        title="next chapter">Examples Overview</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/steeringentropy.txt"
@@ -338,6 +343,9 @@ returned indirectly to user</p>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
+          <a href="examples_index.html" title="Examples Overview"
+             >next</a> |</li>
+        <li class="right" >
           <a href="logstream.html" title="logstream"
              >previous</a> |</li>
 <li><a href="index.html">undaqTools 0.2.0 documentation</a> &raquo;</li>
@@ -346,7 +354,7 @@ returned indirectly to user</p>
     </div>
     <div class="footer">
         &copy; Copyright 2013, Roger Lew.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
   </body>
 </html>

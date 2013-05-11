@@ -118,7 +118,7 @@ class Test_load(unittest.TestCase):
         assert_array_equal(rs, daq.keys())
 
     def test_load_partial(self):
-        global test_file
+        """test a file that did not close properly"""
 
         try:
             with open(os.path.join('data', partial)):
@@ -127,8 +127,32 @@ class Test_load(unittest.TestCase):
             return
         
         daq = Daq()
-        daq.read(os.path.join('data', partial))
+        with warnings.catch_warnings(record=True) as w:
+            daq.read(os.path.join('data', partial))
 
+        self.assertEqual(len(daq.keys()), 246)
+        self.assertEqual(daq['VDS_Veh_Speed'].shape, (1, 68646))
+        
+    def test_load_missing(self):
+        """test a file with missing frames"""
+        missing = 'Left_08_20130426164301.daq'
+
+        try:
+            with open(os.path.join('data', missing)):
+                pass
+        except:
+            return
+        
+        daq = Daq()
+        with warnings.catch_warnings(record=True) as w:
+            daq.read(os.path.join('data', missing))
+
+        daq.write_hd5(os.path.join('tmp', 'partial.hdf5'))
+        
+        daq2 = Daq()
+        daq2.read_hd5(os.path.join('tmp', 'partial.hdf5'))
+
+        assert_Daqs_equal(self, daq, daq2)        
     
     def __assert_old_daq_equals_daq(self, old_daq, daq):
 
@@ -239,14 +263,9 @@ class Test_mat(unittest.TestCase):
         daq.load_elemlist_fromfile('elemList2.txt')
 
         with warnings.catch_warnings(record=True) as w:
-            
             daq.read(os.path.join('data', test_file),
                      process_dynobjs=False)
 
-            msg = "Need 'SCC_Spline_Lane_Deviation' to fix lane "\
-                  "deviation (did not fix lane deviation)"
-                  
-            self.assertEqual(msg, str(w[0].message))
             
         daq.write_mat(matfile)
         del daq
@@ -327,14 +346,6 @@ class Test_hd5(unittest.TestCase):
         with warnings.catch_warnings(record=True) as w:
             daq.read(os.path.join('data', test_file)) 
             
-            msg = "Need 'SCC_Spline_Lane_Deviation' to fix lane "\
-                  "deviation (did not fix lane deviation)"
-                  
-            self.assertEqual(msg, str(w[0].message))
-            
-            msg = "Need 'SCC_DynObj*' to build dynobjs (did not build dynobjs)"
-                  
-            self.assertEqual(msg, str(w[1].message))
                               
         daq.write_hd5(hdf5file)
 

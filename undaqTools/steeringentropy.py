@@ -15,7 +15,7 @@ from undaqTools.misc.cdf import percentile
 warnings.filterwarnings('ignore',category=BadCoefficients)
 
 class SteeringEntropyModel:
-    def __init__(**kwds):
+    def __init__(self, **kwds):
         """
         SteeringEntropyModel(**kwds)
         

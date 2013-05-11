@@ -98,6 +98,7 @@ def mult_ado_by_pid_plot(pids, page):
                 # sorts out which are actually defined (should be 
                 # defined) for this trial.
                 if i*10 <= int(do.name[-2:]) < (i+1)*10:
+                    print(do.name)
                     
                     # figure out when the ado enters the 
                     d0 = np.sum((do.pos - pos0)**2., axis=0)**.5
@@ -110,10 +111,15 @@ def mult_ado_by_pid_plot(pids, page):
                     # now we can plot the Ados relative distance to the
                     # vehicle as a function of distance over the passing
                     # lane
-                    distance = do.distance[0, imin0:iminend]
-                    distance -= distance[0]
-                    rel_distance = do.relative_distance[0, imin0:iminend]
-                    ax2.plot(distance, rel_distance, color='g', alpha=0.4)
+                    if iminend-imin0 > 0:
+                        distance = do.distance[0, imin0:iminend]
+                        distance -= distance[0]
+                        rel_distance = do.relative_distance[0, imin0:iminend]
+                        ax2.plot(distance, rel_distance, color='g', alpha=0.4)
+                    else:
+                        print('    %s did not drive '
+                              'through passing zone'%do.name)
+
 
             # make things pretty
             ax1.set_ylim(ylim1)

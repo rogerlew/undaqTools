@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -15,7 +13,7 @@
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
+        URL_ROOT:    './',
         VERSION:     '0.2.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -58,6 +56,107 @@
 <dt id="undaqTools.Daq">
 <em class="property">class </em><tt class="descclassname">undaqTools.</tt><tt class="descname">Daq</tt><a class="headerlink" href="#undaqTools.Daq" title="Permalink to this definition">¶</a></dt>
 <dd><p class="rubric">Methods</p>
+<dl class="method">
+<dt id="undaqTools.Daq.match_keys">
+<tt class="descname">match_keys</tt><big>(</big><em>wc</em><big>)</big><a class="headerlink" href="#undaqTools.Daq.match_keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of keys (element names) that match 
+the Unix-style wildcard.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>wc</strong> : string</p>
+<blockquote>
+<div><p>wildcard apply to each match</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>matches</strong> : list</p>
+<blockquote class="last">
+<div><p>names (keys to daq)</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>keys and wc both case normalized</p>
+<p>Patterns are Unix shell style:</p>
+<div class="highlight-python"><pre>*       matches everything
+?       matches any single character
+[seq]   matches any character in seq
+[!seq]  matches any char not in seq</pre>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="undaqTools.Daq.plot_dynobjs">
+<tt class="descname">plot_dynobjs</tt><big>(</big><em>self</em><span class="optional">[</span>, <em>dynobj_wc='*'</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#undaqTools.Daq.plot_dynobjs" title="Permalink to this definition">¶</a></dt>
+<dd><p>make top-down plot of dynamic object paths</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>dynobj_wc</strong> : string</p>
+<blockquote>
+<div><p>wildcard pattern to apply to dynamic object names using fnmatch
+(case normalized, shell-style matching)</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>fig</strong> : matplotlib.figure.Figure</p>
+<blockquote class="last">
+<div><p>the plot</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="undaqTools.Daq.plot_ts">
+<tt class="descname">plot_ts</tt><big>(</big><em>self</em>, <em>elem_pars</em><span class="optional">[</span>, <em>xindx=None</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#undaqTools.Daq.plot_ts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a time series figure containing elements specified by
+elem_pars</p>
+<p>CSSDC measures yield step plots.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>elem_pars</strong> : list of tuples</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>each tuple should contain</dt>
+<dd><dl class="first last docutils">
+<dt>name <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">element to plot</p>
+</dd>
+<dt>yindx <span class="classifier-delimiter">:</span> <span class="classifier">None, int, or slice object</span></dt>
+<dd><p class="first last">specifies the values of element to plot
+None -&gt; slice(None, None, None)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>xindx</strong> : None, slice object, FrameSlice object</p>
+<blockquote>
+<div><p>specifies the frame range to plot
+None -&gt; slice(None, None, None)</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>fig</strong> : matplotlib.figure.Figure</p>
+<blockquote class="last">
+<div><p>the plot</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="method">
 <dt id="undaqTools.Daq.read_daq">
 <tt class="descname">read_daq</tt><big>(</big><em>filename[, elemlist=None] [, loaddata=True][, process_dynobjs=True]</em><big>)</big><a class="headerlink" href="#undaqTools.Daq.read_daq" title="Permalink to this definition">¶</a></dt>
@@ -168,107 +267,6 @@ string : specify output file (will overwrite)</p>
 </table>
 </dd></dl>
 
-<dl class="method">
-<dt id="undaqTools.Daq.match_keys">
-<tt class="descname">match_keys</tt><big>(</big><em>wc</em><big>)</big><a class="headerlink" href="#undaqTools.Daq.match_keys" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a list of keys (element names) that match 
-the Unix-style wildcard.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>wc</strong> : string</p>
-<blockquote>
-<div><p>wildcard apply to each match</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>matches</strong> : list</p>
-<blockquote class="last">
-<div><p>names (keys to daq)</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Notes</p>
-<p>keys and wc both case normalized</p>
-<p>Patterns are Unix shell style:</p>
-<div class="highlight-python"><pre>*       matches everything
-?       matches any single character
-[seq]   matches any character in seq
-[!seq]  matches any char not in seq</pre>
-</div>
-</dd></dl>
-
-<dl class="method">
-<dt id="undaqTools.Daq.plot_ts">
-<tt class="descname">plot_ts</tt><big>(</big><em>self</em>, <em>elem_pars</em><span class="optional">[</span>, <em>xindx=None</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#undaqTools.Daq.plot_ts" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a time series figure containing elements specified by
-elem_pars</p>
-<p>CSSDC measures yield step plots.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>elem_pars</strong> : list of tuples</p>
-<blockquote>
-<div><dl class="docutils">
-<dt>each tuple should contain</dt>
-<dd><dl class="first last docutils">
-<dt>name <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
-<dd><p class="first last">element to plot</p>
-</dd>
-<dt>yindx <span class="classifier-delimiter">:</span> <span class="classifier">None, int, or slice object</span></dt>
-<dd><p class="first last">specifies the values of element to plot
-None -&gt; slice(None, None, None)</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</div></blockquote>
-<p><strong>xindx</strong> : None, slice object, FrameSlice object</p>
-<blockquote>
-<div><p>specifies the frame range to plot
-None -&gt; slice(None, None, None)</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>fig</strong> : matplotlib.figure.Figure</p>
-<blockquote class="last">
-<div><p>the plot</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="undaqTools.Daq.plot_dynobjs">
-<tt class="descname">plot_dynobjs</tt><big>(</big><em>self</em><span class="optional">[</span>, <em>dynobj_wc='*'</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#undaqTools.Daq.plot_dynobjs" title="Permalink to this definition">¶</a></dt>
-<dd><p>make top-down plot of dynamic object paths</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>dynobj_wc</strong> : string</p>
-<blockquote>
-<div><p>wildcard pattern to apply to dynamic object names using fnmatch
-(case normalized, shell-style matching)</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>fig</strong> : matplotlib.figure.Figure</p>
-<blockquote class="last">
-<div><p>the plot</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 </dd></dl>
 
 </div>
@@ -330,7 +328,7 @@ None -&gt; slice(None, None, None)</p>
     </div>
     <div class="footer">
         &copy; Copyright 2013, Roger Lew.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
   </body>
 </html>

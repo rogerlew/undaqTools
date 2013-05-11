@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -15,7 +13,7 @@
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
+        URL_ROOT:    './',
         VERSION:     '0.2.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -88,6 +86,9 @@ all of the hdf5 files you can use the -r or &#8211;rebuild flag.:</p>
 &#8211;output mat:</p>
 <div class="highlight-python"><pre>$ undaq.py */* -n 6 -o mat</pre>
 </div>
+<p>By default undaq will process all the dynamic objects in the drive. If you
+wish to supress this use the -p or -process_dynobjs. The presence of the
+flag turns the processing off.</p>
 <p>lastly there is a flag print debugging information -d or &#8211;debug:</p>
 <div class="highlight-python"><pre>$ undaq.py */* -n 6 -d</pre>
 </div>
@@ -95,9 +96,117 @@ all of the hdf5 files you can use the -r or &#8211;rebuild flag.:</p>
 never completely fail (knock-on-wood, don&#8217;t forget the caveat about memory
 ussage), but sometimes warnings might get thrown if the daq is missing
 frames or ends abruptly. When these things occur undaq does its best to
-fix what went wrong and make the interaction with the Daq files consistent.
-To make the output more readable these warnings are suppressed until the
-batch processing has finished and only display if in debug mode.</p>
+fix what went wrong fix the Daq files.</p>
+<p>The output:</p>
+<div class="highlight-python"><pre>C:\LocalData\Left Lane&gt;undaq.py */* -n 6 -r -d
+
+Glob Summary
+--------------------------------------------------------------------
+                                                              hdf5
+daq                                            size (KB)      exists
+--------------------------------------------------------------------
+Part01\Left_01_20130424102744.daq              1,535,587        True
+Part02\Left_02_20130425084730.daq              1,543,370        True
+Part03\Left_03_20130425102301.daq              1,518,779        True
+Part04\Left_04_20130425142804.daq              1,387,550        True
+Part05\Left_05_20130425161122.daq              1,609,689        True
+Part06\Left_06_20130426111502.daq              1,364,879        True
+Part07\Left_07_20130426143846.daq              1,509,513        True
+Part08\Left_08_20130426164114.daq                  4,565        True
+Part08\Left_08_20130426164301.daq              1,426,507        True
+Part09\Left09_20130423155149.daq               1,339,437        True
+Part10\Left10_20130423155149.daq               1,339,437        True
+Part11\Left_11_20130429102407.daq                410,624        True
+Part111\Left_11_20130430081052.daq             1,463,012        True
+Part12\Left_12_20130429163745.daq              1,431,765        True
+Part13\Left_13_20130429182923.daq              1,507,542        True
+Part14\Left_14_20130430102504.daq              1,502,793        True
+Part15\Left_15_20130430171947.daq              1,669,443        True
+Part16\Left_16_20130501103917.daq              1,341,214        True
+Part170\Left_17_20130501163745.daq             1,552,098        True
+Part18\Left_18_20130502084422.daq                416,873        True
+Part18\Left_18_reset_20130502090909.daq        1,128,833        True
+Part19\Left_19_20130502153547.daq              1,526,510        True
+Part200\Left_20_20130509094509.daq             1,572,357        True
+--------------------------------------------------------------------
+
+
+debug = True
+rebuild = True
+process_dynobjs = True
+
+Converting daqs with 6 cpus (this may take awhile)...
+  Part01\Left_01_20130424102744.daq -&gt; .hdf5 (292.7 s)
+  Part02\Left_02_20130425084730.daq -&gt; .hdf5 (294.6 s)
+  Part03\Left_03_20130425102301.daq -&gt; .hdf5 (226.8 s)
+  Part04\Left_04_20130425142804.daq -&gt; .hdf5 (219.1 s)
+  Part05\Left_05_20130425161122.daq -&gt; .hdf5 (207.7 s)
+  Part06\Left_06_20130426111502.daq -&gt; .hdf5 (270.2 s)
+  Part07\Left_07_20130426143846.daq -&gt; .hdf5 (252.5 s)
+  Part08\Left_08_20130426164114.daq -&gt; .hdf5 (0.7 s)
+  Part08\Left_08_20130426164301.daq -&gt; .hdf5 (238.6 s)
+  Part09\Left09_20130423155149.daq -&gt; .hdf5 (170.3 s)
+  Part10\Left10_20130423155149.daq -&gt; .hdf5 (168.4 s)
+  Part11\Left_11_20130429102407.daq -&gt; .hdf5 (68.1 s)
+  Part111\Left_11_20130430081052.daq -&gt; .hdf5 (187.1 s)
+  Part12\Left_12_20130429163745.daq -&gt; .hdf5 (182.5 s)
+  Part13\Left_13_20130429182923.daq -&gt; .hdf5 (194.8 s)
+  Part14\Left_14_20130430102504.daq -&gt; .hdf5 (186.4 s)
+  Part15\Left_15_20130430171947.daq -&gt; .hdf5 (207.4 s)
+  Part16\Left_16_20130501103917.daq -&gt; .hdf5 (176.2 s)
+  Part170\Left_17_20130501163745.daq -&gt; .hdf5 (194.0 s)
+  Part18\Left_18_20130502084422.daq -&gt; .hdf5 (52.0 s)
+  Part18\Left_18_reset_20130502090909.daq -&gt; .hdf5 (130.2 s)
+  Part19\Left_19_20130502153547.daq -&gt; .hdf5 (201.5 s)
+  Part200\Left_20_20130509094509.daq -&gt; .hdf5 (198.1 s)
+
+
+Debug Summary
+  Part01\Left_01_20130424102744.daq
+    Warning: Missing frames. (interpolated missing frames)
+
+  Part02\Left_02_20130425084730.daq
+    Warning: Missing frames. (interpolated missing frames)
+
+  Part06\Left_06_20130426111502.daq
+    Warning: Missing frames. (interpolated missing frames)
+
+  Part07\Left_07_20130426143846.daq
+    Warning: Missing frames. (interpolated missing frames)
+
+  Part08\Left_08_20130426164301.daq
+    Warning: Missing frames. (interpolated missing frames)
+
+  Part11\Left_11_20130429102407.daq
+    Warning: Failed loading file on frame 615180. (stopped reading file)
+
+
+Batch processing completed.
+
+--------------------------------------------------------------------
+Conversion Summary
+--------------------------------------------------------------------
+Total elapsed time: 823.7 s
+Data converted: 29,396.864 MB
+Data throughput: 35.7 MB/s
+--------------------------------------------------------------------
+
+C:\LocalData\Left Lane&gt;</pre>
+</div>
+<p>The Glob summary is emitted immediately. It allows users to see what files
+undaq has found and see whether it already has a cooresponding daq or hdf5
+file converted.</p>
+<p>After the summary undaq will tell you whether it is in debug mode, as well
+as whether it is in rebuild mode.</p>
+<p>Then it will produce a running log alerting users as their daqs finish.
+The multiprocessing maintains the order from the glob summary so the output
+may be delayed until other files in its multiprocessing cohort complete.</p>
+<p>To make the output more readable undaq catches and supresses the warnings
+until the batch processing has finished, and then only display if in debug
+mode.</p>
+<p>Lastly, a conversion summary is provided. From this we can see it processed
+almost 30 Gb of data in 789.7 seconds at a rate of 35.7 MB/s. These
+particular files have several hundred Ados that have to be unpacked.</p>
 </div>
 <div class="section" id="daq-objects">
 <h2>Daq Objects<a class="headerlink" href="#daq-objects" title="Permalink to this headline">¶</a></h2>
@@ -296,28 +405,54 @@ to control the range of the x-axis across  all of the subplots.</p>
 <p>The code is smart enough to dynamically adjust its height as additional
 subplots are specified. It also knows to represent time series measures
 as step functions. The method returns a matplotlib.figure.Figure instance.</p>
-<p>Building a timeseries plot:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">elems_indxs</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&#39;CFS_Accelerator_Pedal_Position&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
-               <span class="p">(</span><span class="s">&#39;SCC_Spline_Lane_Deviation&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-               <span class="p">(</span><span class="s">&#39;SCC_Spline_Lane_Deviation_Fixed&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
-               <span class="p">(</span><span class="s">&#39;SCC_Spline_Lane_Deviation&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
-               <span class="p">(</span><span class="s">&#39;VDS_Tire_Weight_On_Wheels&#39;</span><span class="p">,</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">4</span><span class="p">))]</span>
+<dl class="docutils">
+<dt>Building a timeseries plot::</dt>
+<dd><p class="first">import matplotlib.pyplot as plt
+from undaqTools import Daq</p>
+<dl class="docutils">
+<dt>elems_indxs = [(&#8216;CFS_Accelerator_Pedal_Position&#8217;, 0),</dt>
+<dd>(&#8216;SCC_Spline_Lane_Deviation&#8217;, 1),
+(&#8216;SCC_Spline_Lane_Deviation_Fixed&#8217;, 0),
+(&#8216;SCC_Spline_Lane_Deviation&#8217;, 3),
+(&#8216;VDS_Tire_Weight_On_Wheels&#8217;, slice(0,4))]</dd>
+</dl>
+<p class="last">daq = Daq()
+daq.read_hd5(hdf5file)
+fig = daq.plot_ts(elems_indxs, xindx=fslice(6000, None))
+fig.savefig(&#8216;ts_plot.png&#8217;)
+plt.close(&#8216;all&#8217;)</p>
+</dd>
+</dl>
+<p>Download
+[<a class="reference download internal" href="_downloads/ts_plot.png"><tt class="xref download docutils literal"><span class="pre">hi-res</span></tt></a>]</p>
+<a class="reference internal image-reference" href="_images/ts_plot.png"><img alt="ts_plot.png" class="align-center" src="_images/ts_plot.png" style="width: 750px;" /></a>
+</div>
+<div class="section" id="dynobjs-plots">
+<h2>DynObjs Plots<a class="headerlink" href="#dynobjs-plots" title="Permalink to this headline">¶</a></h2>
+<p>The Daq Class also has a routine to visualize the pathes taken by the
+OwnVehicle and dynamic objects.</p>
+<p>dynobjs plot:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">undaqTools</span> <span class="kn">import</span> <span class="n">Daq</span>
+
 
 <span class="n">daq</span> <span class="o">=</span> <span class="n">Daq</span><span class="p">()</span>
-<span class="n">daq</span><span class="o">.</span><span class="n">read_hd5</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&#39;data&#39;</span><span class="p">,</span> <span class="n">hdf5file</span><span class="p">))</span>
-<span class="n">fig</span> <span class="o">=</span> <span class="n">daq</span><span class="o">.</span><span class="n">plot_ts</span><span class="p">(</span><span class="n">elems_indxs</span><span class="p">,</span> <span class="n">xindx</span><span class="o">=</span><span class="n">fslice</span><span class="p">(</span><span class="mi">6000</span><span class="p">,</span> <span class="bp">None</span><span class="p">))</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s">&#39;ts_plot.png&#39;</span><span class="p">)</span>
+<span class="n">daq</span><span class="o">.</span><span class="n">read_hd5</span><span class="p">(</span><span class="n">hdf5file</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">daq</span><span class="o">.</span><span class="n">plot_dynobjs</span><span class="p">(</span><span class="s">&#39;Ado*&#39;</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s">&#39;dynobjs_plot.png&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s">&#39;all&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Download
-[<a class="reference download internal" href="_downloads/ts_plot.png"><tt class="xref download docutils literal"><span class="pre">hi-res</span></tt></a>]</p>
-<img alt="ts_plot.png" class="align-center" src="_images/ts_plot.png" style="width: 750px;" />
+[<a class="reference download internal" href="_downloads/dynobjs_plot.png"><tt class="xref download docutils literal"><span class="pre">hi-res</span></tt></a>]</p>
+<a class="reference internal image-reference" href="_images/dynobjs_plot.png"><img alt="dynobjs_plot.png" class="align-center" src="_images/dynobjs_plot.png" style="width: 750px;" /></a>
 </div>
 <div class="section" id="lastly-the-absence-of-a-time-is-a-feature">
 <h2>Lastly: The Absence of a Time is a Feature<a class="headerlink" href="#lastly-the-absence-of-a-time-is-a-feature" title="Permalink to this headline">¶</a></h2>
-<p>Time is almost completly redundant with the frames data. Just start
-thinking in frames. It will soon become second nature. When you need
-time just divide the frames by the sampling rate.</p>
+<p>Time is almost completly redundant with the frames data for most things.
+Just start thinking in frames. It will soon become second nature.</p>
+<p>If you do need time there is the &#8216;SCC_Graphics_Wall_Clock_Time&#8217; data. It
+an int32 Element with millisecond units. It doesn&#8217;t start at 0.</p>
 </div>
 </div>
 
@@ -339,6 +474,7 @@ time just divide the frames by the sampling rate.</p>
 <li><a class="reference internal" href="#working-with-elements">Working with Elements</a></li>
 <li><a class="reference internal" href="#cssdc-elements">CSSDC Elements</a></li>
 <li><a class="reference internal" href="#timeseries-plots">Timeseries Plots</a></li>
+<li><a class="reference internal" href="#dynobjs-plots">DynObjs Plots</a></li>
 <li><a class="reference internal" href="#lastly-the-absence-of-a-time-is-a-feature">Lastly: The Absence of a Time is a Feature</a></li>
 </ul>
 </li>
@@ -395,7 +531,7 @@ time just divide the frames by the sampling rate.</p>
     </div>
     <div class="footer">
         &copy; Copyright 2013, Roger Lew.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
   </body>
 </html>

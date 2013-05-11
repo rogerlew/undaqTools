@@ -10,6 +10,21 @@ undaqTools is the the unofficial pythonic interface to the
 National Advanced Driving Simulator (NADS) Data AcQuisition 
 (DAQ) files.
 
+Table of Contents
+-----------------
+.. toctree::
+   install
+   gettingstarted
+   daq
+   element
+   fslice
+   findex
+   dynobj
+   logstream
+   steeringentropy
+   examples_index
+
+   
 undaqTools (unofficial) vs. ndaqTools (official)
 ------------------------------------------------
 **Approach:**  
@@ -96,18 +111,5 @@ decide how to best utilize their data.
       | ...
       
 
-Table of Contents
------------------
-.. toctree::
-   
-   install
-   gettingstarted
-   daq
-   element
-   fslice
-   findex
-   dynobj
-   logstream
-   steeringentropy
 
    

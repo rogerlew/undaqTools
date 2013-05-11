@@ -154,7 +154,7 @@ class DynObj:
         pos = np.asarray([x,y,z])
          
         del x,y,z
-        
+
         # positions are packed [y,x,z] for the dyn objects
         # here we swap x and y to make it consistent with OwnVeh
         # position.
@@ -180,11 +180,7 @@ class DynObj:
             
             self.interpolated = 1
 
-        # otherwise we just need take care of some more book-keeping
         else:
-            heading = np.array(heading, ndmin=2)
-            speed = np.array(speed, ndmin=2)
-            
             # convert from indices to frames            
             frames = frame_indices + int(daq.frame.frame[0])
 
@@ -195,7 +191,13 @@ class DynObj:
 
         # calculate distance vector. At the first frame it is
         # defined, it has a distance of 0.
-        distance = np.cumsum(np.sum(np.square(np.diff(pos)), axis=0))
+        distance = np.cumsum(
+                       np.sqrt(
+                           np.sum(
+                               np.square(
+                                   np.diff(pos)),
+                               axis=0)))
+        
         distance = np.concatenate(([0.], distance))
         distance = np.array(distance, ndmin=2)
 

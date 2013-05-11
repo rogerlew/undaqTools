@@ -24,18 +24,6 @@ class Test_stat(unittest.TestCase):
         self.assertEqual(repr(info), repr(eval(repr(info))))
                     
 class Test_match_keys(unittest.TestCase):
-    def setUp(self):
-        global test_file
-        hdf5file = test_file[:-4]+'.hdf5'
-        hdf5file = os.path.join('data', hdf5file)
-        
-        try:
-           with open(hdf5file):
-               pass
-        except IOError:
-           daq = Daq()
-           daq.read(os.path.join('data', test_file))
-           daq.write_hd5(hdf5file)
            
     def test0(self):
         global test_file
@@ -65,10 +53,57 @@ class Test_match_keys(unittest.TestCase):
         
         self.assertEqual(''.join(ds), ''.join(rs))
 
+class Test_keys_summary(unittest.TestCase):
+           
+    def test0(self):
+        global test_file
+        hdf5file = test_file[:-4]+'.hdf5'
+        hdf5file = os.path.join('data', hdf5file)
 
+        wcs = """\
+CIS_Auxiliary_Buttons
+SCC_Collision*
+SCC_Current_VDS_Frame_Count
+SCC_DRT_ReactionTime
+SCC_DynObj*
+SCC_Eval*
+SCC_False_Alarm
+SCC_Fog
+SCC_Glare_Obj*
+SCC_Graphics_Frame_Time
+SCC_HighRes_Time
+SCC_Init*
+SCC_Lane_Depart_Warn
+SCC_LogStreams
+SCC_NVES_Target_Dist
+SCC_StatObj*
+SCC_StatObj_AudioVisualState
+SCC_StatObj_CvedId
+SCC_StatObj_DataSize
+SCC_StatObj_Pos
+SCC_StatObj_SolId
+SCC_Time_Counter
+SCC_Tire_Condition
+SCC_TrafLight_Id 
+SCC_TrafLight_Size
+SCC_TrafLight_State
+SCC_Trailer_Col_Det_Ob_SolId 
+SCC_Trailer_Col_Det_Ob_Type 
+SCC_Trailer_Col_Det_Object 
+SCC_Trailer_Col_List_Size 
+SCC_Trailer_Collision_Count
+VDS_DRV_Frame_No
+VDS_Frame_Count"""
+        wcs = [wc.strip() for wc in wcs.split('\n')]
+        print(wcs)
+        
+        daq = Daq()
+        daq.read_daq(os.path.join('data', test_file))
+##        daq.read_hd5(hdf5file)
+        daq.keys_summary(wcs)
+
+        
 class Test_etc(unittest.TestCase):
-    def setUp(self):
-        pass
 
     def tearDown(self):
         time.sleep(.1)
@@ -152,7 +187,8 @@ def suite():
     return unittest.TestSuite((
 ##            unittest.makeSuite(Test_stat),
 ##            unittest.makeSuite(Test_match_keys),
-            unittest.makeSuite(Test_etc),
+            unittest.makeSuite(Test_keys_summary),
+##            unittest.makeSuite(Test_etc),
 ##            unittest.makeSuite(Test_setitem),
 ##            unittest.makeSuite(Test_load_elemlist_fromfile),
                               ))

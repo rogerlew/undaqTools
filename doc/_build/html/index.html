@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -15,7 +13,7 @@
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
+        URL_ROOT:    './',
         VERSION:     '0.2.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -53,6 +51,44 @@
 <p>undaqTools is the the unofficial pythonic interface to the
 National Advanced Driving Simulator (NADS) Data AcQuisition
 (DAQ) files.</p>
+<div class="section" id="table-of-contents">
+<h2>Table of Contents<a class="headerlink" href="#table-of-contents" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation Instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html#recommended-system-requirements">Recommended System Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gettingstarted.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="gettingstarted.html#undaq-py">undaq.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gettingstarted.html#daq-objects">Daq Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gettingstarted.html#stat">stat()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gettingstarted.html#accessing-data">Accessing Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gettingstarted.html#daq-match-keys">Daq.match_keys()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gettingstarted.html#daq-etc-dict">Daq.etc &lt;<em>dict</em>&gt;</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gettingstarted.html#working-with-elements">Working with Elements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gettingstarted.html#cssdc-elements">CSSDC Elements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gettingstarted.html#timeseries-plots">Timeseries Plots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gettingstarted.html#dynobjs-plots">DynObjs Plots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gettingstarted.html#lastly-the-absence-of-a-time-is-a-feature">Lastly: The Absence of a Time is a Feature</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="daq.html">Daq</a></li>
+<li class="toctree-l1"><a class="reference internal" href="element.html">Element</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fslice.html">fslice</a></li>
+<li class="toctree-l1"><a class="reference internal" href="findex.html">findex</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dynobj.html">DynObj</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logstream.html">logstream</a></li>
+<li class="toctree-l1"><a class="reference internal" href="steeringentropy.html">steeringentropy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples_index.html">Examples Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="example01.html">Example 01: Daq, and multiprocessing pool</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example02.html">Example 02: stat, logstream, and Daq.etc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example03.html">Example 03: Collaborate timeseries measures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example04.html">Example 04: Multipanel ensemble plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example05.html">Example 05: Ado headway distance visualization</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
 <div class="section" id="undaqtools-unofficial-vs-ndaqtools-official">
 <h2>undaqTools (unofficial) vs. ndaqTools (official)<a class="headerlink" href="#undaqtools-unofficial-vs-ndaqtools-official" title="Permalink to this headline">¶</a></h2>
 <dl class="docutils">
@@ -134,35 +170,6 @@ decide how to best utilize their data.</p>
   | ...</pre>
 </div>
 </div>
-<div class="section" id="table-of-contents">
-<h2>Table of Contents<a class="headerlink" href="#table-of-contents" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="install.html">Installation Instructions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="install.html#recommended-system-requirements">Recommended System Requirements</a></li>
-<li class="toctree-l1"><a class="reference internal" href="gettingstarted.html">Getting Started</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="gettingstarted.html#undaq-py">undaq.py</a></li>
-<li class="toctree-l2"><a class="reference internal" href="gettingstarted.html#daq-objects">Daq Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="gettingstarted.html#stat">stat()</a></li>
-<li class="toctree-l2"><a class="reference internal" href="gettingstarted.html#accessing-data">Accessing Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="gettingstarted.html#daq-match-keys">Daq.match_keys()</a></li>
-<li class="toctree-l2"><a class="reference internal" href="gettingstarted.html#daq-etc-dict">Daq.etc &lt;<em>dict</em>&gt;</a></li>
-<li class="toctree-l2"><a class="reference internal" href="gettingstarted.html#working-with-elements">Working with Elements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="gettingstarted.html#cssdc-elements">CSSDC Elements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="gettingstarted.html#timeseries-plots">Timeseries Plots</a></li>
-<li class="toctree-l2"><a class="reference internal" href="gettingstarted.html#lastly-the-absence-of-a-time-is-a-feature">Lastly: The Absence of a Time is a Feature</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="daq.html">Daq</a></li>
-<li class="toctree-l1"><a class="reference internal" href="element.html">Element</a></li>
-<li class="toctree-l1"><a class="reference internal" href="fslice.html">fslice</a></li>
-<li class="toctree-l1"><a class="reference internal" href="findex.html">findex</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dynobj.html">DynObj</a></li>
-<li class="toctree-l1"><a class="reference internal" href="logstream.html">logstream</a></li>
-<li class="toctree-l1"><a class="reference internal" href="steeringentropy.html">steeringentropy</a></li>
-</ul>
-</div>
-</div>
 </div>
 
 
@@ -174,11 +181,11 @@ decide how to best utilize their data.</p>
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">undaqTools [<em>uhn-dak-tools</em>]</a><ul>
-<li><a class="reference internal" href="#undaqtools-unofficial-vs-ndaqtools-official">undaqTools (unofficial) vs. ndaqTools (official)</a></li>
-<li><a class="reference internal" href="#summary">Summary</a></li>
 <li><a class="reference internal" href="#table-of-contents">Table of Contents</a><ul>
 </ul>
 </li>
+<li><a class="reference internal" href="#undaqtools-unofficial-vs-ndaqtools-official">undaqTools (unofficial) vs. ndaqTools (official)</a></li>
+<li><a class="reference internal" href="#summary">Summary</a></li>
 </ul>
 </li>
 </ul>
@@ -228,7 +235,7 @@ decide how to best utilize their data.</p>
     </div>
     <div class="footer">
         &copy; Copyright 2013, Roger Lew.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
   </body>
 </html>

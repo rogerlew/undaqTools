@@ -1,0 +1,326 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Example 02: stat, logstream, and Daq.etc &mdash; undaqTools 0.2.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/scipy.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="undaqTools 0.2.0 documentation" href="index.html" />
+    <link rel="up" title="Examples Overview" href="examples_index.html" />
+    <link rel="prev" title="Example 01: Daq, and multiprocessing pool" href="example01.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="example01.html" title="Example 01: Daq, and multiprocessing pool"
+             accesskey="P">previous</a> |</li>
+<li><a href="index.html">undaqTools 0.2.0 documentation</a> &raquo;</li>
+
+          <li><a href="examples_index.html" accesskey="U">Examples Overview</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="example-02-stat-logstream-and-daq-etc">
+<h1>Example 02: stat, logstream, and Daq.etc<a class="headerlink" href="#example-02-stat-logstream-and-daq-etc" title="Permalink to this headline">¶</a></h1>
+<p>Demonstrates how to use the stat function, logstream.find_epoch function,
+and Daq.etc dict of undaqTools</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">undaqTools</span>
+<span class="kn">from</span>   <span class="nn">undaqTools</span> <span class="kn">import</span> <span class="n">Daq</span>
+<span class="kn">from</span>   <span class="nn">undaqTools.logstream</span> <span class="kn">import</span> <span class="n">find_epochs</span>
+
+<span class="c"># in this particular example participants drove through ten passing zones. The</span>
+<span class="c"># order of the passing zones was counterbalanced according to this latin square.</span>
+<span class="c"># we want to attach this and other experiment relevant metadata to the hd5 files</span>
+<span class="c"># so we don&#39;t have to keep looking it up.</span>
+<span class="n">latin_square</span> <span class="o">=</span> \
+    <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">8</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">9</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">9</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">]]</span>
+
+<span class="c"># through the 1-mile 2-lane sections of the passing zones the wind speeds were</span>
+<span class="c"># manipulated using this ordering. Each was split into 1/10 mile sections</span>
+<span class="c"># Each zone is represented as a row. The speeds are in mph.</span>
+<span class="n">wind_speeds</span> <span class="o">=</span> \
+    <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">],</span>
+     <span class="p">[</span><span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span>
+     <span class="p">[</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">100</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">],</span>
+     <span class="p">[</span><span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span>
+     <span class="p">[</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">100</span><span class="p">]]</span>
+
+
+<span class="k">def</span> <span class="nf">attach_metadata</span><span class="p">(</span><span class="n">hd5_file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The Daq files have an &#39;etc&#39; dict attribute inteaded for users to</span>
+<span class="sd">    store analysis relevant metadata. The etc dict can be exported to hdf5</span>
+<span class="sd">    and reloaded from hdf5. We want to go through and build these dicts so</span>
+<span class="sd">    that the information is at our fingertips when we need it.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">global</span> <span class="n">latin_square</span><span class="p">,</span> <span class="n">wind_speeds</span>
+
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="n">tmp_file</span> <span class="o">=</span> <span class="n">hd5_file</span> <span class="o">+</span> <span class="s">&#39;.tmp&#39;</span>
+
+    <span class="c"># load hd5</span>
+    <span class="n">daq</span> <span class="o">=</span> <span class="n">Daq</span><span class="p">()</span>
+    <span class="n">daq</span><span class="o">.</span><span class="n">read_hd5</span><span class="p">(</span><span class="n">hd5_file</span><span class="p">)</span>
+
+    <span class="n">etc</span> <span class="o">=</span> <span class="p">{}</span> <span class="c"># fill and pack in daq</span>
+
+    <span class="c"># find the real participant id (pid) from the file path</span>
+    <span class="n">etc</span><span class="p">[</span><span class="s">&#39;pid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">hd5_file</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\\</span><span class="s">&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">4</span><span class="p">:])</span>
+    <span class="n">etc</span><span class="p">[</span><span class="s">&#39;scen_order&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">latin_square</span><span class="p">[(</span><span class="n">etc</span><span class="p">[</span><span class="s">&#39;pid&#39;</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">%</span><span class="mi">10</span><span class="p">]</span>
+    <span class="n">etc</span><span class="p">[</span><span class="s">&#39;wind_speeds&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">wind_speeds</span>
+
+    <span class="c"># now to find the epochs</span>
+    <span class="c"># epochs is a dictionary. The keys are the enumerated states and the</span>
+    <span class="c"># values are FrameSlice objects. The FrameSlice objects can be used</span>
+    <span class="c"># to slice the Elements in Daq instances.</span>
+    <span class="n">etc</span><span class="p">[</span><span class="s">&#39;epochs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">find_epochs</span><span class="p">(</span><span class="n">daq</span><span class="p">[</span><span class="s">&#39;SCC_LogStreams&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">,:])</span>
+
+    <span class="n">daq</span><span class="o">.</span><span class="n">etc</span> <span class="o">=</span> <span class="n">etc</span> <span class="c"># doing it this way ensures we know what is in there</span>
+
+    <span class="c"># write to temporary file.</span>
+    <span class="c"># once that completes, delete original hd5, and rename temporary file.</span>
+    <span class="c"># This protects you from yourself. If you get impatient and kill the</span>
+    <span class="c"># kernel there is way less risk of corrupting your hd5.</span>
+    <span class="n">daq</span><span class="o">.</span><span class="n">write_hd5</span><span class="p">(</span><span class="n">tmp_file</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">hd5_file</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">tmp_file</span><span class="p">,</span> <span class="n">hd5_file</span><span class="p">)</span>
+
+    <span class="k">del</span> <span class="n">daq</span>
+
+    <span class="k">return</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+
+    <span class="c"># data is on a local SSD drive. This is very important for performance.</span>
+    <span class="n">data_dir</span> <span class="o">=</span> <span class="s">&#39;C:</span><span class="se">\\</span><span class="s">LocalData</span><span class="se">\\</span><span class="s">Left Lane</span><span class="se">\\</span><span class="s">&#39;</span>
+
+    <span class="c"># change the directory of the kernel</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Changing wd to &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span><span class="o">%</span><span class="n">data_dir</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span>
+
+    <span class="c"># undaqTools.stat</span>
+    <span class="c">#</span>
+    <span class="c"># Here we are going to verify that the subject IDs on the directories</span>
+    <span class="c"># match the subject IDs that were specified in the MiniSim. This can be</span>
+    <span class="c"># accomplished in to ways. The first is to use undaqTools.stat to read</span>
+    <span class="c"># the .daq files directly. This method will return namedTuple with the</span>
+    <span class="c"># info information packed into the fields. This method is nice because</span>
+    <span class="c"># it works with the raw data files. If your files are already converted</span>
+    <span class="c"># you can just look at Daq.info.subject. In this case our files have</span>
+    <span class="c"># already been converted, but for example purposes...</span>
+
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">daq_files</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s">&#39;*/*.daq&#39;</span><span class="p">))</span>
+    <span class="n">matches</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">from file   from Daq     Match&#39;</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;--------------------------------------&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">daq_file</span> <span class="ow">in</span> <span class="n">daq_files</span><span class="p">:</span>
+        <span class="c"># figure out subject ID from the filename path</span>
+        <span class="n">from_fname</span> <span class="o">=</span> <span class="n">daq_file</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\\</span><span class="s">&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c"># get an undaqTools.Info instance for daq_file</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="n">undaqTools</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">daq_file</span><span class="p">)</span>
+
+        <span class="c"># do they match?</span>
+        <span class="n">matches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">from_fname</span> <span class="o">==</span> <span class="n">info</span><span class="o">.</span><span class="n">subject</span><span class="p">)</span>
+
+        <span class="c"># some feedback</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;{0:&lt;11}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">from_fname</span><span class="p">),</span>
+              <span class="s">&#39;{0.subject}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">info</span><span class="p">)</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span><span class="s">&#39; &#39;</span><span class="p">),</span>
+              <span class="nb">str</span><span class="p">(</span><span class="n">matches</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">matches</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">Warning: Not all subject names match!&#39;</span><span class="p">)</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">stat-ing daqs took </span><span class="si">%.3f</span><span class="s"> s&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">t0</span><span class="p">))</span>
+
+    <span class="c">#</span>
+    <span class="c"># undaqTools.logstream.find_epochs</span>
+    <span class="c">#</span>
+    <span class="c"># The next thing we want to do is find the epochs or time segments of</span>
+    <span class="c"># interest from each drive. With this particular dataset participants</span>
+    <span class="c"># drove through ten 2-lane passing zones. The passing zones are enumerated</span>
+    <span class="c"># in the logstream and we want to identify the frames where they start</span>
+    <span class="c"># and end. We can do this using undaqTools.logstream.find_epochs</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">Building etc dicts...&#39;</span><span class="p">)</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">hd5_files</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s">&#39;*/*.hdf5&#39;</span><span class="p">))</span>
+
+    <span class="c"># this is so IO dependent that parallelizing</span>
+    <span class="c"># the code doesn&#39;t make it any faster</span>
+    <span class="k">for</span> <span class="n">hd5_file</span> <span class="ow">in</span> <span class="n">hd5_files</span><span class="p">:</span>
+        <span class="n">elapsed</span> <span class="o">=</span> <span class="n">attach_metadata</span><span class="p">(</span><span class="n">hd5_file</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;  processed &#39;</span><span class="si">%s</span><span class="s">&#39; in </span><span class="si">%.1f</span><span class="s"> s&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">hd5_file</span><span class="p">,</span> <span class="n">elapsed</span><span class="p">))</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">Done.</span><span class="se">\n\n</span><span class="s">building etc dicts took </span><span class="si">%.1f</span><span class="s"> s&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">t0</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Example Output:</p>
+<div class="highlight-python"><pre>Changing wd to 'C:\LocalData\Left Lane\'
+
+from file   from Daq     Match
+--------------------------------------
+Part01      Part01         True
+Part02      Part02         True
+Part03      Part03         True
+Part04      Part04         True
+Part05      Part05         True
+Part06      Part06         True
+Part07      Part07         True
+Part08      Part08         True
+Part08      Part08         True
+Part09      Part200        False
+Part10      Part200        False
+Part11      Part11         True
+Part111     Part111        True
+Part12      Part12         True
+Part13      Part13         True
+Part14      Part14         True
+Part15      Part15         True
+Part16      test           False
+Part170     Part177        False
+Part18      Part18         True
+Part18      Part18_reset   False
+Part19      Part19         True
+
+Warning: Not all subject names match!
+
+stat-ing daqs took 0.1 s
+
+Building etc dicts...
+  processed Part01\Left_01_20130424102744.hdf5 in 7.0 s
+  processed Part02\Left_02_20130425084730.hdf5 in 7.2 s
+  processed Part03\Left_03_20130425102301.hdf5 in 6.7 s
+  processed Part04\Left_04_20130425142804.hdf5 in 6.2 s
+  processed Part05\Left_05_20130425161122.hdf5 in 7.6 s
+  processed Part06\Left_06_20130426111502.hdf5 in 6.2 s
+  processed Part07\Left_07_20130426143846.hdf5 in 6.8 s
+  processed Part08\Left_08_20130426164114.hdf5 in 0.2 s
+  processed Part08\Left_08_20130426164301.hdf5 in 6.8 s
+  processed Part09\Left09_20130423155149.hdf5 in 6.2 s
+  processed Part10\Left10_20130423155149.hdf5 in 6.2 s
+  processed Part111\Left_11_20130430081052.hdf5 in 7.4 s
+  processed Part12\Left_12_20130429163745.hdf5 in 7.2 s
+  processed Part13\Left_13_20130429182923.hdf5 in 7.8 s
+  processed Part14\Left_14_20130430102504.hdf5 in 7.3 s
+  processed Part15\Left_15_20130430171947.hdf5 in 7.8 s
+  processed Part16\Left_16_20130501103917.hdf5 in 12.5 s
+  processed Part170\Left_17_20130501163745.hdf5 in 13.0 s
+  processed Part18\Left_18_20130502084422.hdf5 in 4.4 s
+  processed Part18\Left_18_reset_20130502090909.hdf5 in 9.8 s
+  processed Part19\Left_19_20130502153547.hdf5 in 12.6 s
+
+Done.
+
+building etc dicts took 157.2 s</pre>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="example01.html"
+                        title="previous chapter">Example 01: Daq, and multiprocessing pool</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/example02.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<ul class="this-page-menu">
+  <li><a href="/numpy/docs/numpy-docs/example02.rst">Edit page</a></li>
+</ul>
+
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="example01.html" title="Example 01: Daq, and multiprocessing pool"
+             >previous</a> |</li>
+<li><a href="index.html">undaqTools 0.2.0 documentation</a> &raquo;</li>
+
+          <li><a href="examples_index.html" >Examples Overview</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Roger Lew.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

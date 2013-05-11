@@ -25,11 +25,46 @@ from numpy import fromfile
 from scipy import io as sio
 
 from undaqTools.misc.base import  _size_lookup, _nptype_lookup
-from undaqTools.element import Element, FrameSlice, FrameIndex
+from undaqTools.element import Element, FrameSlice, FrameIndex, findex
 from undaqTools.dynobj import DynObj
 from undaqTools.misc.base import _searchsorted
 from undaqTools.misc.recordtype import recordtype
 from undaqTools.misc.ast import _literal_eval, _literal_repr
+
+interpolation_wclist = \
+    ['CIS_Auxiliary_Buttons',
+     'SCC_Collision*',
+     'SCC_Current_VDS_Frame_Count',
+     'SCC_DRT_ReactionTime',
+     'SCC_DynObj*',
+     'SCC_Eval*',
+     'SCC_False_Alarm',
+     'SCC_Fog',
+     'SCC_Glare_Obj*',
+     'SCC_Graphics_Frame_Time',
+     'SCC_HighRes_Time',
+     'SCC_Init*',
+     'SCC_Lane_Depart_Warn',
+     'SCC_LogStreams',
+     'SCC_NVES_Target_Dist',
+     'SCC_StatObj*',
+     'SCC_StatObj_AudioVisualState',
+     'SCC_StatObj_CvedId',
+     'SCC_StatObj_DataSize',
+     'SCC_StatObj_Pos',
+     'SCC_StatObj_SolId',
+     'SCC_Time_Counter',
+     'SCC_Tire_Condition',
+     'SCC_TrafLight_Id',
+     'SCC_TrafLight_Size',
+     'SCC_TrafLight_State',
+     'SCC_Trailer_Col_Det_Ob_SolId',
+     'SCC_Trailer_Col_Det_Ob_Type',
+     'SCC_Trailer_Col_Det_Object',
+     'SCC_Trailer_Col_List_Size',
+     'SCC_Trailer_Collision_Count',
+     'VDS_DRV_Frame_No',
+     'VDS_Frame_Count']
 
 Info = namedtuple('Info', ['run','runinst','title','numentries',
                            'frequency','date','magic','subject',
@@ -88,36 +123,36 @@ def stat(filename):
     fid.close()
 
     return \
-        Info(run=run, 
-             runinst=runinst, 
-             title=title, 
-             numentries=numentries, 
-             frequency=frequency, 
-             date=date,  
-             magic=magic, 
-             subject= subject,
-             filename=filename)
+        Info(run = run, 
+             runinst = runinst, 
+             title = title, 
+             numentries = numentries, 
+             frequency = frequency, 
+             date = date,  
+             magic = magic, 
+             subject = subject,
+             filename = filename)
         
 class Daq(dict):
     def __init__(self):
         """Abstraction of NADS .daq data"""
 
         # namedtuple containing drive relevant metadata
-        self.info = Info(run='', 
-                         runinst='', 
-                         title='', 
-                         numentries=0, 
-                         frequency=0, 
-                         date='',  
-                         magic='', 
-                         subject='',
-                         filename='')
+        self.info = Info(run = '', 
+                         runinst = '', 
+                         title = '', 
+                         numentries = 0, 
+                         frequency = 0, 
+                         date = '',  
+                         magic = '', 
+                         subject = '',
+                         filename = '')
                          
         
         # recordtype of frame information
-        self.frame = Frame(code=array('i'),
-                           frame=array('i'),
-                           count=array('i'))
+        self.frame = Frame(code = array('i'),
+                           frame = array('i'),
+                           count = array('i'))
 
         # recordtype of element header infomation
         self._header = None
@@ -138,7 +173,8 @@ class Daq(dict):
             self.elemlist = [s.rstrip() for s in f.readlines()]
 
     def read_daq(self, filename, elemlist=None,
-                 loaddata=True, process_dynobjs=True):
+                 loaddata=True, process_dynobjs=True,
+                 interpolate_missing_frames=True):
         """
         read_daq(filename[, elemlist=None]
                  [, loaddata=True][, process_dynobjs=True])
@@ -166,15 +202,15 @@ class Daq(dict):
         """        
         
         _header = \
-            Header(id=None,
-                   numvalues=array('i'),
-                   name=[],
-                   units=[],
-                   rate=array('i'),
-                   type=array('c'),
-                   nptype=[],
-                   varrateflag=array('i'),
-                   bytes=array('i'))
+            Header(id = None,
+                   numvalues = array('i'),
+                   name = [],
+                   units = [],
+                   rate = array('i'),
+                   type = array('c'),
+                   nptype = [],
+                   varrateflag = array('i'),
+                   bytes = array('i'))
         
         if elemlist is not None:
             self.elemlist = elemlist    
@@ -194,15 +230,15 @@ class Daq(dict):
         filename = filename
 
         self.info = \
-            Info(run=run, 
-                 runinst=runinst, 
-                 title=title, 
-                 numentries=numentries, 
-                 frequency=frequency, 
-                 date=date,  
-                 magic=magic, 
-                 subject= subject,
-                 filename=filename)
+            Info(run = run, 
+                 runinst = runinst, 
+                 title = title, 
+                 numentries = numentries, 
+                 frequency = frequency, 
+                 date = date,  
+                 magic = magic, 
+                 subject = subject,
+                 filename = filename)
 
         # read header
         _header.id = range(self.info.numentries)
@@ -240,6 +276,24 @@ class Daq(dict):
 
         if loaddata and process_dynobjs:
             self._process_dynobjs()
+
+        # interpolate if frames are missing
+        # we want to do this after loading dyn_objects so that the
+        # SCC_DynObjs* stay aligned with the rest of the data.
+        # DynObj.process detects whether frames are missing and
+        # interpolates the dynamic object Elements so in the end
+        # everything gets realigned.
+
+        if len(self) == 0:
+            return # no data loaded
+        
+        missing_frames = (self.fend - self.f0 + 1) - len(self.frame.frame)
+        if missing_frames != 0:
+            msg = "Missing %i frames."%missing_frames
+            if interpolate_missing_frames:
+                msg += " (interpolated missing frames)"
+                self._interpolate_missing_frames()
+            warnings.warn(msg, RuntimeWarning)
             
     # create alias read for read_daq
     read = read_daq
@@ -346,7 +400,7 @@ class Daq(dict):
                         read(numitems*size) # seek is slow...
                                             # reduce calls to read
             except:
-                msg = 'Failed loading file on frame %i.'%frame
+                msg = 'Failed loading file on frame %i.'%frame.frame[-1]
                 msg += ' (stopped reading file)'
                 warnings.warn(msg, RuntimeWarning)
                 bombed = True
@@ -440,35 +494,70 @@ class Daq(dict):
         del _header, self._header
         self._header = None
                     
-                    
-        # interpolate if frames are missing after building Elements
-        if fend - f0 >= len(frame.frame):
-            msg = "Missing frames. (interpolated missing frames)"
-            warnings.warn(msg, RuntimeWarning)
-
-            self._interpolate_missing_frames()
 
     def _interpolate_missing_frames(self):
         """
         interpolates over missing frames for non-CSSDC measures
+
+        Excludes elements that wildcard match:
         
+            CIS_Auxiliary_Buttons
+            SCC_Collision*
+            SCC_Current_VDS_Frame_Count
+            SCC_DRT_ReactionTime
+            SCC_DynObj*
+            SCC_Eval*
+            SCC_False_Alarm
+            SCC_Fog
+            SCC_Glare_Obj*
+            SCC_Graphics_Frame_Time
+            SCC_HighRes_Time
+            SCC_Init*
+            SCC_Lane_Depart_Warn
+            SCC_LogStreams
+            SCC_NVES_Target_Dist
+            SCC_StatObj*
+            SCC_StatObj_AudioVisualState
+            SCC_StatObj_CvedId
+            SCC_StatObj_DataSize
+            SCC_StatObj_Pos
+            SCC_StatObj_SolId
+            SCC_Time_Counter
+            SCC_Tire_Condition
+            SCC_TrafLight_Id 
+            SCC_TrafLight_Size
+            SCC_TrafLight_State
+            SCC_Trailer_Col_Det_Ob_SolId 
+            SCC_Trailer_Col_Det_Ob_Type 
+            SCC_Trailer_Col_Det_Object 
+            SCC_Trailer_Col_List_Size 
+            SCC_Trailer_Collision_Count
+            VDS_DRV_Frame_No
+            VDS_Frame_Count        
         """
+        global interpolation_wclist
         f0, fend = self.f0, self.fend
         old_frames = self.frame.frame[:]
         new_frames = np.linspace(f0, fend, fend - f0 + 1)
         
         # np.interp can only handle 1-d arrays
         for elem in self.values():
-            if elem.isCSSDC() or elem.type == 'c':
+            if elem.isCSSDC():
                 continue
 
-                # todo: should really apply interpolation
-                # to non-CSSDC string measures. I don't
-                # see an immediate need for it.
-            
+            if any(fnmatch(elem.name, wc) for wc in interpolation_wclist):
+                # The 'SCC_DynObj*' cells are non-CSSDC but contain
+                # categorical data so we don't want to interpolate it.
+                #
+                # All we really have to do is tell Daq to treat it as
+                # a non-CSSDC measures. When it gets exported the
+                # frames will go with it as SCC_DynObj*_Frames
+                self[elem.name].rate = -2
+                continue
+
             x = [np.interp(new_frames, old_frames, elem[j,:])
                  for j in xrange(elem.numvalues)]
-            
+        
             self[elem.name] = \
                 Element(x, new_frames,
                         rate=elem.rate,
@@ -509,6 +598,8 @@ class Daq(dict):
             for j, cved in enumerate(cveds_in_frame):
                 if cved != 0:
                     try:
+                        # if cved not in dict it will raise a
+                        # key error
                         frame_indiceses[cved].append(i)
                         row_indiceses[cved].append(j)
                     except:
@@ -548,16 +639,31 @@ class Daq(dict):
         
         dict.__setitem__(self, name, elem)
         
-    def _unwrap_lane_deviation(self):
+    def _unwrap_lane_deviation(self, lanewidth=12.):
+        """
+        Uses np.unwrap to create a continuous lane deviation measure
 
+        measure is registered in self as 'SCC_Spline_Lane_Deviation_Fixed'
+
+        Has not been extensively tested or evaluated.
+
+        Parameters
+        ----------
+        lanewidth : float
+            assumed lanewidth in feet
+        """
         if 'SCC_Spline_Lane_Deviation'not in self:
             msg = "Need 'SCC_Spline_Lane_Deviation' to fix lane deviation"
             msg += ' (did not fix lane deviation)'
             warnings.warn(msg, RuntimeWarning)
             return None
             
+        halfwidth = lanewidth/2.
         lane_dev = self['SCC_Spline_Lane_Deviation'][1,:]
-        fixed_lane_dev =  np.unwrap(lane_dev*(np.pi/6.))*(6./np.pi)
+
+        fixed_lane_dev = lane_dev*(np.pi/halfwidth) # convert to radians
+        fixed_lane_dev = np.unwrap(fixed_lane_dev)  # unwrap  
+        fixed_lane_dev *= (halfwidth/np.pi)         # convert back to feet
 
         self['SCC_Spline_Lane_Deviation_Fixed'] = \
             Element(fixed_lane_dev,
@@ -586,15 +692,15 @@ class Daq(dict):
         """
         global _nptype_lookup, _size_lookup
         _header = \
-            Header(id=array('i'),
-                   numvalues=array('i'),
-                   name=[],
-                   units=[],
-                   rate=array('i'),
-                   type=array('c'),
-                   nptype=[],
-                   varrateflag=array('i'),
-                   bytes=array('i'))
+            Header(id = array('i'),
+                   numvalues = array('i'),
+                   name = [],
+                   units = [],
+                   rate = array('i'),
+                   type = array('c'),
+                   nptype = [],
+                   varrateflag = array('i'),
+                   bytes = array('i'))
 
         i = 0
         for elem in sorted(self.values(), key=attrgetter('name')):
@@ -649,41 +755,41 @@ class Daq(dict):
 
         # info
         self.info = \
-            Info(run=root['info'].attrs['run'], 
-                 runinst=root['info'].attrs['runinst'], 
-                 title=root['info'].attrs['title'], 
-                 numentries=root['info'].attrs['numentries'], 
-                 frequency=root['info'].attrs['frequency'], 
-                 date=root['info'].attrs['date'],  
-                 magic=root['info'].attrs['magic'], 
-                 subject=root['info'].attrs['subject'],
-                 filename=root['info'].attrs['filename'])
+            Info(run = root['info'].attrs['run'], 
+                 runinst = root['info'].attrs['runinst'], 
+                 title = root['info'].attrs['title'], 
+                 numentries = root['info'].attrs['numentries'], 
+                 frequency = root['info'].attrs['frequency'], 
+                 date = root['info'].attrs['date'],  
+                 magic = root['info'].attrs['magic'], 
+                 subject = root['info'].attrs['subject'],
+                 filename = root['info'].attrs['filename'])
 
         # header
         # The [:] unpacks the data from a h5py.dataset.Dataset
         # object to a numpy.ndarray object
         try:
             _header = \
-                Header(id=root['header/id'][:],
-                       numvalues=root['header/numvalues'][:],
-                       name=root['header/name'][:],
-                       units=root['header/units'][:],
-                       rate=root['header/rate'][:],
-                       type=root['header/type'][:],
-                       nptype=root['header/nptype'][:],
-                       varrateflag=root['header/varrateflag'][:],
-                       bytes=root['header/bytes'][:])
+                Header(id = root['header/id'][:],
+                       numvalues = root['header/numvalues'][:],
+                       name = root['header/name'][:],
+                       units = root['header/units'][:],
+                       rate = root['header/rate'][:],
+                       type = root['header/type'][:],
+                       nptype = root['header/nptype'][:],
+                       varrateflag = root['header/varrateflag'][:],
+                       bytes = root['header/bytes'][:])
         except:
             _header = \
-                Header(id=array('i'),
-                       numvalues=array('i'),
-                       name=[],
-                       units=[],
-                       rate=array('i'),
-                       type=array('c'),
-                       nptype=[],
-                       varrateflag=array('i'),
-                       bytes=array('i'))
+                Header(id = array('i'),
+                       numvalues = array('i'),
+                       name = [],
+                       units = [],
+                       rate = array('i'),
+                       type = array('c'),
+                       nptype = [],
+                       varrateflag = array('i'),
+                       bytes = array('i'))
         
         # Find the indices cooresponding to the first and last
         # frames requested. We can use these indices to
@@ -712,14 +818,14 @@ class Daq(dict):
         # frame
         try:
             self.frame = \
-                Frame(code=root['frame/code'][indx],
-                      frame=root['frame/frame'][indx],
-                      count=root['frame/count'][indx])
+                Frame(code = root['frame/code'][indx],
+                      frame = root['frame/frame'][indx],
+                      count = root['frame/count'][indx])
         except:
             self.frame = \
-                Frame(code=array('i'),
-                      frame=array('i'),
-                      count=array('i'))
+                Frame(code = array('i'),
+                      frame = array('i'),
+                      count = array('i'))
 
         # elemlist
         try:
@@ -916,7 +1022,8 @@ class Daq(dict):
                 _literal_eval(s)
             except:
                 root.close()
-                msg = "'%s' is not a Python literal, FrameSlice, or FrameIndex"%str(obj)
+                msg = "'%s' is not a Python literal, "\
+                      "FrameSlice, or FrameIndex"%str(obj)
                 raise ValueError(msg)
             root['etc'].attrs[name] = s
             
@@ -973,9 +1080,9 @@ class Daq(dict):
         
         sio.savemat(filename,
                     {'daqInfo':dict(self.info._asdict()),
-                     'elemInfo':header,
-                     'elemData':data,
-                     'elemFrames':dict(self.frame._asdict())},
+                    'elemInfo':header,
+                    'elemData':data,
+                  'elemFrames':dict(self.frame._asdict())},
                     long_field_names=True, oned_as='column')
         
         del data
@@ -1050,24 +1157,23 @@ class Daq(dict):
             axs[-1].set_xlim([x[0], x[-1]])
 
             # put a title on the subplot
-            def indx_frmttr(slice_obj):
+            def _frmttr(slice_obj):
                 if slice_obj == slice(None):
                     return ':'
                 
-                return str(slice_obj).replace('FrameSlice(', '') \
-                                     .replace('slice(', '') \
-                                     .replace('start=None', '') \
-                                     .replace('stop=None', '') \
-                                     .replace('step=', '') \
-                                     .replace('start=', 'f') \
-                                     .replace('stop=', 'f') \
-                                     .replace(', None)', '') \
-                                     .replace(', ', ':') \
+                return str(slice_obj).replace('FrameSlice(', '')\
+                                     .replace('slice(', '')\
+                                     .replace('start=None', '')\
+                                     .replace('stop=None', '')\
+                                     .replace('step=', '')\
+                                     .replace('start=', 'f')\
+                                     .replace('stop=', 'f')\
+                                     .replace(', None)', '')\
+                                     .replace(', ', ':')\
                                      .replace(')', '')
             
-            axs[-1].set_title('%s[%s, %s]'%(name,
-                                            indx_frmttr(yindx),
-                                            indx_frmttr(xindx)))
+            title = '%s[%s, %s]'%(name, _frmttr(yindx), _frmttr(xindx))
+            axs[-1].set_title(title)
 
         # remove xticklabels from all but the last subplot
         for i in xrange(num_subplots-1):
@@ -1149,3 +1255,42 @@ class Daq(dict):
         
         """
         return [name for name in self if fnmatch(name, wc)]
+
+    def keys_summary(self, wclist=None):
+        """
+        Print a table summary of the Elements in daq
+        
+        Parameters
+        ----------
+        wclist : list of strings
+            list of wildcards to match to each key in daq
+        """
+
+        if wclist is None:
+            wclist = ['*']
+
+        if len(self) == 0:
+            print('daq is empty')
+            return
+            
+        names =  []
+        for name in self:
+            if any(fnmatch(name, wc) for wc in wclist):
+                names.append(name)
+
+        ncol = max(len(n) for n in names) + 1
+        missing = self.fend - self.f0 + 1 - len(self.frame.frame)
+        
+        for name in sorted(names):
+            elem = self[name]
+            if elem.isCSSDC():
+                continue
+            
+            print(name.ljust(ncol),
+                  ('     ','X    ')[elem.isCSSDC()],
+                  str(elem.dtype).ljust(10),
+                  elem[0,:10].toarray())
+
+
+            
+                  
