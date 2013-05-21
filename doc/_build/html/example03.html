@@ -56,106 +56,142 @@
 <h1>Example 03: Collaborate timeseries measures<a class="headerlink" href="#example-03-collaborate-timeseries-measures" title="Permalink to this headline">¶</a></h1>
 <p>Walks through directory structure and collaborates timeseries
 based on metadata in the etc dictionaries and writes the
-aggregated data to a csv file</p>
-<p>from __future__ import print_function</p>
-<p>from collections import OrderedDict
-import os
-import glob
-import time</p>
-<p>import numpy as np</p>
-<p>from pyvttbl import DataFrame</p>
-<p>from   undaqTools import Daq</p>
-<p># dependent variables and indices that we want to analyze
-dvs = [(&#8216;CFS_Accelerator_Pedal_Position&#8217;, 0),</p>
-<blockquote>
-<div>(&#8216;CFS_Brake_Pedal_Force&#8217;, 0),
-(&#8216;CFS_Steering_Wheel_Angle&#8217;, 0),
-(&#8216;SCC_Lane_Deviation&#8217;, 1),
-(&#8216;VDS_Veh_Speed&#8217;, 0)]</div></blockquote>
-<p>if __name__ == &#8216;__main__&#8217;:</p>
-<blockquote>
-<div><p># data is on a local SSD drive. This is very important for performance.
-data_dir = &#8216;C:\LocalData\Left Lane\&#8217;</p>
-<p># change the directory of the kernel
-print(&#8220;Changing wd to &#8216;%s&#8217;&#8221;%data_dir)
-os.chdir(data_dir)</p>
-<p># pyvttbl is in pypi
-# container to hold the collaborated results
-df = DataFrame()</p>
-<p>print(&#8216;nCollaborating timeseries measures...&#8217;)
-t0 = time.time()
-hd5_files = tuple(glob.glob(&#8216;<em>/</em>.hdf5&#8217;))</p>
-<dl class="docutils">
-<dt>for hd5_file in hd5_files:</dt>
-<dd><p class="first">print(&#8221;  analyzing &#8216;%s&#8217;...&#8221;%hd5_file)</p>
-<p># load hd5
-daq = Daq()
-daq.read_hd5(hd5_file)</p>
-<p># daq.etc was configured in Example02_*
-for (epoch, fslice) in daq.etc[&#8216;epochs&#8217;].items():</p>
-<blockquote class="last">
-<div><p># figure out pid and independent variable conditions
-pid = daq.etc[&#8216;pid&#8217;]
-trial = epoch / 10
-scenario = daq.etc[&#8216;scen_order&#8217;][trial]
-section = epoch % 10</p>
-<p># pack pid and IV conditions into OrderedDict
-row = OrderedDict([(&#8216;pid&#8217;, pid),</p>
-<blockquote>
-<div>(&#8216;trial&#8217;, trial),
-(&#8216;scenario&#8217;, scenario),
-(&#8216;section&#8217;, section)])</div></blockquote>
-<dl class="docutils">
-<dt>for (dv, indx) in dvs:</dt>
-<dd><p class="first">vec = daq[dv][indx,fslice].flatten()</p>
-<p class="last">row[&#8216;%s_mean&#8217;%dv] = np.mean(vec)
-row[&#8216;%s_min&#8217;%dv] = np.min(vec)
-row[&#8216;%s_max&#8217;%dv] = np.max(vec)
-row[&#8216;%s_range&#8217;%dv] = row[&#8216;%s_max&#8217;%dv] - row[&#8216;%s_min&#8217;%dv]
-row[&#8216;%s_amean&#8217;%dv] = np.mean(np.abs(vec))
-row[&#8216;%s_sd&#8217;%dv] = np.std(vec)
-row[&#8216;%s_rms&#8217;%dv] = np.linalg.norm(vec)/np.sqrt(len(vec))</p>
-</dd>
-</dl>
-<p># insert the row into the dataframe
-df.insert(row)</p>
-</div></blockquote>
-</dd>
-</dl>
-<p>df.write(fname=&#8217;collaborated_ts.csv&#8217;)</p>
-<p>print(&#8216;nDone.nncollaborating timeseries measureas took %.1f s&#8217;%(time.time()-t0))</p>
-</div></blockquote>
+aggregated data to a csv file.</p>
+<p>By using a multiprocessing pool and specifying an elemlist
+to read_hd5 the datafiles can be quickly traversed.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+
+<span class="c"># Copyright (c) 2013, Roger Lew</span>
+<span class="c"># All rights reserved.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Example timeseries reduction</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">pyvttbl</span> <span class="kn">import</span> <span class="n">DataFrame</span>
+
+<span class="kn">from</span> <span class="nn">undaqTools</span> <span class="kn">import</span> <span class="n">Daq</span>
+
+<span class="c"># dependent variables and indices that we want to analyze</span>
+<span class="n">dvs</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&#39;CFS_Accelerator_Pedal_Position&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+       <span class="p">(</span><span class="s">&#39;CFS_Brake_Pedal_Force&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+       <span class="p">(</span><span class="s">&#39;CFS_Steering_Wheel_Angle&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+       <span class="p">(</span><span class="s">&#39;SCC_Lane_Deviation&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+       <span class="p">(</span><span class="s">&#39;VDS_Veh_Speed&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span>
+
+<span class="n">elemlist</span> <span class="o">=</span> <span class="p">[</span><span class="n">elem</span> <span class="k">for</span> <span class="n">elem</span><span class="p">,</span><span class="n">indx</span> <span class="ow">in</span> <span class="n">dvs</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">collaborate_timeseries</span><span class="p">(</span><span class="n">hd5_file</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">dvs</span><span class="p">,</span> <span class="n">elemlist</span>
+
+    <span class="c"># load hd5</span>
+    <span class="n">daq</span> <span class="o">=</span> <span class="n">Daq</span><span class="p">()</span>
+    <span class="n">daq</span><span class="o">.</span><span class="n">read_hd5</span><span class="p">(</span><span class="n">hd5_file</span><span class="p">,</span> <span class="n">elemlist</span><span class="o">=</span><span class="n">elemlist</span><span class="p">)</span>
+
+    <span class="n">results_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="n">fslice</span><span class="p">)</span> <span class="ow">in</span> <span class="n">daq</span><span class="o">.</span><span class="n">etc</span><span class="p">[</span><span class="s">&#39;epochs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+
+        <span class="c"># figure out pid and independent variable conditions</span>
+        <span class="n">pid</span> <span class="o">=</span> <span class="n">daq</span><span class="o">.</span><span class="n">etc</span><span class="p">[</span><span class="s">&#39;pid&#39;</span><span class="p">]</span>
+        <span class="n">trial</span> <span class="o">=</span> <span class="n">epoch</span> <span class="o">/</span> <span class="mi">10</span>
+        <span class="n">scenario</span> <span class="o">=</span> <span class="n">daq</span><span class="o">.</span><span class="n">etc</span><span class="p">[</span><span class="s">&#39;scen_order&#39;</span><span class="p">][</span><span class="n">trial</span><span class="p">]</span>
+        <span class="n">section</span> <span class="o">=</span> <span class="n">epoch</span> <span class="o">%</span> <span class="mi">10</span>
+
+        <span class="c"># pack pid and IV conditions into OrderedDict</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([(</span><span class="s">&#39;pid&#39;</span><span class="p">,</span> <span class="n">pid</span><span class="p">),</span>
+                           <span class="p">(</span><span class="s">&#39;trial&#39;</span><span class="p">,</span> <span class="n">trial</span><span class="p">),</span>
+                           <span class="p">(</span><span class="s">&#39;scenario&#39;</span><span class="p">,</span> <span class="n">scenario</span><span class="p">),</span>
+                           <span class="p">(</span><span class="s">&#39;section&#39;</span><span class="p">,</span> <span class="n">section</span><span class="p">)])</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="n">dv</span><span class="p">,</span> <span class="n">indx</span><span class="p">)</span> <span class="ow">in</span> <span class="n">dvs</span><span class="p">:</span>
+            <span class="n">vec</span> <span class="o">=</span> <span class="n">daq</span><span class="p">[</span><span class="n">dv</span><span class="p">][</span><span class="n">indx</span><span class="p">,</span><span class="n">fslice</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+            <span class="n">row</span><span class="p">[</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">_mean&#39;</span><span class="o">%</span><span class="n">dv</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span>
+            <span class="n">row</span><span class="p">[</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">_min&#39;</span><span class="o">%</span><span class="n">dv</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span>
+            <span class="n">row</span><span class="p">[</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">_max&#39;</span><span class="o">%</span><span class="n">dv</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span>
+            <span class="n">row</span><span class="p">[</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">_range&#39;</span><span class="o">%</span><span class="n">dv</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">_max&#39;</span><span class="o">%</span><span class="n">dv</span><span class="p">]</span> <span class="o">-</span> <span class="n">row</span><span class="p">[</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">_min&#39;</span><span class="o">%</span><span class="n">dv</span><span class="p">]</span>
+            <span class="n">row</span><span class="p">[</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">_amean&#39;</span><span class="o">%</span><span class="n">dv</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">vec</span><span class="p">))</span>
+            <span class="n">row</span><span class="p">[</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">_sd&#39;</span><span class="o">%</span><span class="n">dv</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span>
+            <span class="n">row</span><span class="p">[</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">_rms&#39;</span><span class="o">%</span><span class="n">dv</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">vec</span><span class="p">))</span>
+
+        <span class="n">results_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">results_list</span>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+
+    <span class="c"># data is on a local SSD drive.</span>
+    <span class="n">data_dir</span> <span class="o">=</span> <span class="s">&#39;C:</span><span class="se">\\</span><span class="s">LocalData</span><span class="se">\\</span><span class="s">Left Lane</span><span class="se">\\</span><span class="s">&#39;</span>
+
+    <span class="c"># change the directory of the kernel</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Changing wd to &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span><span class="o">%</span><span class="n">data_dir</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">Collaborating timeseries measures...&#39;</span><span class="p">)</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">hd5_files</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s">&#39;*/*.hdf5&#39;</span><span class="p">))</span>
+
+    <span class="c"># parallel worker pool</span>
+    <span class="n">hd5_files</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s">&#39;*/*.hdf5&#39;</span><span class="p">))</span>
+    <span class="n">numcpus</span> <span class="o">=</span> <span class="mi">8</span>
+    <span class="n">pool</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">numcpus</span><span class="p">)</span>
+    <span class="n">list_of_results_lists</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">imap</span><span class="p">(</span><span class="n">collaborate_timeseries</span><span class="p">,</span> <span class="n">hd5_files</span><span class="p">)</span>
+
+    <span class="c"># pyvttbl is in pypi</span>
+    <span class="c"># container to hold the collaborated results</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">result_list</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">list_of_results_lists</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> analyzed.&#39;</span><span class="o">%</span><span class="n">hd5_files</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">result_list</span><span class="p">:</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+    <span class="n">df</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="s">&#39;collaborated_ts.csv&#39;</span><span class="p">)</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">Done.</span><span class="se">\n\n</span><span class="s">collaborating timeseries measures took </span><span class="si">%.1f</span><span class="s"> s&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">t0</span><span class="p">))</span>
+</pre></div>
+</div>
 <p>Example Output:</p>
 <div class="highlight-python"><pre>Changing wd to 'C:\LocalData\Left Lane\'
 
 Collaborating timeseries measures...
-  analyzing 'Part01\Left_01_20130424102744.hdf5'...
-  analyzing 'Part02\Left_02_20130425084730.hdf5'...
-  analyzing 'Part03\Left_03_20130425102301.hdf5'...
-  analyzing 'Part04\Left_04_20130425142804.hdf5'...
-  analyzing 'Part05\Left_05_20130425161122.hdf5'...
-  analyzing 'Part06\Left_06_20130426111502.hdf5'...
-  analyzing 'Part07\Left_07_20130426143846.hdf5'...
-  analyzing 'Part08\Left_08_20130426164114.hdf5'...
-  analyzing 'Part08\Left_08_20130426164301.hdf5'...
-  analyzing 'Part09\Left09_20130423155149.hdf5'...
-  analyzing 'Part10\Left10_20130423155149.hdf5'...
-  analyzing 'Part111\Left_11_20130430081052.hdf5'...
-  analyzing 'Part12\Left_12_20130429163745.hdf5'...
-  analyzing 'Part13\Left_13_20130429182923.hdf5'...
-  analyzing 'Part14\Left_14_20130430102504.hdf5'...
-  analyzing 'Part15\Left_15_20130430171947.hdf5'...
-  analyzing 'Part16\Left_16_20130501103917.hdf5'...
-  analyzing 'Part170\Left_17_20130501163745.hdf5'...
-  analyzing 'Part18\Left_18_20130502084422.hdf5'...
-  analyzing 'Part18\Left_18_reset_20130502090909.hdf5'...
-  analyzing 'Part19\Left_19_20130502153547.hdf5'...
-  analyzing 'Part200\Left_20_20130509094509.hdf5'...
+Part01\Left_01_20130424102744.hdf5 analyzed.
+Part02\Left_02_20130425084730.hdf5 analyzed.
+Part03\Left_03_20130425102301.hdf5 analyzed.
+Part04\Left_04_20130425142804.hdf5 analyzed.
+Part05\Left_05_20130425161122.hdf5 analyzed.
+Part06\Left_06_20130426111502.hdf5 analyzed.
+Part07\Left_07_20130426143846.hdf5 analyzed.
+Part08\Left_08_20130426164114.hdf5 analyzed.
+Part08\Left_08_20130426164301.hdf5 analyzed.
+Part09\Left09_20130423155149.hdf5 analyzed.
+Part10\Left10_20130423155149.hdf5 analyzed.
+Part111\Left_11_20130430081052.hdf5 analyzed.
+Part12\Left_12_20130429163745.hdf5 analyzed.
+Part13\Left_13_20130429182923.hdf5 analyzed.
+Part14\Left_14_20130430102504.hdf5 analyzed.
+Part15\Left_15_20130430171947.hdf5 analyzed.
+Part16\Left_16_20130501103917.hdf5 analyzed.
+Part170\Left_17_20130501163745.hdf5 analyzed.
+Part18\Left_18_20130502084422.hdf5 analyzed.
+Part18\Left_18_reset_20130502090909.hdf5 analyzed.
+Part19\Left_19_20130502153547.hdf5 analyzed.
+Part200\Left_20_20130509094509.hdf5 analyzed.
 
 Done.
 
-collaborating timeseries measureas took 182.5 s</pre>
+collaborating timeseries measures took 18.0 s</pre>
 </div>
+<p>Traversing 30 GB of data in 18 seconds with 100 lines of code
+is a pretty impressive feat if you ask me.</p>
 </div>
 
 

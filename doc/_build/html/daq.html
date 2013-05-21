@@ -211,9 +211,20 @@ Will export daq.dynobjs to HDF5 container</p>
 int -&gt; read from this frame</p>
 </div></blockquote>
 <p><strong>fend</strong> : None or int</p>
-<blockquote class="last">
+<blockquote>
 <div><p>None -&gt; read to end of file
 int -&gt; read to this frame</p>
+</div></blockquote>
+<p><strong>elemlist</strong> : None or list</p>
+<blockquote class="last">
+<div><dl class="docutils">
+<dt>None -&gt; read all the elements available in file</dt>
+<dd><p class="first last">self.elemlist becomes what was specified</p>
+</dd>
+<dt>elemlist -&gt; read only elems matching wildcards in</dt>
+<dd><p class="first last">this list</p>
+</dd>
+</dl>
 </div></blockquote>
 </td>
 </tr>

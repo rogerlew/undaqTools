@@ -7,6 +7,9 @@ In this example each subplot represents the level of independent conditions.
 
     from __future__ import print_function
 
+    # Copyright (c) 2013, Roger Lew
+    # All rights reserved.
+
     import os
     import glob
     from operator import attrgetter
@@ -101,8 +104,7 @@ In this example each subplot represents the level of independent conditions.
                     # each passing zone has its own set of Ados. This
                     # sorts out which are actually defined (should be 
                     # defined) for this trial.
-                    if i*10 <= int(do.name[-2:]) < (i+1)*10:
-                        
+                    if i*10 <= int(do.name[-2:]) < (i+1)*10:                    
                         # figure out when the ado enters the 
                         d0 = np.sum((do.pos - pos0)**2., axis=0)**.5
                         dend = np.sum((do.pos - posend)**2., axis=0)**.5
@@ -114,10 +116,28 @@ In this example each subplot represents the level of independent conditions.
                         # now we can plot the Ados relative distance to the
                         # vehicle as a function of distance over the passing
                         # lane
-                        distance = do.distance[0, imin0:iminend]
-                        distance -= distance[0]
-                        rel_distance = do.relative_distance[0, imin0:iminend]
-                        ax2.plot(distance, rel_distance, color='g', alpha=0.4)
+                        
+                        # with this dataset the thrid vehicle in the platoon
+                        # was systematically manipulate
+                        if 'L' in do.name:
+                            color = 'm'
+                            alpha = 1.
+                        elif 'S' in do.name:
+                            color = 'g'
+                            alpha = 1.
+                        else:
+                            color = 'g'
+                            alpha = .4
+
+                        if iminend-imin0 > 0:
+                            distance = do.distance[0, imin0:iminend]
+                            distance -= distance[0]
+                            rel_distance = do.relative_distance[0, imin0:iminend]
+                            ax2.plot(distance, rel_distance, color=color, alpha=alpha)
+                        else:
+                            print('    %s did not drive '
+                                  'through passing zone'%do.name)
+
 
                 # make things pretty
                 ax1.set_ylim(ylim1)
@@ -168,7 +188,7 @@ In this example each subplot represents the level of independent conditions.
                           'Force Rh', 
                           'Lines w/ mid']
 
-        n = 8 # number of pids per page
+        n = 7 # number of pids per page
 
         # data is on a local SSD drive. This is very important for performance.
         data_dir = 'C:\\LocalData\\Left Lane\\'
@@ -181,21 +201,40 @@ In this example each subplot represents the level of independent conditions.
         hdf5_files = glob.glob('*/*.hdf5')
         pids = sorted(list(set([get_pid(hf) for hf in hdf5_files])))
 
-        for i in xrange(len(pids)/n + 1):
+        print(pids)
+
+        for i in xrange(len(pids)/n+1):
             mult_ado_by_pid_plot(pids[i*n:i*n+n], i+1)
             
-        print('\nDone.\n\nMaking multipanel plot took %.1f s'%(time.time()-t0))  
+        print('\nDone.\n\nMaking multipanel plot took %.1f s'%(time.time()-t0))   
+
 
 
 **The plots**
 
 Download 
-[:download:`hi-res <_static/ensemble_speed.png>`]
+[:download:`hi-res <_static/do_passing_behavior__PAGE1.png>`]
 
-.. image:: _static/ensemble_speed.png 
+.. image:: _static/do_passing_behavior__PAGE1.png 
     :width: 750px
     :align: center
-    :alt: ensemble_speed.png
+    :alt: do_passing_behavior__PAGE1.png
+ 
+Download 
+[:download:`hi-res <_static/do_passing_behavior__PAGE2.png>`]
+
+.. image:: _static/do_passing_behavior__PAGE2.png 
+    :width: 750px
+    :align: center
+    :alt: do_passing_behavior__PAGE2.png
+    
+Download 
+[:download:`hi-res <_static/do_passing_behavior__PAGE3.png>`]
+
+.. image:: _static/do_passing_behavior__PAGE3.png 
+    :width: 750px
+    :align: center
+    :alt: do_passing_behavior__PAGE3.png
     
 **Example Output**::
 

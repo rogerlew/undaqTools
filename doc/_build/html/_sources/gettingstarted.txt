@@ -75,7 +75,6 @@ The output::
     Part08\Left_08_20130426164301.daq              1,426,507        True
     Part09\Left09_20130423155149.daq               1,339,437        True
     Part10\Left10_20130423155149.daq               1,339,437        True
-    Part11\Left_11_20130429102407.daq                410,624        True
     Part111\Left_11_20130430081052.daq             1,463,012        True
     Part12\Left_12_20130429163745.daq              1,431,765        True
     Part13\Left_13_20130429182923.daq              1,507,542        True
@@ -95,49 +94,48 @@ The output::
     process_dynobjs = True
 
     Converting daqs with 6 cpus (this may take awhile)...
-      Part01\Left_01_20130424102744.daq -> .hdf5 (292.7 s)
-      Part02\Left_02_20130425084730.daq -> .hdf5 (294.6 s)
-      Part03\Left_03_20130425102301.daq -> .hdf5 (226.8 s)
-      Part04\Left_04_20130425142804.daq -> .hdf5 (219.1 s)
-      Part05\Left_05_20130425161122.daq -> .hdf5 (207.7 s)
-      Part06\Left_06_20130426111502.daq -> .hdf5 (270.2 s)
-      Part07\Left_07_20130426143846.daq -> .hdf5 (252.5 s)
-      Part08\Left_08_20130426164114.daq -> .hdf5 (0.7 s)
-      Part08\Left_08_20130426164301.daq -> .hdf5 (238.6 s)
-      Part09\Left09_20130423155149.daq -> .hdf5 (170.3 s)
-      Part10\Left10_20130423155149.daq -> .hdf5 (168.4 s)
-      Part11\Left_11_20130429102407.daq -> .hdf5 (68.1 s)
-      Part111\Left_11_20130430081052.daq -> .hdf5 (187.1 s)
-      Part12\Left_12_20130429163745.daq -> .hdf5 (182.5 s)
-      Part13\Left_13_20130429182923.daq -> .hdf5 (194.8 s)
-      Part14\Left_14_20130430102504.daq -> .hdf5 (186.4 s)
-      Part15\Left_15_20130430171947.daq -> .hdf5 (207.4 s)
-      Part16\Left_16_20130501103917.daq -> .hdf5 (176.2 s)
-      Part170\Left_17_20130501163745.daq -> .hdf5 (194.0 s)
-      Part18\Left_18_20130502084422.daq -> .hdf5 (52.0 s)
-      Part18\Left_18_reset_20130502090909.daq -> .hdf5 (130.2 s)
-      Part19\Left_19_20130502153547.daq -> .hdf5 (201.5 s)
-      Part200\Left_20_20130509094509.daq -> .hdf5 (198.1 s)
+      Part01\Left_01_20130424102744.daq -> .hdf5 (200.7 s)
+      Part02\Left_02_20130425084730.daq -> .hdf5 (207.0 s)
+      Part03\Left_03_20130425102301.daq -> .hdf5 (193.0 s)
+      Part04\Left_04_20130425142804.daq -> .hdf5 (180.0 s)
+      Part05\Left_05_20130425161122.daq -> .hdf5 (213.1 s)
+      Part06\Left_06_20130426111502.daq -> .hdf5 (194.9 s)
+      Part07\Left_07_20130426143846.daq -> .hdf5 (194.7 s)
+      Part08\Left_08_20130426164114.daq -> .hdf5 (0.6 s)
+      Part08\Left_08_20130426164301.daq -> .hdf5 (189.3 s)
+      Part09\Left09_20130423155149.daq -> .hdf5 (163.3 s)
+      Part10\Left10_20130423155149.daq -> .hdf5 (174.0 s)
+      Part111\Left_11_20130430081052.daq -> .hdf5 (189.4 s)
+      Part12\Left_12_20130429163745.daq -> .hdf5 (193.7 s)
+      Part13\Left_13_20130429182923.daq -> .hdf5 (182.5 s)
+      Part14\Left_14_20130430102504.daq -> .hdf5 (183.9 s)
+      Part15\Left_15_20130430171947.daq -> .hdf5 (212.5 s)
+      Part16\Left_16_20130501103917.daq -> .hdf5 (173.6 s)
+      Part170\Left_17_20130501163745.daq -> .hdf5 (196.5 s)
+      Part18\Left_18_20130502084422.daq -> .hdf5 (55.2 s)
+      Part18\Left_18_reset_20130502090909.daq -> .hdf5 (144.5 s)
+      Part19\Left_19_20130502153547.daq -> .hdf5 (150.7 s)
+      Part200\Left_20_20130509094509.daq -> .hdf5 (152.1 s)
 
 
     Debug Summary
       Part01\Left_01_20130424102744.daq
-        Warning: Missing frames. (interpolated missing frames)
+        Warning: Missing 3 frames. (interpolated missing frames)
 
       Part02\Left_02_20130425084730.daq
-        Warning: Missing frames. (interpolated missing frames)
+        Warning: Missing 2 frames. (interpolated missing frames)
 
       Part06\Left_06_20130426111502.daq
-        Warning: Missing frames. (interpolated missing frames)
+        Warning: Missing 1 frames. (interpolated missing frames)
 
       Part07\Left_07_20130426143846.daq
-        Warning: Missing frames. (interpolated missing frames)
+        Warning: Missing 2 frames. (interpolated missing frames)
 
       Part08\Left_08_20130426164301.daq
-        Warning: Missing frames. (interpolated missing frames)
+        Warning: Missing 1 frames. (interpolated missing frames)
 
-      Part11\Left_11_20130429102407.daq
-        Warning: Failed loading file on frame 615180. (stopped reading file)
+      Part200\Left_20_20130509094509.daq
+        Warning: Missing 3 frames. (interpolated missing frames)
 
 
     Batch processing completed.
@@ -145,9 +143,9 @@ The output::
     --------------------------------------------------------------------
     Conversion Summary
     --------------------------------------------------------------------
-    Total elapsed time: 823.7 s
-    Data converted: 29,396.864 MB
-    Data throughput: 35.7 MB/s
+    Total elapsed time: 709.3 s
+    Data converted: 28,995.864 MB
+    Data throughput: 40.9 MB/s
     --------------------------------------------------------------------
 
     C:\LocalData\Left Lane>
@@ -372,6 +370,7 @@ subplots are specified. It also knows to represent time series measures
 as step functions. The method returns a matplotlib.figure.Figure instance.
 
 Building a timeseries plot::
+
     import matplotlib.pyplot as plt
     from undaqTools import Daq
     
