@@ -1,1 +1,3 @@
 numpydoc >= 0.1
+scipy >= 0.12
+undaqtools >= 0.1

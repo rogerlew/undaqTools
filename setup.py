@@ -1,8 +1,6 @@
-# Copyright (c) 2012, Roger Lew [see LICENSE.txt]
-# This software is funded in part by NIH Grant P20 RR016454.
+# Copyright (c) 2013, Roger Lew [see LICENSE.txt]
 
-##from distutils.core import setup
-from setuptools import setup
+from distutils.core import setup
 
 setup(name='undaqTools',
     version='0.2.0',
@@ -11,7 +9,7 @@ setup(name='undaqTools',
     author='Roger Lew',
     author_email='rogerlew@gmail.com',
     license = "BSD",
-    classifiers=["DDevelopment Status :: 4 - Beta",
+    classifiers=["Development Status :: 4 - Beta",
                  "Intended Audience :: Developers",
                  "Intended Audience :: Information Technology",
                  "Intended Audience :: Science/Research",
@@ -29,6 +27,6 @@ setup(name='undaqTools',
               'undaqTools.scripts',
               'undaqTools.tests'],
     scripts=['scripts/undaq'],
-    zip_safe=False)
+    long_description=open('README.rst').read())
 
 """C:\Python27\python.exe setup.py sdist upload --identity="Roger Lew" --sign"""
