@@ -4,7 +4,7 @@ undaqTools [*uhn-dak-tools*]
 
 undaqTools is the unofficial pythonic interface to the 
 National Advanced Driving Simulator (NADS) Data AcQuisition 
-(DAQ) files.
+(DAQ) files (i.e. NADS miniSim (TM) datafiles).
 
 undaqTools (unofficial) vs. ndaqTools (official)
 ------------------------------------------------
