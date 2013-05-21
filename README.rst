@@ -2,7 +2,7 @@
 undaqTools [*uhn-dak-tools*] 
 ==========================================================
 
-undaqTools is the the unofficial pythonic interface to the 
+undaqTools is the unofficial pythonic interface to the 
 National Advanced Driving Simulator (NADS) Data AcQuisition 
 (DAQ) files.
 
@@ -90,3 +90,21 @@ decide how to best utilize their data.
       | + write_hd5py()
       | + write_mat()
       | ...
+      
+
+Source
+-------    
+https://github.com/rogerlew/undaqTools
+
+Release
+-------
+https://pypi.python.org/pypi/undaqTools/
+
+Documentation
+-------------
+http://pythonhosted.org/undaqTools/
+
+Acknowledgments
+---------------
+Daq.read_daq() method based on Chris Schwarz and others of NADS 
+convert_daq.py script.
