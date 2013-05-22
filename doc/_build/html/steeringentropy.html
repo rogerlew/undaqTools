@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>steeringentropy &mdash; undaqTools 0.2.3 documentation</title>
+    <title>SteeringEntropyModel &mdash; undaqTools 0.2.3 documentation</title>
     
     <link rel="stylesheet" href="_static/scipy.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -52,8 +52,8 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="steeringentropy">
-<h1>steeringentropy<a class="headerlink" href="#steeringentropy" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="steeringentropymodel">
+<h1>SteeringEntropyModel<a class="headerlink" href="#steeringentropymodel" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="undaqTools.steeringentropy.SteeringEntropyModel">
 <em class="property">class </em><tt class="descclassname">undaqTools.steeringentropy.</tt><tt class="descname">SteeringEntropyModel</tt><big>(</big><em>**kwds</em><big>)</big><a class="headerlink" href="#undaqTools.steeringentropy.SteeringEntropyModel" title="Permalink to this definition">¶</a></dt>
@@ -157,6 +157,38 @@ Detriot, Michigan. March 1-4, 1999.</dd>
 </dd></dl>
 
 <dl class="method">
+<dt id="undaqTools.steeringentropy.SteeringEntropyModel.fit_baseline">
+<tt class="descname">fit_baseline</tt><big>(</big><em>self, x[, fs=60.][, _tsplot=False]</em><big>)</big><a class="headerlink" href="#undaqTools.steeringentropy.SteeringEntropyModel.fit_baseline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds AR coefficients to build prediction errors and estimates baseline
+prediction errors distribution. Returns the baseline entropy.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>x</strong> : array_like</p>
+<blockquote>
+<div><p>Input data. Should specify steering wheel angle over at least 120 s.
+x[:N/2] is used to find the AR coefficients.
+x[N/2:] is used to build the baseline prediciton error distribution.</p>
+</div></blockquote>
+<p><strong>fs</strong> : float</p>
+<blockquote>
+<div><p>sampling rate of x in Hz. Default is 60 Hz. Be sure to specify fs if
+x was not sampled at 60 Hz.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>hbas</strong> : float</p>
+<blockquote class="last">
+<div><p>baseline entropy</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="undaqTools.steeringentropy.SteeringEntropyModel.get_entropy">
 <tt class="descname">get_entropy</tt><big>(</big><em>self, x[, fs=60.][, _pedistplot=False]</em><big>)</big><a class="headerlink" href="#undaqTools.steeringentropy.SteeringEntropyModel.get_entropy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns steering entropy from given data vector. Specify fs if not
@@ -249,6 +281,22 @@ and resamples and returns x at self.resample_fs.</p>
 <div><p>low-passed and resampled copy of x</p>
 </div></blockquote>
 </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="undaqTools.steeringentropy.SteeringEntropyModel._lpfilter_bode">
+<tt class="descname">_lpfilter_bode</tt><big>(</big><big>)</big><a class="headerlink" href="#undaqTools.steeringentropy.SteeringEntropyModel._lpfilter_bode" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns bode plot of the lp filter applied before downsampling</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><strong>None</strong> :</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><strong>fig</strong> : matplotlib.figure.Figure</td>
 </tr>
 </tbody>
 </table>
