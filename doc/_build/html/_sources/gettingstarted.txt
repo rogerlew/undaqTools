@@ -1,13 +1,21 @@
 Getting Started
 ==========================
 undaqTools uses the HDF5 (Hierarchical Data Format) data model 
-to store the data contained within NAD's DAQ files. The undaq.py
-script allows you to parallel batch processing DAQ files to
-HDF5. Once converted Daq instances can be loaded from HDF5 in a 
-fraction of the time. 
+to store the data contained within NAD's DAQ files. 
 
 undaq.py
 --------
+The undaq.py script allows you to parallel batch processing DAQ files 
+to HDF5. Once converted Daq instances can be loaded from HDF5 in a 
+fraction of the time. Upon installation undaq.py should create a link 
+in the Scripts directory of your Python installation. If your Scripts
+directory is in your path you should be able to call it from the command
+line 
+
+.. note:: With Windows Vista/7/8 holding down shift while right-clicking in
+    an explorer window will add a "Open Command Window Here" option to the
+    context menu.
+
 Ussage is pretty straight forward. You give it a wild card argument and it
 searches for daq files that meet that wildcard. For example you wish to 
 convert all daq files in the current directory::
@@ -25,9 +33,11 @@ in parallel use the -n or --numcpu flag::
     $ undaq.py */* -n 6
     
 This would tell undaq to convert all the daq files one level down using
-6 cores. Keep in mind you might run out of memory before you run out of
-CPU cores. Even the fastest computers don't work very well when they 
-run out of memory!
+6 cores. 
+
+.. warning:: Keep in mind you might run out of memory before you run out of
+    CPU cores. Even the fastest computers don't work very well when they 
+    run out of memory!
 
 By default undaq.py will only convert daq files that haven't already been
 converted to hdf5. The idea being that you will probably be incrementally 
@@ -55,7 +65,7 @@ ussage), but sometimes warnings might get thrown if the daq is missing
 frames or ends abruptly. When these things occur undaq does its best to
 fix what went wrong fix the Daq files.
 
-The output::
+Example Output::
 
     C:\LocalData\Left Lane>undaq.py */* -n 6 -r -d
 
@@ -150,27 +160,28 @@ The output::
 
     C:\LocalData\Left Lane>
 
-The Glob summary is emitted immediately. It allows users to see what files
+The Glob Summary is emitted immediately and allows users to see what files
 undaq has found and see whether it already has a cooresponding daq or hdf5
 file converted.
 
 After the summary undaq will tell you whether it is in debug mode, as well
 as whether it is in rebuild mode.
 
-Then it will produce a running log alerting users as their daqs finish. 
+undaq.py will produce a running log alerting users as their daqs finish. 
 The multiprocessing maintains the order from the glob summary so the output
 may be delayed until other files in its multiprocessing cohort complete.
 
 To make the output more readable undaq catches and supresses the warnings 
-until the batch processing has finished, and then only display if in debug 
+until the batch processing has finished, and will only display if in debug 
 mode.
  
 Lastly, a conversion summary is provided. From this we can see it processed
-almost 30 Gb of data in 789.7 seconds at a rate of 35.7 MB/s. These 
-particular files have several hundred Ados that have to be unpacked.
+almost 30 Gb of data in 709.3 seconds at a rate of 40.9 MB/s. These 
+particular files have the additional overhead of several hundred Ados that 
+have to be unpacked. 
  
-Daq Objects
-------------
+Initializing and Loading Daq Instances
+--------------------------------------
 
 Daq objects can be initialized in two ways. The first is to
 read the DAQ files directly.
@@ -181,7 +192,8 @@ read the DAQ files directly.
 
 Daq.read will also unpack and process any dynamic objects that might
 be present during the drive. This processing is computationally intensive 
-and about doubles the processing time. This can be suppressed with the 
+can significantly increase the processing time depedending on how many
+dynamic objects were present. This can be suppressed with the 
 process_dynobjs keyword argument if so desired. 
 
 >>> daq.read(daq_file, process_dynobjs=False)
@@ -190,16 +202,48 @@ Once loaded, saving the hdf5 is as simple as:
 
 >>> daq.write_hd5(hd5_file)
 
-Once an HDF5 file has been saved it can be reloaded with:
+Assuming you have already converted your DAQS to HDF5 using the above
+method or using the undaq.py script you could load the HDF5 file directly:
 
 >>> daq.read_hd5(hd5_file)
 
 Reading HDF5 files is about 2 magnitude orders faster than reading 
-DAQ files directly. To provide a means of inspecting DAQ files directly
-there is a stat function.
+DAQ files directly. The suggested interaction is to use the undaq.py
+script to convert your DAQ files to HDF5. Once they have been converted the
+DAQs should be archived but should not be needed for the data analysis.
 
-stat()
-------------------
+Specifying an `elemlist`
+------------------------
+To save memory and time a list of element wildcards to load can be 
+supplied to read_hd5:
+
+>>> elemlist = ['VDS_Veh*', 'CFS_Accelerator_Pedal_Position']
+>>> daq.read_hd5(hd5_file, elemlist=elemlist)
+
+Every wildcard in elemlist is matched to the elements in the HDF5 file.
+The above example would load all the elements beginning with 'VDS_Veh'
+and 'CFS_Accelerator_Pedal_Position'.
+
+The wildcard matching is Unix-shell style case-normalized matching (i.e. 
+not regex).
+
+.. note:: No warnings are provided if your wildcards don't match the elements in
+    the HDF5.
+
+Daq.match_keys()
+-----------------
+The DAQ files provide an almost overwhelming amount of data. When you
+first start getting acquainted with your driving simulator data it is 
+easy to forget what contain the the things that you are interested in. 
+The match_keys function makes this a little easier by allowing you to 
+find keys that match Unix style wildcard patterns. The searches are 
+case insensitive.
+
+>>> daq.match_keys('*veh*dist*')
+[u'VDS_Veh_Dist', u'SCC_OwnVeh_PathDist', u'SCC_OwnVehToLeadObjDist']
+
+stat() and the Daq.info <*NamedTuple*>
+--------------------------------------
 If you want to get metadata from a DAQ file but don't have it converted
 to HDF5 you can use the undaqTools.stat() function to pull out the info
 metadata. 
@@ -216,38 +260,10 @@ Info(run='data reduction',
      subject='part12', 
      filename='data reduction_20130204125617.daq')
 
-Accessing Data
----------------
-Daq objects are dictionary objects. The keys coorespond to the 
-NADS variable names in the DAQ files. The values are Element
-object instances. The Element class inherents numpy ndarrays 
-and they are always 2 dimensional.
-
->>> daq['VDS_Veh_Speed'].shape
-(1L, 10658L)
-
-Because Element is a numpy.ndarray subclass they behave, for the
-most part, just like the plain old numpy arrays that you are 
-(hopefully) use to.
-
->>> np.mean(daq['VDS_Veh_Speed'])
-76.4363
-
-There is some special functionality built into these Elements that
-we will get to later.
-
-Daq.match_keys()
------------------
-The DAQ files provide an almost overwhelming amount of data. When you
-first start getting acquainted with your driving simulator data it is 
-easy to forget what contain the the things that you are interested in. 
-The match_keys function makes this a little easier by allowing you to 
-find keys that match Unix style wildcard patterns. The searches are 
-case insensitive.
-
->>> daq.match_keys('*veh*dist*')
-[u'VDS_Veh_Dist', u'SCC_OwnVeh_PathDist', u'SCC_OwnVehToLeadObjDist']
-
+When you load data into a Daq instance the info attribute contains this
+metadata. The Info dict is stored as a namedTuple to prevent or at
+least discourage users from altering this metadata.
+     
 Daq.etc <*dict*>
 -----------------
 The data reductions are usually hypothesis driven. This means that we
@@ -272,11 +288,26 @@ dict will export and import when the attribute changes. To get this to work
 you would have to interact with etc through getter and setter methods and it
 just doesn't seem particularly worth the hassle.
 
-Working with Elements
+Accessing Element Data
 ----------------------
-Element instances inherent numpy.ndarrays. They also keep track of the 
-frames that their data represent. The frames are always a 1 dimensional
-and are aligned with the second axis of the Element's data.
+Daq objects are dictionary objects. The keys coorespond to the 
+NADS variable names in the DAQ files. The values are Element
+object instances. The Element class inherents numpy ndarrays 
+and they are always 2 dimensional.
+
+>>> daq['VDS_Veh_Speed'].shape
+(1L, 10658L)
+
+Because Element is a numpy.ndarray subclass they behave, for the
+most part, just like the plain old numpy arrays that you are 
+(hopefully) use to.
+
+>>> np.mean(daq['VDS_Veh_Speed'])
+76.4363
+
+They also keep track of the frames that their data represent. The frames 
+are always a 1 dimensional and are aligned with the second axis of the 
+Element's data.
 
 >>> veh_spd = daq['VDS_Veh_Speed']
 >>> type(veh_spd.frames)
@@ -366,7 +397,7 @@ plot. Each list argument becomes a subplot. The xindx keyword allows one
 to control the range of the x-axis across  all of the subplots. 
 
 The code is smart enough to dynamically adjust its height as additional
-subplots are specified. It also knows to represent time series measures 
+subplots are specified. It also knows to represent CSSDC measures 
 as step functions. The method returns a matplotlib.figure.Figure instance.
 
 Building a timeseries plot::
@@ -419,10 +450,14 @@ Download
     :align: center
     :alt: dynobjs_plot.png
     
-Lastly: The Absence of a Time is a Feature
+Quirks
 -------------------------------------------
-Time is almost completly redundant with the frames data for most things. 
-Just start thinking in frames. It will soon become second nature.
+**Absence of Time**
 
-If you do need time there is the 'SCC_Graphics_Wall_Clock_Time' data. It
-an int32 Element with millisecond units. It doesn't start at 0.
+    Time is almost completly redundant with the frames data for most things. 
+    Just start thinking in frames. It will soon become second nature.
+
+    If you do need millisecond precision timing there is the 
+    'SCC_Graphics_Wall_Clock_Time' element. It an int32 Element with 
+    millisecond units. It doesn't start at 0.
+

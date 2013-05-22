@@ -7,6 +7,7 @@ doing and some of the examples are more complex so you can
 get an idea of what is possible.
 
 .. toctree::
+
    example01
    example02
    example03

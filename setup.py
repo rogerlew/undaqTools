@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='undaqTools',
-    version='0.2.0',
+    version='0.2.3',
     description='undaqTools is a pythonic interface to the National Advanced '\
                 'Driving Simulator (NADS) Data AcQuisition (DAQ) files',
     author='Roger Lew',
@@ -26,7 +26,8 @@ setup(name='undaqTools',
               'undaqTools.misc',
               'undaqTools.scripts',
               'undaqTools.tests'],
-    scripts=['scripts/undaq'],
-    long_description=open('README.rst').read())
+    scripts = ['undaqTools/scripts/undaq.py'])
+
+    
 
 """C:\Python27\python.exe setup.py sdist upload --identity="Roger Lew" --sign"""

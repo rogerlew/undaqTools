@@ -135,7 +135,6 @@ def stat(filename):
         
 class Daq(dict):
     def __init__(self):
-        """Abstraction of NADS .daq data"""
 
         # namedtuple containing drive relevant metadata
         self.info = Info(run = '', 

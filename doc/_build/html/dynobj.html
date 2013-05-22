@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -6,15 +8,15 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>DynObj &mdash; undaqTools 0.2.0 documentation</title>
+    <title>DynObj &mdash; undaqTools 0.2.3 documentation</title>
     
     <link rel="stylesheet" href="_static/scipy.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.2.0',
+        URL_ROOT:    '',
+        VERSION:     '0.2.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +25,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="undaqTools 0.2.0 documentation" href="index.html" />
+    <link rel="top" title="undaqTools 0.2.3 documentation" href="index.html" />
     <link rel="next" title="logstream" href="logstream.html" />
     <link rel="prev" title="findex" href="findex.html" /> 
   </head>
@@ -40,7 +42,7 @@
         <li class="right" >
           <a href="findex.html" title="findex"
              accesskey="P">previous</a> |</li>
-<li><a href="index.html">undaqTools 0.2.0 documentation</a> &raquo;</li>
+<li><a href="index.html">undaqTools 0.2.3 documentation</a> &raquo;</li>
  
       </ul>
     </div>  
@@ -134,24 +136,6 @@ as the OwnVehicle)</td>
 </table>
 <p class="rubric">Methods</p>
 <dl class="method">
-<dt id="undaqTools.DynObj.__delitem__">
-<tt class="descname">__delitem__</tt><big>(</big><em>indx</em><big>)</big><a class="headerlink" href="#undaqTools.DynObj.__delitem__" title="Permalink to this definition">¶</a></dt>
-<dd><p>provides dicionary-esque access to the Element Attributes</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="undaqTools.DynObj.__getitem__">
-<tt class="descname">__getitem__</tt><big>(</big><em>indx</em><big>)</big><a class="headerlink" href="#undaqTools.DynObj.__getitem__" title="Permalink to this definition">¶</a></dt>
-<dd><p>provides dicionary-esque access to the Element Attributes</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="undaqTools.DynObj.__setitem__">
-<tt class="descname">__setitem__</tt><big>(</big><em>indx</em>, <em>value</em><big>)</big><a class="headerlink" href="#undaqTools.DynObj.__setitem__" title="Permalink to this definition">¶</a></dt>
-<dd><p>provides dicionary-esque access to the Element Attributes</p>
-</dd></dl>
-
-<dl class="method">
 <dt id="undaqTools.DynObj.process">
 <tt class="descname">process</tt><big>(</big><em>cvedId</em>, <em>frame_indices</em>, <em>row_indices</em>, <em>daq</em><big>)</big><a class="headerlink" href="#undaqTools.DynObj.process" title="Permalink to this definition">¶</a></dt>
 <dd><p>unpacks data from the SCC_DynObj* Elements</p>
@@ -187,6 +171,28 @@ dynamic object</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="undaqTools.DynObj.write_hd5">
+<tt class="descname">write_hd5</tt><big>(</big><em>self[, filename=None][, root=None]</em><big>)</big><a class="headerlink" href="#undaqTools.DynObj.write_hd5" title="Permalink to this definition">¶</a></dt>
+<dd><p>writes DynObj to hdf5.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>filename</strong> : string</p>
+<blockquote>
+<div><p>path to write to</p>
+</div></blockquote>
+<p><strong>root</strong> : h5py.File</p>
+<blockquote class="last">
+<div><p>handle to group</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="undaqTools.DynObj.read_hd5">
 <tt class="descname">read_hd5</tt><big>(</big><em>self[, filename=None][, root=None]</em><big>)</big><a class="headerlink" href="#undaqTools.DynObj.read_hd5" title="Permalink to this definition">¶</a></dt>
 <dd><p>reads a DynObj from a hdf5 file.</p>
@@ -209,25 +215,21 @@ dynamic object</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="undaqTools.DynObj.write_hd5">
-<tt class="descname">write_hd5</tt><big>(</big><em>self[, filename=None][, root=None]</em><big>)</big><a class="headerlink" href="#undaqTools.DynObj.write_hd5" title="Permalink to this definition">¶</a></dt>
-<dd><p>writes DynObj to hdf5.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>filename</strong> : string</p>
-<blockquote>
-<div><p>path to write to</p>
-</div></blockquote>
-<p><strong>root</strong> : h5py.File</p>
-<blockquote class="last">
-<div><p>handle to group</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
+<dt id="undaqTools.DynObj.__getitem__">
+<tt class="descname">__getitem__</tt><big>(</big><em>indx</em><big>)</big><a class="headerlink" href="#undaqTools.DynObj.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>provides dicionary-esque access to the Element Attributes</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="undaqTools.DynObj.__setitem__">
+<tt class="descname">__setitem__</tt><big>(</big><em>indx</em>, <em>value</em><big>)</big><a class="headerlink" href="#undaqTools.DynObj.__setitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>provides dicionary-esque access to the Element Attributes</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="undaqTools.DynObj.__delitem__">
+<tt class="descname">__delitem__</tt><big>(</big><em>indx</em><big>)</big><a class="headerlink" href="#undaqTools.DynObj.__delitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>provides dicionary-esque access to the Element Attributes</p>
 </dd></dl>
 
 </dd></dl>
@@ -285,13 +287,13 @@ dynamic object</p>
         <li class="right" >
           <a href="findex.html" title="findex"
              >previous</a> |</li>
-<li><a href="index.html">undaqTools 0.2.0 documentation</a> &raquo;</li>
+<li><a href="index.html">undaqTools 0.2.3 documentation</a> &raquo;</li>
  
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2013, Roger Lew.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

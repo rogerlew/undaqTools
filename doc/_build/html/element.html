@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -6,15 +8,15 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Element &mdash; undaqTools 0.2.0 documentation</title>
+    <title>Element &mdash; undaqTools 0.2.3 documentation</title>
     
     <link rel="stylesheet" href="_static/scipy.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.2.0',
+        URL_ROOT:    '',
+        VERSION:     '0.2.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +25,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="undaqTools 0.2.0 documentation" href="index.html" />
+    <link rel="top" title="undaqTools 0.2.3 documentation" href="index.html" />
     <link rel="next" title="fslice" href="fslice.html" />
     <link rel="prev" title="Daq" href="daq.html" /> 
   </head>
@@ -40,7 +42,7 @@
         <li class="right" >
           <a href="daq.html" title="Daq"
              accesskey="P">previous</a> |</li>
-<li><a href="index.html">undaqTools 0.2.0 documentation</a> &raquo;</li>
+<li><a href="index.html">undaqTools 0.2.3 documentation</a> &raquo;</li>
  
       </ul>
     </div>  
@@ -57,36 +59,6 @@
 <em class="property">class </em><tt class="descclassname">undaqTools.</tt><tt class="descname">Element</tt><a class="headerlink" href="#undaqTools.Element" title="Permalink to this definition">¶</a></dt>
 <dd><p>Container to hold NADS DAQ cell data</p>
 <p class="rubric">Methods</p>
-<dl class="method">
-<dt id="undaqTools.Element.__getitem__">
-<tt class="descname">__getitem__</tt><big>(</big><em>indx</em><big>)</big><a class="headerlink" href="#undaqTools.Element.__getitem__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the item described by indx, as an Element</p>
-<p>elem.__getitem__(indx) &lt;==&gt; elem[indx]</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>indx</strong> : None, int, slice, tuple</p>
-<blockquote>
-<div><p>first arg of tuple must be None, int, or slice object.
-second arg can also be a FrameSlice or FrameIndex instance</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>view</strong> : Element or possibly float</p>
-<blockquote class="last">
-<div><p>the requested data</p>
-<p>when Element is a CSSDC measure and a FrameIndex is supplied:</p>
-<p>If frame is not defined it returns the last defined state.
-If shape of the state is (1,1) the state is returned as a scalar.
-If frame &lt; elem.frames[0] then nan is returned.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 <dl class="staticmethod">
 <dt id="undaqTools.Element.__new__">
 <em class="property">static </em><tt class="descname">__new__</tt><big>(</big><em>data</em>, <em>frames</em><span class="optional">[</span>, <em>**kwds</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#undaqTools.Element.__new__" title="Permalink to this definition">¶</a></dt>
@@ -138,7 +110,7 @@ mat files. Shouldn&#8217;t be important to most end users.</p>
 </tr>
 </tbody>
 </table>
-<div class="admonition seealso">
+<div class="admonition-see-also admonition seealso">
 <p class="first admonition-title">See also</p>
 <dl class="last docutils">
 <dt><a class="reference internal" href="fslice.html"><em>fslice</em></a></dt>
@@ -150,16 +122,28 @@ mat files. Shouldn&#8217;t be important to most end users.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="undaqTools.Element.isCSSDC">
-<tt class="descname">isCSSDC</tt><big>(</big><big>)</big><a class="headerlink" href="#undaqTools.Element.isCSSDC" title="Permalink to this definition">¶</a></dt>
-<dd><p>evaluates whether element is a CSSDC measure</p>
+<dt id="undaqTools.Element.__getitem__">
+<tt class="descname">__getitem__</tt><big>(</big><em>indx</em><big>)</big><a class="headerlink" href="#undaqTools.Element.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the item described by indx, as an Element</p>
+<p>elem.__getitem__(indx) &lt;==&gt; elem[indx]</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>answer</strong> : bool</p>
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>indx</strong> : None, int, slice, tuple</p>
+<blockquote>
+<div><p>first arg of tuple must be None, int, or slice object.
+second arg can also be a FrameSlice or FrameIndex instance</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>view</strong> : Element or possibly float</p>
 <blockquote class="last">
-<div><p>True if it is a CSSDC measure, False otherwise</p>
+<div><p>the requested data</p>
+<p>when Element is a CSSDC measure and a FrameIndex is supplied:</p>
+<p>If frame is not defined it returns the last defined state.
+If shape of the state is (1,1) the state is returned as a scalar.
+If frame &lt; elem.frames[0] then nan is returned.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -188,6 +172,24 @@ mat files. Shouldn&#8217;t be important to most end users.</p>
 <tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>x</strong> : np.ndarray</p>
 <blockquote class="last">
 <div><p>the Element data as a numpy array</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="undaqTools.Element.isCSSDC">
+<tt class="descname">isCSSDC</tt><big>(</big><big>)</big><a class="headerlink" href="#undaqTools.Element.isCSSDC" title="Permalink to this definition">¶</a></dt>
+<dd><p>evaluates whether element is a CSSDC measure</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>answer</strong> : bool</p>
+<blockquote class="last">
+<div><p>True if it is a CSSDC measure, False otherwise</p>
 </div></blockquote>
 </td>
 </tr>
@@ -250,13 +252,13 @@ mat files. Shouldn&#8217;t be important to most end users.</p>
         <li class="right" >
           <a href="daq.html" title="Daq"
              >previous</a> |</li>
-<li><a href="index.html">undaqTools 0.2.0 documentation</a> &raquo;</li>
+<li><a href="index.html">undaqTools 0.2.3 documentation</a> &raquo;</li>
  
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2013, Roger Lew.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>
