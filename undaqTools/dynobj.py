@@ -69,6 +69,18 @@ class DynObj:
         error in relative distance estimate
         (assuming you know apriori the dynamic object travels the same path
         as the OwnVehicle)
+
+    Methods
+    -------
+    process(cvedId, frame_indices, row_indices, daq)
+        unpacks data `Daq` instance
+
+    write_hd5(self[, filename=None][, root=None])
+        writes DynObj to hdf5.
+        
+    read_hd5(self[, filename=None][, root=None])        
+        reads a DynObj from a hdf5 file
+        
     """
     def __init__(self):
         self.name = ''

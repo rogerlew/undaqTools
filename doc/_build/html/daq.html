@@ -57,7 +57,82 @@
 <dl class="class">
 <dt id="undaqTools.Daq">
 <em class="property">class </em><tt class="descclassname">undaqTools.</tt><tt class="descname">Daq</tt><a class="headerlink" href="#undaqTools.Daq" title="Permalink to this definition">¶</a></dt>
-<dd><p class="rubric">Methods</p>
+<dd><p>class to represent a NADS DAQ file</p>
+<p class="rubric">Attributes</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="20%" />
+<col width="70%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>info</td>
+<td>Info namedtuple</td>
+<td>contains information from info block of DAQ</td>
+</tr>
+<tr class="row-even"><td>frame</td>
+<td>Frame recordtype</td>
+<td>contains information relevent to each frame</td>
+</tr>
+<tr class="row-odd"><td>elemlist</td>
+<td>None or list</td>
+<td>None &#8211;&gt; load all elements, list of wildcards</td>
+</tr>
+<tr class="row-even"><td>f0</td>
+<td>int</td>
+<td>first frame contained in Daq instance</td>
+</tr>
+<tr class="row-odd"><td>fend</td>
+<td>int</td>
+<td>last frame contained in Daq instance</td>
+</tr>
+<tr class="row-even"><td>cursor</td>
+<td>int</td>
+<td>starting byte of data in DAQ</td>
+</tr>
+<tr class="row-odd"><td>dynobjs</td>
+<td>dict</td>
+<td>dictionary of dynamic objects</td>
+</tr>
+<tr class="row-even"><td>etc</td>
+<td>dict</td>
+<td>dictionary for end-user to store analysis relevent info</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="59%" />
+<col width="41%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>load_elemlist_fromfile(filename)</td>
+<td>load elemlist wildcards from plaintext file</td>
+</tr>
+<tr class="row-even"><td>read_daq(filename[, elemlist=None][, loaddata=True][, process_dynobjs=True])</td>
+<td>Reads a .daq file into object</td>
+</tr>
+<tr class="row-odd"><td>read_hd5(filename[, f0=None][, fend=None])</td>
+<td>writes Daq object to HDF5 container</td>
+</tr>
+<tr class="row-even"><td>write_mat([filename=None][, outpath=None])</td>
+<td>writes Daq object to .mat file using scipy.io.savmat</td>
+</tr>
+<tr class="row-odd"><td>plot_ts(elem_pars[, xindx=None)</td>
+<td>time series specified by elem_pars</td>
+</tr>
+<tr class="row-even"><td>plot_dynobjs(dynobj_wc=&#8217;*&#8217;)</td>
+<td>make top-down plot of dynamic object paths</td>
+</tr>
+<tr class="row-odd"><td>match_keys(wc)</td>
+<td>list of keys (element names) that match wc</td>
+</tr>
+<tr class="row-even"><td>keys_summary(wclist=None)</td>
+<td>prints table summary of Elements matching wclist</td>
+</tr>
+</tbody>
+</table>
 <dl class="method">
 <dt id="undaqTools.Daq.read_daq">
 <tt class="descname">read_daq</tt><big>(</big><em>filename[, elemlist=None] [, loaddata=True][, process_dynobjs=True]</em><big>)</big><a class="headerlink" href="#undaqTools.Daq.read_daq" title="Permalink to this definition">¶</a></dt>
@@ -82,9 +157,13 @@ list_like -&gt; load names that match list</p>
 False -&gt; don&#8217;t load data</p>
 </div></blockquote>
 <p><strong>process_dynobjs</strong> : bool</p>
-<blockquote class="last">
+<blockquote>
 <div><p>True -&gt; process dynobjs and put them in self.dynobjs
 False -&gt; don&#8217;t load dynobjs</p>
+</div></blockquote>
+<p><strong>write_hd5(filename=None)</strong> :</p>
+<blockquote class="last">
+<div><p>writes Daq object to HDF5 container</p>
 </div></blockquote>
 </td>
 </tr>
@@ -161,6 +240,25 @@ string : specify output file (will overwrite)</p>
 <p><strong>outpath</strong> : None or string (optional)</p>
 <blockquote class="last">
 <div><p>string : directory to path</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="undaqTools.Daq.load_elemlist_fromfile">
+<tt class="descname">load_elemlist_fromfile</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#undaqTools.Daq.load_elemlist_fromfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>load elemlist wildcards from plaintext file.</p>
+<p>assumes one wildcard per line</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>filename</strong> : string</p>
+<blockquote class="last">
+<div><p>path to file containing elemlist wildcards</p>
 </div></blockquote>
 </td>
 </tr>

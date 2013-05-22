@@ -23,6 +23,7 @@ td.field-body > blockquote {
 
 /* spacing around example code */
 div.highlight > pre {
+    background-color: #e8ecef;
     padding: 2px 5px 2px 5px;
 }
 
@@ -78,31 +79,44 @@ div.body h4 {
  */
 
 body { 
-  background-color: rgb(100,135,220);
+    background-color: #465158;
+/*  background-color: rgb(100,135,220); */
 }
 
 div.document { 
-  background-color: rgb(230,230,230);
+    background-color: #e8ecef;
+/*  background-color: rgb(230,230,230); */
 }
 
 div.sphinxsidebar {
-  background-color: rgb(230,230,230);
+    background-color: #e8ecef;
+/*  background-color: rgb(230,230,230); */
+}
+
+div.highlight {
+    background-color: #e8ecef;
+/*  background-color: rgb(230,230,230); */
 }
 
 div.related {
-  background-color: rgb(100,135,220);
+
+    background-color: #465158;
+/*  background-color: rgb(100,135,220); */
 }
 
 div.sphinxsidebar h3 {
-  color: rgb(0,102,204);
+    color: #222222;
+/*  color: rgb(0,102,204); */
 }
 
 div.sphinxsidebar h3 a {
-  color: rgb(0,102,204);
+    color: #222222;
+/*  color: rgb(0,102,204); */
 }
 
 div.sphinxsidebar h4 {
-  color: rgb(0,82,194);
+    color: #222222;
+/*  color: rgb(0,82,194); */
 }
 
 div.sphinxsidebar p {
@@ -110,7 +124,8 @@ div.sphinxsidebar p {
 }
 
 div.sphinxsidebar a {
-  color: #355f7c;
+    color: #444;
+/*  color: #355f7c; */
 }
 
 div.sphinxsidebar ul.want-points {
@@ -118,7 +133,8 @@ div.sphinxsidebar ul.want-points {
 }
 
 .field-list th {
-  color: rgb(0,102,204);
+    color: #222222;
+/*  color: rgb(0,102,204); */
   white-space: nowrap;
 }
 

@@ -1,5 +1,0 @@
-After building need to 
-1) resize images in the _images folder to 750px wide
-2) remove large images from _static folder
-3) resize images in downloads folder to something not crazy
-4) build from inside the folder so that index.html is in the zip root

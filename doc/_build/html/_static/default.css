@@ -190,9 +190,11 @@ div.admonition ul, div.admonition ol {
     margin-bottom: 5px;
 }
 
-div.note {
-    background-color: #eee;
-    border: 1px solid #ccc;
+div.note,
+div.important {
+  color: #468847;
+  background-color: #dff0d8;
+  border: 1px solid #468847;
 }
 
 div.seealso {
@@ -218,13 +220,13 @@ p.admonition-title:after {
 }
 
 pre {
-    padding: 5px;
-    background-color: #eeffcc;
-    color: #333333;
-    line-height: 120%;
-    border: 1px solid #ac9;
-    border-left: none;
-    border-right: none;
+    border: 1px solid #ccc;
+    background-color: #eee;
+}
+
+pre a {
+    color: inherit;
+    text-decoration: underline;
 }
 
 tt {

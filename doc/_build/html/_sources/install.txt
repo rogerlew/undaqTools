@@ -37,7 +37,7 @@ To develop undaqTools you should also have:
 3.  **numpydoc**
 
 Recommended System Requirements
-================================
+-------------------------------
 1. at least 8 GB of memory, the more the better
 2. solid state drive for holding data files
 3. CPU is less important. You are better off opting
