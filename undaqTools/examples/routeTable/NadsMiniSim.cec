@@ -1,0 +1,466 @@
+#
+# MallDemoSim.cec
+#
+# December 15, 2004
+#
+
+Cell configuration
+Version $Revision: 1.11 $
+
+#SCC initialzation
+cell 1 SCNVIF
+  SCC_Visual_Database                                 is 256 chars;
+  SCC_Scenario_File                                   is 128 chars;
+  SCC_Audio_Config                                    is 256 chars;
+  SCC_InitChassis_ANG_Velocity                        is 3 floats; 
+  SCC_InitChassis_CG_HAngle                           is 1 float;
+  SCC_InitChassis_CG_Position                         is 3 floats;
+  SCC_InitChassis_CG_Velocity                         is 3 floats;
+  SCC_InitGround_Direction                            is 3 floats;
+  SOP_Init_GeomCenter_Loc                             is 3 floats;
+  SOP_Init_RF_Vibr_Actuator_Loc                       is 3 floats;
+  SOP_Init_LF_Vibr_Actuator_Loc                       is 3 floats;
+  SOP_Init_RR_Vibr_Actuator_Loc                       is 3 floats;
+  SOP_Init_LR_Vibr_Actuator_Loc                       is 3 floats;
+  SOP_RF_Vibr_Actuator_Conf                           is 5 floats;
+  SOP_LF_Vibr_Actuator_Conf                           is 5 floats;
+  SOP_RR_Vibr_Actuator_Conf                           is 5 floats;
+  SOP_LR_Vibr_Actuator_Conf                           is 5 floats;
+  UseAutoRestart                                      is 1 short;
+  SOP_CollectionMode                                  is 1 short;
+  SOP_DaqOverRideFileName                             is 256 chars;
+  SOP_RestartFileName                                 is 256 chars;
+  SOP_PlaybackFileName                                is 256 chars;
+  SCC_Tire_Parameter_Ind                              is 10 shorts;
+  SOP_Init_Head_Pt_Loc                                is 3 floats;
+  SCC_Init_Wind_Direction                             is 2 floats;
+  SCC_Init_Wind_Speed                                 is 1 float;
+  SCC_Init_Ext_Air_Temp                               is 1 float;
+  SCC_Baro_Pressure                                   is 1 float;
+  SCC_NVES_Warning_Mode                               is 1 short;
+  SCC_Time_Counter                                    is 1 integer;
+  SCC_OwnVeh_PathDist                                 is 1 float;
+  SOP_Scenario_Input                                  is 3 integers;
+  SOP_DAQ_Playback_File                               is 256 chars;
+  SOP_GotoPlaybackFrame                               is 1 integer;
+  SOP_GotoPlaybackCnt                                 is 1 short;
+  SOP_Playback_Frame_Delta                            is 1 float;
+  SOP_Viewpoint                                       is 5 shorts;
+  SOP_Road_Conditions                                 is 1 integer;
+  SOP_Eye_Offset                                      is 6 floats;
+  SOP_Simulation_Time                                 is 4 integers;
+  SOP_Weather_State                                   is 2 integers;
+  SOP_Weather_Parameters                              is 3 floats;
+  SOP_First_Good_Frame                                is 1 integer;
+  SOP_Weather_Override                                is 1 short;
+  SOP_Time_Override                                   is 1 short;
+  SCC_Playback_Curr_Frame                             is 1 integer;
+  SCC_Playback_First_Frame                            is 1 integer;
+  SCC_Playback_Last_Frame                             is 1 integer;
+  SCC_Graphics_Wall_Clock_Time                        is 1 integer;
+  SCC_Graphics_Frame_Time                             is 1 float;
+end_cell
+
+#VDS initialization
+cell 2 VDS
+  SOP_NADSdyna_Workdir                                is 80 chars;
+  SOP_Vehicle_Name                                    is 80 chars;
+  SOP_Cab_SOL_Name                                    is 80 chars;
+  SOP_Cab_Type                                        is 80 chars;
+  SOP_Init_Eyepoint_Loc                               is 3 floats;
+  SOP_Init_TrailerOrig_Loc                            is 3 floats;
+  SOP_TFFDriverDataFile                               is 256 chars;
+  VDS_Num_Grids                                       is 1 short;
+  VDS_Num_Tires                                       is 1 short;
+  VDS_SteeringDeadBand                                is 1 float;
+  VDS_Filter_VIS_Pitch                                is 1 float;
+  VDS_Vis_Comp_F0                                     is 1 float;
+  VDS_Vis_Comp_Filt0                                  is 1 float;
+  VDS_Vis_Comp_Delay                                  is 1 float;
+  VDS_Vis_Comp_m                                      is 1 float;
+  VDS_Vis_Comp_MaxOrient                              is 3 float;
+  VDS_Vis_Comp_MaxDisp                                is 3 float;
+  VDS_Exp_CrSpeed_Inp                                 is 1 float;
+  SOP_InertialCube_Loc                                is 3 floats;
+  SOP_StopType                                        is 1 short;
+end_cell
+
+# VDS outputs
+cell 3 VDS
+  VDS_Health_Status                                   is 1 short;
+  VDS_Seq_No                                          is 1 integer;
+  VDS_Eyepoint_Pos                                    is 3 doubles;
+  VDS_Eyepoint_Orient                                 is 3 floats;
+  VDS_Eyepoint_Vel                                    is 3 floats;
+  VDS_Tire_Lat_Slip_Angle                             is 10 floats;
+  VDS_Tire_Long_Slip_Ratio                            is 10 floats;
+  VDS_Veh_Eng_RPM                                     is 1 float;
+  VDS_Veh_Speed                                       is 1 float;
+  VDS_Veh_Dist                                        is 1 float;
+  VDS_Engine_State                                    is 1 float;
+  VDS_Tire_Slip_Angle                                 is 10 floats;
+  VDS_Tire_Slip_Ratio                                 is 10 floats;
+  VDS_Curr_Gear                                       is 1 integer;
+  VDS_TRANS_Eng_Rnng                                  is 1 integer;
+  VDS_TRANS_Lck_Slnd                                  is 1 integer;  
+  VDS_Brakefile_Name                                  is 80 chars;
+end_cell
+
+#VDS CIFS outputs
+cell 4 VDS
+  CFS_Steering_Wheel_Angle                            is 1 float;
+  CFS_Steering_Wheel_Angle_Rate                       is 1 float;
+  CFS_Steering_Wheel_Torque                           is 1 float;
+  CFS_Transfer_Case_Mode                              is 1 short;
+  CFS_Transmission_Gear                               is 1 short;
+  CFS_Auto_Transmission_Mode                          is 1 short;
+  CFS_Accelerator_Pedal_Position                      is 1 float;
+  CFS_Brake_Pedal_Force                               is 1 float;
+  CFS_Brake_Pedal_Position                            is 1 float;
+  CFS_Clutch_Pedal_Position                           is 1 float;
+  CFS_Trolley_Valve_Position                          is 1 float;
+  CFS_TranSim_Drive_Torque                            is 1 float;
+  CIS_Parking_Brake_Displacement                      is 1 float;
+  CIS_Parking_Brake_Engaged                           is 1 short;
+  CIS_Tractor_ParkingB_Engaged                        is 1 short;
+  CIS_Trailer_ParkingB_Engaged                        is 1 short;
+  CIS_Horn                                            is 1 integer;
+  CIS_Cruise_Control                                  is 1 short;
+  CIS_High_Beam                                       is 1 short;
+  CIS_Gear                                            is 1 short;
+  CIS_Turn_Signal                                     is 1 short;
+  CIS_Headlights_On                                   is 1 short;
+  CIS_Seat_Belt_On                                    is 1 short;
+  CIS_Wiper_Switch_State                              is 1 short;
+  CIS_ABS_State                                       is 1 short;
+  CIS_Warning_Lights                                  is 20 shorts;
+  CIS_Auto_Ignition                                   is 1 short;  
+  CFS_TRANS_Rng_Swtch                                 is 1 integer;
+  CFS_TRANS_Spltr_Swtch                               is 1 integer;
+  CFS_TRANS_Igntn                                     is 1 integer;
+  CFS_TRANS_Crnk_Psh_Btn                              is 1 integer;
+  CFS_TRANS_Shft_x_Pos                                is 1 float;
+  CFS_TRANS_Shft_y_Pos                                is 1 float;
+  VDS_ESC_TSC1_E                                      is 1 short;
+  VDS_ESC_TSC1_ER                                     is 1 short;
+  VDS_ESC_TSC1_E_CM                                   is 1 short;
+  VDS_ESC_TSC1_ER_CM                                  is 1 short;
+  CFS_Tractor_ESC_Valve_Pressure1                     is 1 float;
+  CFS_Tractor_ESC_Valve_Pressure2                     is 1 float;
+  CFS_Tractor_ESC_Valve_Pressure3                     is 1 float;
+  CFS_Tractor_ESC_Valve_Pressure4                     is 1 float;
+  CIS_Engine_Brake_Status                             is 1 integer;
+  CFS_Diff_Brake_Pedal_Force                          is 2 floats;   
+  CFS_Left_Brake_Pedal_Force                          is 1 float;   
+  CFS_Right_Brake_Pedal_Force                         is 1 float;   
+  CIS_Auxiliary_Buttons                               is 20 floats;
+  CFS_Hydro_Command                                   is 1 float;
+  CFS_IVT_Command                                     is 1 float;
+  CFS_TransModeShiftInProgress                        is 1 float;
+end_cell
+
+#VDS MTS outputs
+cell 5 VDS
+  VDS_Head_Pt_Specific_Force                          is 3 floats;
+  VDS_Head_Pt_Angular_Vel                             is 3 floats;
+  VDS_RF_Vibr_Accel_Zdd                               is 1 float;
+  VDS_LF_Vibr_Accel_Zdd                               is 1 float;
+  VDS_RR_Vibr_Accel_Zdd                               is 1 float;
+  VDS_LR_Vibr_Accel_Zdd                               is 1 float;
+end_cell
+
+#VDS other outputs
+cell 6 VDS
+  VDS_Load_Torque                                     is 1 float;
+  VDS_Veh_Eng_Torque                                  is 1 float;
+  VDS_Veh_Dynamic_Pres                                is 2 floats;
+  VDS_Tire_Rot_Vel                                    is 10 floats;
+  VDS_Tire_Weight_On_Wheels                           is 10 floats;
+  VDS_Tire_Friction_Coef                              is 10 floats;
+  VDS_Veh_Trans_RPM                                   is 1 float;
+  VDS_Wheel_Center_Velocity                           is 30 floats;
+  VDS_Wheel_Center_Heading                            is 10 floats;
+  VDS_Wheel_Steer_Angle                               is 10 floats;
+  VDS_Wheel_Spin                                      is 10 floats;
+  VDS_Wheel_Spin_Angle                                is 10 floats;
+  VDS_Tire_Ground_Contact                             is 20 floats; 
+  VDS_VibrForce                                       is 4 floats;
+  VDS_Veh_Heading                                     is 1 float;
+  VDS_Chassis_CG_Accel                                is 3 floats;
+  VDS_Chassis_CG_Ang_Vel                              is 3 floats;
+  VDS_Chassis_CG_Orient                               is 3 floats;
+  VDS_Chassis_CG_Position                             is 3 doubles;
+  VDS_Chassis_CG_Vel                                  is 3 floats;
+  VDS_Trailer_CG_Accel                                is 2 floats;
+  VDS_Trailer_CG_Ang_Vel                              is 3 floats;
+  VDS_Trailer_CG_Orient                               is 3 floats;
+  VDS_Trailer_CG_Position                             is 3 floats;
+  VDS_Trailer_CG_Vel                                  is 3 floats;
+  VDS_Trailer_CG_Filt_Orient                          is 3 floats;
+  VDS_Trailer_CG_Filt_Pos                             is 3 floats;
+  VDS_Trailer_CG_Filt_Vel                             is 3 floats;
+  VDS_Trailer_Origin_Pos                              is 3 floats;
+  VDS_GeomCenter_Pos                                  is 3 floats;
+  VDS_Steering_Torque_Backdrive                       is 1 float;
+  VDS_Acc_Pedal_Pos_Backdrive                         is 1 float;
+  VDS_Brk_Pedal_Frc_Backdrive                         is 1 float;
+  VDS_ABS_Operating_Flag                              is 1 short;
+  VDS_Drive_Train_Speed                               is 1 float;
+  VDS_Prim_Trans_Speed                                is 1 float;
+  VDS_Sec_Trans_Speed                                 is 1 float;
+  VDS_Hyd_Fixd_Speed                                  is 1 float;
+  VDS_Carrier_Speed                                   is 1 float;
+  VDS_MFWD_Speed                                      is 1 float;
+  VDS_FAxle_CG_Position                               is 3 floats;
+  VDS_FAxle_CG_Orient                                 is 3 floats;
+  VDS_Tire_Drive_Trq                                  is 10 floats;
+  VDS_Tire_Brake_Trq                                  is 10 floats;
+  VDS_Tire_Long_Frc                                   is 10 floats;
+  VDS_Tire_Lat_Frc                                    is 10 floats;
+  VDS_Tire_Type_Index                                 is 10 integers;
+  VDS_InertialCube_Accel                              is 3 floats;
+  VDS_Veh_Heading_Target                              is 1 float;
+  VDS_Brake_Pressure                                  is 10 floats;
+  VDS_Frame_Count                                     is 1 integer;
+  VDS_Steer_Noise                                     is 1 float;
+  VDS_ACC_Warning                                     is 1 short;
+  VDS_Cruise_State                                    is 1 short;	  
+  VDS_Cruise_SetSpeed                                 is 1 float;  
+  VDS_ACC_Gap                                         is 1 float;
+  VDS_ALF_State	                                      is 1 short;
+  VDS_DRV_Joystick_Type                               is 1 short;
+  VDS_DRV_Frame_No                                    is 1 integer;
+  VDS_DRV_Steering_Wheel_Angle                        is 1 float;
+  VDS_DRV_Steering_Wheel_Angle_Rate                   is 1 float;
+  VDS_DRV_Transmission_Gear                           is 1 short;
+  VDS_DRV_Auto_Transmission_Mode                      is 1 short;
+  VDS_DRV_Accelerator_Pedal_Position                  is 1 float;
+  VDS_DRV_Brake_Pedal_Force                           is 1 float;
+  VDS_DRV_Joystick_Buttons                            is 1 integer;
+  VDS_Brake_Control                                   is 3 integers
+  VDS_Wz_Info                                         is 4 floats;
+  VDS_ESP_ENGTRQ_REQ                                  is 1 integer;
+  VDS_ESP_AXLTRQ_REQ                                  is 1 integer;
+  VDS_ESP_HONOR_REQ                                   is 1 integer;
+  VDS_ESP_ACTIV_FLAG                                  is 1 integer;
+  VDS_ESP_Type                                        is 1 integer;
+  VDS_ESP_Flag                                        is 1 integer;
+end_cell
+
+#SCNVIF
+cell 7 SCNVIF
+  SCC_Audio_Trigger_File                              is 256 chars;
+#  CIS_Horn                                            is 1 integer;
+#  CIS_Cruise_Control                                  is 1 short;
+  SCC_LowerLetterKeyPress_Map                         is 1 integer;
+  SCC_UpperLetterKeyPress_Map                         is 1 integer;
+  SCC_NumberKeyPress_Map                              is 1 integer;
+  SCC_SpecialKeyPress_Map                             is 1 integer;
+  CIS_Joystick_Type                                   is 1 short;
+  CIS_Joystick_Buttons                                is 1 integer;
+  SCC_InitChassis_CG_Info_Ready                       is 1 short;
+  RunInfoReady                                        is 1 short;
+  DAQ_Health_Status                                   is 1 short;
+end_cell
+
+#SCNVIF
+cell 8 SCNVIF
+  SCC_Test_Speed                                      is 1 float;
+  SCC_Record_Data                                     is 1 char;
+  SCC_Scenario_Date                                   is 1 integer;
+  SCC_Scenario_Time                                   is 1 integer;
+  SCC_Scenario_Stop_Ind                               is 1 integer;
+  SCC_Scen_Pos_X_Crossbeam                            is 1 float;
+  SCC_Scen_Pos_Y_Carriage                             is 1 float;
+  SCC_Scen_Pos_Hex_X                                  is 1 float;
+  SCC_Scen_Pos_Hex_Y                                  is 1 float;
+  SCC_Scen_Pos_Hex_Z                                  is 1 float;
+  SCC_Scen_Pos_Hex_Roll                               is 1 float;
+  SCC_Scen_Pos_Hex_Pitch                              is 1 float;
+  SCC_Scen_Pos_Hex_Yaw                                is 1 float;
+  SCC_Scen_Pos_TT                                     is 1 float;
+  SCC_Settings_File_Name                              is 128 chars;
+  SCC_Motion_Drive_File_Name                          is 128 chars;
+  SCC_State_Interlock                                 is 1 short;
+  SCC_State_Power_Interlock                           is 1 short;
+  SCC_State_Program_Interlock                         is 1 short;
+  SCC_Time_of_Day                                     is 1 float;
+  SCC_Veh_Cfg                                         is 1 short;
+  SCC_Veh_Initial_Cond                                is 1 float;
+  SCC_Veh_Model_No                                    is 1 float;
+  SCC_Wind_Speed                                      is 1 float;
+  SCC_Wind_Direction                                  is 2 floats;
+  SCC_Tire_Condition                                  is 10 integers;
+  SCC_Steering_Condition                              is 1 integer;
+  SCC_Brake_Condition                                 is 11 integers;
+  SCC_Alert_Conditions                                is 1 integer;
+  SCC_Informational_Conditions                        is 1 integer;
+  SCC_CabComponent_Conditions                         is 1 integer;
+  SCC_Fog                                             is 1 float;
+  SCC_Haze                                            is 1 float;
+  SCC_Lightning                                       is 1 short;
+  SCC_Clouds                                          is 2 integers;
+  SCC_Precipitation                                   is 1 short;
+  SCC_PrecipRate                                      is 1 float;
+  SCC_Visibility                                      is 1 float;
+  SCC_Smoke                                           is 1 float;
+  SCC_Glare                                           is 1 float;
+  SCC_Lane_Deviation                                  is 4 floats;
+  SCC_Spline_Lane_Deviation                           is 4 floats;
+  SCC_Lane_Depart_Warn                                is 4 floats;
+  SCC_OwnVeh_Curvature                                is 1 float;
+  SCC_Follow_Info                                     is 9 floats;
+  SCC_Sensor_Info                                     is 10 floats;
+  SCC_ACC_On                                          is 1 short;
+  SCC_ALF_On                                          is 1 short;
+  SCC_Sensor_Config                                   is 3 shorts;
+  SCC_Place_Phonecall                                 is 1 integer;
+  SCC_Custom1                                         is 1 float;
+  SCC_Custom2                                         is 1 float;
+  SCC_Custom3                                         is 1 float;
+  SCC_Custom4                                         is 1 float;
+  SCC_OwnVehToLeadObjDist                             is 1 float;
+  SCC_LogStreams                                      is 5 floats;
+  SCC_LogStreamsExt                                   is 5 floats;
+  SCC_DataRed_Segments                                is 6 integers;
+  SCC_DataRed_Params                                  is 10884 chars;
+  SCC_SpeedLimit                                      is 1 float;
+  SCC_PressButton_Trigger                             is 1 integer;
+  SCC_EndOfDrive_Trigger                              is 1 integer;
+  SCC_Audio_Trigger                                   is 1 integer;
+  SCC_Turn_Signal_Audio                               is 1 float;
+  SCC_Valid_Glare_info                                is 1 short;
+  SCC_Glare_Obj_List_Size                             is 1 integer;
+  SCC_Glare_Obj_CvedId                                is 10 shorts;
+  SCC_Glare_Obj_Lamp_Pos                              is 60 floats;
+  SCC_Glare_Obj_Lamp_Ori                              is 60 floats;
+  SCC_Glare_Obj_Lamp_Angles                           is 80 floats;
+  SCC_DRT_ReactionTime                                is 1 float;
+  SCC_HighRes_Time                                    is 2 integers;
+  SCC_Drive_ID                                        is 1 char;
+  SCC_SecondaryTask_State                             is 1 char;
+end_cell
+
+#SCNVIF
+cell 9 SCNVIF
+  SCC_DynObj_CvedId                                   is 20 integers;
+  SCC_DynObj_SolId                                    is 20 integers;
+  SCC_DynObj_HcsmType                                 is 20 integers;
+  SCC_DynObj_ColorIndex                               is 20 shorts;
+  SCC_DynObj_Name                                     is 640 chars; # 32
+  SCC_DynObj_Pos                                      is 60 floats; # X, Y, Z
+  SCC_DynObj_Heading                                  is 20 floats;
+  SCC_DynObj_RollPitch                                is 40 floats; # Roll, Pitch
+  SCC_DynObj_AudioVisualState                         is 20 integers; # unsigned
+  SCC_DynObj_DataSize                                 is 1 integer;
+  SCC_DynObj_BtnDialVal                               is 128 chars;
+  SCC_DynObj_Vel                                      is 20 float;
+  SCC_TrafLight_Size                                  is 1 short;
+  SCC_StatObj_DataSize                                is 1 integers;
+  SCC_StatObj_AudioVisualState                        is 20 integers;
+  SCC_StatObj_Pos                                     is 60 floats; # X, Y, Z
+  SCC_StatObj_SolId                                   is 20 integers;
+  SCC_StatObj_CvedId                                  is 20 integers;
+  SCC_TrafLight_Id                                    is 40 shorts;
+  SCC_TrafLight_State                                 is 40 shorts;
+  SCC_Within_Speed_Limit                              is 1 integer;
+  SCC_Under_Speed_Limit                               is 1 integer;
+  SCC_Over_Speed_Limit                                is 1 integer;
+  SCC_Total_Speed_Limit                               is 1 integer;
+  SCC_Warning_Lights                                  is 1 integer;
+  SCC_Collision_Det_Enable                            is 1 short;
+  SCC_Collision_List_Size                             is 1 integer;
+  SCC_Collision_Det_Object                            is 10 shorts;
+  SCC_Collision_Det_Ob_Type                           is 10 shorts;
+  SCC_Collision_Det_Ob_SolId                          is 10 integers;
+  SCC_Collision_Count                                 is 1 integer;
+  SCC_Trailer_Col_List_Size                           is 1 integer;
+  SCC_Trailer_Col_Det_Object                          is 10 shorts;
+  SCC_Trailer_Col_Det_Ob_Type                         is 10 shorts;
+  SCC_Trailer_Col_Det_Ob_SolId                        is 10 integers;
+  SCC_Trailer_Collision_Count                         is 1 integer;
+  SCC_NVES_Target_Status                              is 1 short;
+  SCC_NVES_Warning_On                                 is 1 short; # gives the id of the target when on
+  SCC_NVES_Target_Id                                  is 10 shorts;
+  SCC_NVES_Target_Dist                                is 20 floats; # tangent, lateral
+  SCC_NVES_Auditory_Warning                           is 1 short;
+  SCC_Visual_Warning                                  is 1 short;
+  SCC_Brake_Control                                   is 3 integers;
+  SCC_False_Alarm                                     is 4 floats;
+  SCC_SirenEffect                                     is 1 float;
+  SCC_EventStatus                                     is 1 short;
+  SCC_EventNumber                                     is 1 short;
+  SCC_Eval_Exec_Time                                  is 1 float;
+  SCC_Eval_Collisions                                 is 1 integer;
+  SCC_Eval_Max_Speed                                  is 1 float;
+  SCC_Eval_Avg_Speed                                  is 1 double;
+  SCC_Eval_SpeedSD                                    is 1 double;
+  SCC_Eval_Overall_SDLP                               is 1 double;
+  SCC_Eval_Lane_Departures                            is 1 integer;
+  SCC_Eval_Lane_Departure_Pct                         is 1 float;
+  SCC_Eval_Speedings                                  is 1 short;
+  SCC_Eval_Speeding_Pct                               is 1 float;
+  SCC_Eval_Avg_Hdwy                                   is 1 float;
+  SCC_Eval_Hard_Brakings                              is 1 short;
+  SCC_Eval_Hard_Cornerings                            is 1 short;
+  SCC_Eval_Steering_Reversals                         is 1 short;
+  SCC_Eval_Event_Collisions                           is 20 integers;  
+  SCC_Eval_Event_Max_Speed                            is 20 floats;
+  SCC_Eval_Event_Min_Speed                            is 20 floats;
+  SCC_Eval_Event_Avg_Speed                            is 20 doubles;
+  SCC_Eval_Event_SpeedSD                              is 20 doubles;
+  SCC_Eval_Event_SDLP                                 is 20 doubles;
+  SCC_Eval_Event_Lane_Departures                      is 20 integers; 
+  SCC_Eval_Event_Lane_Departure_Pct                   is 20 floats;
+  SCC_Eval_Event_Speedings                            is 20 shorts;
+  SCC_Eval_Event_Speeding_Pct                         is 20 floats;
+  SCC_Eval_Event_Avg_Hdwy                             is 20 floats;
+  SCC_Eval_Window_Duration                            is 10 floats;
+  SCC_Eval_Window_Collisions                          is 10 integers;  
+  SCC_Eval_Window_Avg_Speed                           is 10 doubles;
+  SCC_Eval_Window_SpeedSD                             is 10 doubles;
+  SCC_Eval_Window_SDLP                                is 10 doubles;
+  SCC_Eval_Window_Lane_Departures                     is 10 integers; 
+  SCC_Eval_Window_Lane_Departure_Pct                  is 10 floats;
+  SCC_Eval_Window_Speedings                           is 10 shorts;
+  SCC_Eval_Window_Speeding_Pct                        is 10 floats;
+  SCC_Eval_Window_Avg_Hdwy                            is 10 floats;
+  SCC_Replay_Event_Type                               is 20 integers;
+  SCC_Replay_Event_Frame                              is 20 integers;
+  SCC_Reverb_Setting                                  is 1 integer;
+  SCC_Current_VDS_Frame_Count                         is 1 integer; # the DYNA's current frame as seen by the visual server
+end_cell
+
+#RCM
+cell 10 RCM
+  RCM_Use_TFF_File                                    is 1 short;
+  RCM_TFF_Filename                                    is 256 chars;
+  RCM_CAS_Config                                      is 1 short;
+  SOP_DriveMode                                       is 1 short;
+end_cell
+
+#VDS
+cell 11 VDS
+#  TPR_Tire_Grid                                       is 156 float;
+#  TPR_Tire_GridGrad                                   is 156 float;
+#  TPR_Tire_Contact_Points_Ind                         is 10 shorts;
+#  TPR_Seq_No                                          is  1 integer;
+  TPR_Surface_Tire_Friction_Ind                       is 10 shorts;
+  TPR_Surface_Type_Ind                                is 10 shorts;
+  TPR_Tire_Surf_Type                                  is 10 shorts;
+  TPR_Tire_Surf_Obj_Type                              is 10 integers;
+end_cell
+
+#DAQ
+cell 12 DAQ
+  DAQ_DAQFileName                                     is 256 chars;
+end_cell
+
+#SUBSYS2
+cell 13 SUBSYS2
+  ACC_Voltage                                         is 1 float;
+  ACC_State                                           is 1 integer;
+end_cell
+
+end_cell_configuration
+

@@ -134,62 +134,8 @@ def stat(filename):
              filename = filename)
         
 class Daq(dict):
-    """
-    class to represent a NADS DAQ file
-
-    Attributes
-    ----------
-    info : Info namedtuple
-        contains information from info block of DAQ
-        
-    frame : Frame recordtype
-        contains information relevent to each frame
-
-    elemlist : None or list
-        None --> load all elements, list of wildcards
-
-    f0 : int
-        first frame contained in Daq instance
-        
-    fend : int
-        last frame contained in Daq instance
-
-    cursor : int
-        starting byte of data in DAQ
-
-    dynobjs : dict
-        dictionary of dynamic objects
-        
-    etc : dict
-        dictionary for end-user to store analysis relevent info
-
-    Methods
-    -------
-    load_elemlist_fromfile(filename)
-        load elemlist wildcards from plaintext file
-
-    read_daq(filename[, elemlist=None][, loaddata=True][, process_dynobjs=True])
-        Reads a .daq file into object
-    
-    read_hd5(filename[, f0=None][, fend=None])
-        writes Daq object to HDF5 container
-
-    write_mat([filename=None][, outpath=None])
-        writes Daq object to .mat file using scipy.io.savmat
-
-    plot_ts(elem_pars[, xindx=None)
-        time series specified by elem_pars
-
-    plot_dynobjs(dynobj_wc='*')
-        make top-down plot of dynamic object paths
-
-    match_keys(wc)
-        list of keys (element names) that match wc
-
-    keys_summary(wclist=None)
-        prints table summary of Elements matching wclist
-    """
     def __init__(self):
+        """Abstraction of NADS .daq data"""
 
         # namedtuple containing drive relevant metadata
         self.info = Info(run = '', 
@@ -212,6 +158,7 @@ class Daq(dict):
         self._header = None
 
         # other attributes
+        self.data = {}               # dictionary to store elements
         self.elemlist = None         # specifies elements to load
         self.f0 = None               # first Frame in Daq. Probably not 0
         self.fend = None             # last Frame in Daq
@@ -222,16 +169,6 @@ class Daq(dict):
         dict.__init__(self)
 
     def load_elemlist_fromfile(self, filename):
-        """
-        load elemlist wildcards from plaintext file.
-
-        assumes one wildcard per line
-
-        Parameters
-        ----------
-        filename : string
-            path to file containing elemlist wildcards
-        """
         with open(filename,'r') as f:
             self.elemlist = [s.rstrip() for s in f.readlines()]
 
@@ -262,10 +199,6 @@ class Daq(dict):
         process_dynobjs : bool
              True -> process dynobjs and put them in self.dynobjs
              False -> don't load dynobjs        
-
-        write_hd5(filename=None)
-            writes Daq object to HDF5 container
-
         """        
         
         _header = \
@@ -363,7 +296,11 @@ class Daq(dict):
             warnings.warn(msg, RuntimeWarning)
             
     # create alias read for read_daq
-    read = read_daq
+    def read(self, filename, **kwargs):
+        if filename.endswith('.daq'):
+            self.read_daq(filename, **kwargs)
+        else:
+            self.read_hd5(filename, **kwargs)
                 
     def _loaddata(self):
         """
@@ -441,7 +378,7 @@ class Daq(dict):
                 # xrange (2.7, range in 3) is faster than range
                 for j in xrange(frame.count[-1]):
                     i = unpack('i', read(4))[0]
-
+                    
                     if _header.varrateflag[i]:
                         numitems = unpack('i', read(4))[0]
                     else:
@@ -471,6 +408,8 @@ class Daq(dict):
                 msg += ' (stopped reading file)'
                 warnings.warn(msg, RuntimeWarning)
                 bombed = True
+
+                print(j)
                 break
 
         fid.close()
@@ -603,7 +542,8 @@ class Daq(dict):
             VDS_Frame_Count        
         """
         global interpolation_wclist
-        f0, fend = self.f0, self.fend
+        f0 = self.frame.frame[:][0]
+        fend = self.frame.frame[:][-1]
         old_frames = self.frame.frame[:]
         new_frames = np.linspace(f0, fend, fend - f0 + 1)
         
@@ -1325,8 +1265,6 @@ class Daq(dict):
 
     def keys_summary(self, wclist=None):
         """
-        keys_summary(self[, wclist=None])
-        
         Print a table summary of the Elements in daq
         
         Parameters

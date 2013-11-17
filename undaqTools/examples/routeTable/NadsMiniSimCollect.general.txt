@@ -1,0 +1,406 @@
+; -1 means write to DAQ file only when changes to variable occur
+; 0 means don't write the variable at all
+; 1 - n means write the variable to the DAQ file every nth frame
+;cell 0 RTEX
+;SimFrame                             1
+;SimTime                              0
+SimTitle                             -1
+;FeedFileCount                        0
+;FeedFile1                            0
+;FeedFile2                            0
+;FeedFile3                            0
+;FeedFile4                            0
+;FeedFile5                            0
+;FeedFile6                            0
+;XDisplayName                         0
+;HardwareConfig                       0
+;TerrainFile                          0
+;TerrainWset                          0
+;SpecEffectsFile                      0
+;SpecEffectsWset                      0
+;ActualVehicleCab                     0
+;SimulatedVehicle                     0
+;DataCollectionFile                   0
+;DataCollectionFlag                   0
+;DataCollectionOutput                 0
+Experiment                           -1
+Subject                              -1
+Run                                  -1
+RunInst                              -1
+;Simop_Address                        0
+;SimConf                              0
+;end_cell
+
+;cell 1 SCNVIF
+  SCC_Visual_Database                -1
+  SCC_Scenario_File                  -1
+  SCC_Audio_Config                   -1
+  SCC_InitChassis_ANG_Velocity       -1
+  SCC_InitChassis_CG_HAngle          -1
+  SCC_InitChassis_CG_Position        -1
+  SCC_InitChassis_CG_Velocity        -1
+  SCC_InitGround_Direction           -1
+  SOP_Init_GeomCenter_Loc             0
+  SOP_Init_RF_Vibr_Actuator_Loc       0
+  SOP_Init_LF_Vibr_Actuator_Loc       0
+  SOP_Init_RR_Vibr_Actuator_Loc       0
+  SOP_Init_LR_Vibr_Actuator_Loc       0
+  SOP_RF_Vibr_Actuator_Conf           0
+  SOP_LF_Vibr_Actuator_Conf           0
+  SOP_RR_Vibr_Actuator_Conf           0
+  SOP_LR_Vibr_Actuator_Conf           0
+  SCC_Tire_Parameter_Ind              0
+  SOP_Init_Head_Pt_Loc               -1
+  SCC_Init_Wind_Direction            -1
+  SCC_Init_Wind_Speed                -1
+  SCC_Init_Ext_Air_Temp              -1
+  SCC_Baro_Pressure                  -1
+  SCC_NVES_Warning_Mode              -1
+  SCC_ACC_On                         -1
+  SCC_ALF_On                         -1
+  SCC_Sensor_Config                  -1
+  SCC_Time_Counter                    1
+  SCC_OwnVeh_PathDist		      1
+  SOP_Scenario_Input                 -1
+  SOP_DAQ_Playback_File               0
+  SOP_GotoPlaybackFrame               0
+  SOP_GotoPlaybackCnt                 0
+  SOP_Playback_Frame_Delta            0
+  SOP_Viewpoint                       0
+  SOP_Road_Conditions                -1
+  SOP_Eye_Offset                     -1
+  SOP_Simulation_Time                -1
+  SOP_Weather_State                  -1
+  SOP_Weather_Parameters             -1
+  SOP_First_Good_Frame                0
+  SOP_Weather_Override               -1
+  SOP_Time_Override                  -1
+  SCC_Playback_Curr_Frame             0
+  SCC_Playback_First_Frame            0
+  SCC_Playback_Last_Frame             0
+  SCC_Graphics_Wall_Clock_Time        1
+  SCC_Graphics_Frame_Time             1
+;end_cell
+
+;cell 2 VDS
+  SOP_NADSdyna_Workdir               -1
+  SOP_Vehicle_Name                   -1
+  SOP_Init_Eyepoint_Loc              -1
+  SOP_TFFDriverDataFile               0
+  VDS_Num_Grids                      -1
+  VDS_Num_Tires                      -1
+  VDS_SteeringDeadBand                0
+  VDS_Filter_VIS_Pitch                0
+  VDS_Vis_Comp_F0                     0
+  VDS_Vis_Comp_Filt0                  0
+  VDS_Vis_Comp_Delay                  0
+  VDS_Vis_Comp_m                      0
+  VDS_Vis_Comp_MaxOrient              0
+  VDS_Vis_Comp_MaxDisp                0
+  VDS_Exp_CrSpeed_Inp                 0
+;end_cell
+
+;cell 3 VDS
+  VDS_Seq_No                          0
+  VDS_Eyepoint_Pos                    1
+  VDS_Eyepoint_Orient                 1
+  VDS_Eyepoint_Vel                    1
+  VDS_Tire_Lat_Slip_Angle             1
+  VDS_Tire_Long_Slip_Ratio            1
+  VDS_Veh_Eng_RPM                     1
+  VDS_Veh_Speed                       1
+  VDS_Veh_Dist                        1
+  VDS_Engine_State                    0
+  VDS_Tire_Slip_Angle                 1
+  VDS_Tire_Slip_Ratio                 1
+  VDS_TRANS_Eng_Rnng                 -1
+;end_cell
+
+;cell 4 VDS
+  CFS_Steering_Wheel_Angle            1
+  CFS_Steering_Wheel_Angle_Rate       1
+  CFS_Steering_Wheel_Torque           1
+  CFS_Transfer_Case_Mode             -1
+  CFS_Transmission_Gear              -1
+  CFS_Auto_Transmission_Mode         -1
+  CFS_Accelerator_Pedal_Position      1
+  CFS_Brake_Pedal_Force               1
+  CFS_Brake_Pedal_Position            1
+  CFS_Clutch_Pedal_Position           0
+  CIS_Parking_Brake_Displacement      0
+  CIS_Parking_Brake_Engaged           0
+  CIS_Tractor_ParkingB_Engaged        0
+  CIS_Trailer_ParkingB_Engaged        0
+  CIS_Horn                           -1
+  CIS_Cruise_Control                 -1
+  CIS_High_Beam                      -1
+  CIS_Gear                           -1
+  CIS_Turn_Signal                    -1
+  CIS_Headlights_On                  -1
+  CIS_Seat_Belt_On                   -1
+  CIS_Wiper_Switch_State             -1
+  CIS_ABS_State                      -1
+  CIS_Warning_Lights                 -1
+  CIS_Auto_Ignition                   0
+  CFS_TRANS_Igntn                    -1
+  CFS_TRANS_Crnk_Psh_Btn             -1
+  CIS_Auxiliary_Buttons               1
+;end_cell
+
+;cell 5 VDS
+  VDS_Head_Pt_Specific_Force          1
+  VDS_Head_Pt_Angular_Vel             1
+  VDS_RF_Vibr_Accel_Zdd               1
+  VDS_LF_Vibr_Accel_Zdd               1
+  VDS_RR_Vibr_Accel_Zdd               1
+  VDS_LR_Vibr_Accel_Zdd               1
+;end_cell
+
+;cell 6 VDS
+  VDS_Load_Torque                     1
+  VDS_Veh_Eng_Torque                  1
+  VDS_Veh_Dynamic_Pres                1
+  VDS_Tire_Rot_Vel                    1
+  VDS_Tire_Weight_On_Wheels           1
+  VDS_Tire_Friction_Coef             -1
+  VDS_Veh_Trans_RPM                   0
+  VDS_Wheel_Center_Velocity           0
+  VDS_Wheel_Center_Heading            0
+  VDS_Wheel_Steer_Angle               1
+  VDS_Wheel_Spin                      0
+  VDS_Wheel_Spin_Angle                1
+  VDS_Tire_Ground_Contact             0
+  VDS_VibrForce                       0
+  VDS_Veh_Heading                     1
+  VDS_Chassis_CG_Accel                1
+  VDS_Chassis_CG_Ang_Vel              1
+  VDS_Chassis_CG_Orient               1
+  VDS_Chassis_CG_Position             1
+  VDS_Chassis_CG_Vel                  1
+  VDS_Trailer_CG_Orient               0
+  VDS_Trailer_CG_Position             0
+  VDS_Trailer_CG_Vel                  0
+  VDS_Trailer_Origin_Pos              0
+  VDS_Tire_Drive_Trq                  0
+  VDS_Tire_Brake_Trq                  0
+  VDS_Tire_Long_Frc                   0
+  VDS_Tire_Lat_Frc                    0
+  VDS_Tire_Type_Index                 4
+  VDS_GeomCenter_Pos                  0
+  VDS_Steering_Torque_Backdrive       1
+  VDS_Frame_Count                     1
+  VDS_ACC_Warning                    -1
+  VDS_Cruise_State                   -1
+  VDS_Cruise_SetSpeed                -1
+  VDS_ACC_Gap                        -1
+  VDS_ALF_State                      -1
+  VDS_Acc_Pedal_Pos_Backdrive         1
+  VDS_Brk_Pedal_Frc_Backdrive         1
+  VDS_DRV_Joystick_Type              -1
+  VDS_DRV_Frame_No                    1
+  VDS_DRV_Steering_Wheel_Angle        1
+  VDS_DRV_Steering_Wheel_Angle_Rate   1
+  VDS_DRV_Transmission_Gear          -1
+  VDS_DRV_Auto_Transmission_Mode     -1
+  VDS_DRV_Accelerator_Pedal_Position  1
+  VDS_DRV_Brake_Pedal_Force           1
+  VDS_DRV_Joystick_Buttons           -1
+  VDS_Brake_Control                  -1
+  VDS_Wz_Info                         1
+  VDS_ESP_ENGTRQ_REQ                 -1
+  VDS_ESP_AXLTRQ_REQ                 -1
+  VDS_ESP_HONOR_REQ                  -1
+  VDS_ESP_ACTIV_FLAG                 -1
+  VDS_ESP_Type                       -1
+  VDS_ESP_Flag                       -1
+;end_cell
+
+;cell 7 SCNVIF
+  SCC_Audio_Trigger_File              0
+;  CIS_Horn                           0
+;  CIS_Cruise_Control                 0
+  CIS_Joystick_Type                  -1
+  CIS_Joystick_Buttons               -1
+  SCC_InitChassis_CG_Info_Ready      -1
+;end_cell
+
+;cell 8 SCNVIF
+  SCC_Test_Speed                      1
+  SCC_Record_Data                     0
+  SCC_Scenario_Date                  -1
+  SCC_Scenario_Time                  -1
+  SCC_Scenario_Stop_Ind               0
+  SCC_Scen_Pos_X_Crossbeam           -1
+  SCC_Scen_Pos_Y_Carriage            -1
+  SCC_Scen_Pos_Hex_X                 -1
+  SCC_Scen_Pos_Hex_Y                 -1
+  SCC_Scen_Pos_Hex_Z                 -1
+  SCC_Scen_Pos_Hex_Roll              -1
+  SCC_Scen_Pos_Hex_Pitch             -1
+  SCC_Scen_Pos_Hex_Yaw               -1
+  SCC_Scen_Pos_TT                    -1
+  SCC_Settings_File_Name              0
+  SCC_Motion_Drive_File_Name          0
+  SCC_State_Interlock                 0
+  SCC_State_Power_Interlock           0
+  SCC_State_Program_Interlock         0
+  SCC_Time_of_Day                     0
+  SCC_Veh_Cfg                         0
+  SCC_Veh_Initial_Cond                0
+  SCC_Veh_Model_No                    0
+  SCC_Wind_Speed                      1
+  SCC_Wind_Direction                  1
+  SCC_Tire_Condition                  1
+  SCC_Steering_Condition              0
+  SCC_Alert_Conditions                0
+  SCC_Informational_Conditions        0
+  SCC_CabComponent_Conditions         0
+  SCC_Fog                             1
+  SCC_Haze                            0
+  SCC_Lightning                       0
+  SCC_Clouds                          0
+  SCC_Precipitation                  -1
+  SCC_PrecipRate                      1
+  SCC_Visibility                      1
+  SCC_Smoke                           0
+  SCC_Glare                           0
+  SCC_Lane_Deviation                  1
+  SCC_Spline_Lane_Deviation           1
+  SCC_Lane_Depart_Warn                1
+  SCC_OwnVeh_Curvature                1
+  SCC_Follow_Info                     1
+  SCC_Sensor_Info                     1
+  SCC_Place_Phonecall                 0
+  SCC_Custom1                         0
+  SCC_Custom2                         0
+  SCC_Custom3                         0
+  SCC_Custom4                         0
+  SCC_OwnVehToLeadObjDist             1
+  SCC_LogStreams                      1
+  SCC_DataRed_Segments                0
+  SCC_DataRed_Params                  0
+  SCC_SpeedLimit                      0
+  SCC_PressButton_Trigger             0
+  SCC_EndOfDrive_Trigger              0
+  SCC_Audio_Trigger                  -1
+  SCC_Valid_Glare_info               -1
+  SCC_Glare_Obj_List_Size             1
+  SCC_Glare_Obj_CvedId                1
+  SCC_Glare_Obj_Lamp_Pos              1
+  SCC_Glare_Obj_Lamp_Ori              1
+  SCC_Glare_Obj_Lamp_Angles           1
+  SCC_DRT_ReactionTime                1
+  SCC_HighRes_Time                    1
+  SCC_Drive_ID                       -1
+  SCC_SecondaryTask_State            -1
+
+;end_cell
+
+;cell 9 SCNVIF
+  SCC_DynObj_CvedId                   1
+  SCC_DynObj_SolId                    1
+  SCC_DynObj_HcsmType                 1
+  SCC_DynObj_ColorIndex               1
+  SCC_DynObj_Name                     1
+  SCC_DynObj_Pos                      1
+  SCC_DynObj_Heading                  1
+  SCC_DynObj_RollPitch                1
+  SCC_DynObj_AudioVisualState         1
+  SCC_DynObj_DataSize                 1
+  SCC_DynObj_BtnDialVal               0
+  SCC_DynObj_Vel                      1
+  SCC_StatObj_DataSize                1
+  SCC_StatObj_AudioVisualState        1
+  SCC_StatObj_Pos                     1
+  SCC_StatObj_SolId                   1
+  SCC_StatObj_CvedId                  1
+  SCC_TrafLight_Size                  1
+  SCC_TrafLight_Id                    1
+  SCC_TrafLight_State                 1
+  SCC_Within_Speed_Limit              0
+  SCC_Under_Speed_Limit               0
+  SCC_Over_Speed_Limit                0
+  SCC_Total_Speed_Limit               0
+  SCC_Warning_Lights                  0
+  SCC_Collision_List_Size             1
+  SCC_Collision_Det_Object            1
+  SCC_Collision_Det_Ob_Type           1
+  SCC_Collision_Det_Ob_SolId          1
+  SCC_Collision_Count                 1
+  SCC_Trailer_Col_List_Size           1
+  SCC_Trailer_Col_Det_Object          1
+  SCC_Trailer_Col_Det_Ob_Type         1
+  SCC_Trailer_Col_Det_Ob_SolId        1
+  SCC_Trailer_Collision_Count         1
+  SCC_NVES_Target_Status             -1
+  SCC_NVES_Warning_On                -1
+  SCC_NVES_Target_Id                 -1
+  SCC_NVES_Target_Dist                1
+  SCC_NVES_Auditory_Warning          -1
+  SCC_Visual_Warning                 -1
+  SCC_Brake_Control                  -1
+  SCC_False_Alarm                     1
+  SCC_EventStatus                    -1
+  SCC_EventNumber                    -1
+  SCC_Eval_Exec_Time                  1
+  SCC_Eval_Collisions                -1
+  SCC_Eval_Max_Speed                  1
+  SCC_Eval_Avg_Speed                  1
+  SCC_Eval_SpeedSD                    1
+  SCC_Eval_Overall_SDLP               1
+  SCC_Eval_Lane_Departures           -1
+  SCC_Eval_Lane_Departure_Pct         1
+  SCC_Eval_Speedings                 -1
+  SCC_Eval_Speeding_Pct               1
+  SCC_Eval_Avg_Hdwy                   1
+  SCC_Eval_Hard_Brakings             -1
+  SCC_Eval_Hard_Cornerings           -1
+  SCC_Eval_Steering_Reversals        -1
+  SCC_Eval_Event_Collisions          -1
+  SCC_Eval_Event_Max_Speed            1
+  SCC_Eval_Event_Min_Speed            1
+  SCC_Eval_Event_Avg_Speed            1
+  SCC_Eval_Event_SpeedSD              1
+  SCC_Eval_Event_SDLP                 1
+  SCC_Eval_Event_Lane_Departures     -1
+  SCC_Eval_Event_Lane_Departure_Pct   1
+  SCC_Eval_Event_Speedings            1
+  SCC_Eval_Event_Speeding_Pct         1
+  SCC_Eval_Event_Avg_Hdwy             1
+  SCC_Eval_Window_Duration            1
+  SCC_Eval_Window_Collisions         -1
+  SCC_Eval_Window_Avg_Speed           1
+  SCC_Eval_Window_SpeedSD             1
+  SCC_Eval_Window_SDLP                1
+  SCC_Eval_Window_Lane_Departures    -1
+  SCC_Eval_Window_Lane_Departure_Pct  1
+  SCC_Eval_Window_Speedings          -1
+  SCC_Eval_Window_Speeding_Pct        1
+  SCC_Eval_Window_Avg_Hdwy            1
+  SCC_Replay_Event_Type              -1
+  SCC_Replay_Event_Frame             -1
+  SCC_Current_VDS_Frame_Count         1
+
+;end_cell
+
+;cell 10 RCM
+  RCM_CAS_Config                     -1
+  SOP_DriveMode                      -1
+  SOP_PlaybackFileName               -1
+;end_cell
+
+;cell 11 VDS
+;  TPR_Tire_Grid                      0
+;  TPR_Tire_GridGrad                  0
+;  TPR_Tire_Contact_Points_Ind        0
+;  TPR_Seq_No                         0
+  TPR_Surface_Tire_Friction_Ind      -1
+  TPR_Surface_Type_Ind               -1
+  TPR_Tire_Surf_Type                 -1
+  TPR_Tire_Surf_Obj_Type             -1
+;end_cell
+
+;cell 13 SUBSYS2
+  ACC_Voltage			      1
+  ACC_State			     -1
+;end_cell

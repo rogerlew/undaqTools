@@ -1,0 +1,44 @@
+rem This is a test router table
+rem variable section ***************
+rem This section tells the system what cells to collect 
+rem	name	type	size
+var
+	FrameNum	i	1
+	CFS_Steering_Wheel_Angle	f    1
+	CFS_Accelerator_Pedal_Position	f    1
+	CFS_Brake_Pedal_Force	f	1
+	VDS_Veh_Speed	f	1
+	VDS_Coeff_Fric	f	1
+	VDS_Veh_Eng_RPM	f	1
+	VDS_Veh_Eng_Torque	f	1
+end
+
+rem device section ***************
+rem Here we format each variable for output, we can change the size of the output here if we want
+rem	DevID	type	size	is Expr/Name	Name or Expression
+device
+	11	i	1	n		"FrameNum"
+	12	f	1	n		"CFS_Steering_Wheel_Angle"
+	13	f	1	n		"CFS_Accelerator_Pedal_Position"
+	14	f	1	n		"CFS_Brake_Pedal_Force"
+	15	f	1	n		"VDS_Veh_Speed"
+	16	f	1	e		"VDS_Coeff_Fric + 0"
+	17	f	1	e		"VDS_Veh_Eng_RPM + 0"
+	18	f	1	e		"VDS_Veh_Eng_Torque + 1"
+end
+
+rem input section ****************
+rem here is where we map the data we receive to a 
+rem data types are defined in cec file
+rem	id	CellName		offset(byte)	size(Byte)
+input	
+	22	ECO_Fuel_MPG	       0    4
+	23	ECO_Emissions	       0    4
+end
+
+rem route section ****************
+rem \t<id>\t<ip address>\t<in-port>\t<out-port>\t<packed?>\t<space delimited list of devices>
+route
+	1	127.0.0.1	1550	1551	1	11 15 13 14 12 16 17 18 i 22 23
+	2	127.0.0.1	1650	1651	1	11 12
+end
