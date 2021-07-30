@@ -34,6 +34,8 @@ import sys as _sys
 from keyword import iskeyword as _iskeyword
 from collections import Mapping as _Mapping
 
+from six import string_types
+
 NO_DEFAULT = object()
 
 # Keep track of fields, both with and without defaults.
@@ -121,7 +123,7 @@ def recordtype(typename, field_names, default=NO_DEFAULT, rename=False,
 
     _check_name(typename, is_type_name=True)
 
-    if isinstance(field_names, basestring):
+    if isinstance(field_names, string_types):
         # No per-field defaults. So it's like a namedtuple, but with
         #  a possible default value.
         field_names = field_names.replace(',', ' ').split()
@@ -140,7 +142,7 @@ def recordtype(typename, field_names, default=NO_DEFAULT, rename=False,
 
     seen_names = set()
     for idx, field_name in enumerate(field_names):
-        if isinstance(field_name, basestring):
+        if isinstance(field_name, string_types):
             field_name = _check_field_name(field_name, seen_names, rename,
                                            idx)
             fields.add_without_default(field_name)
@@ -247,7 +249,7 @@ def recordtype(typename, field_names, default=NO_DEFAULT, rename=False,
         namespace[_default_name(name)] = default
 
     try:
-        exec template in namespace
+        exec(template, namespace)
     except SyntaxError as e:
         raise SyntaxError(e.message + ':\n' + template)
 

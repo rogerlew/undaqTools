@@ -28,8 +28,14 @@
     :license: Python License.
 """
 from _ast import *
-from _ast import __version__
 
+from six import string_types
+
+try:
+    from _ast import __version__
+except:
+    __version = None
+    
 from undaqTools.element import FrameSlice, FrameIndex
 
 
@@ -79,7 +85,7 @@ def _literal_eval(node_or_string):
     and None) and undaqTools FrameSlice and FrameIndex objects.
     """
     _safe_names = {'None': None, 'True': True, 'False': False}
-    if isinstance(node_or_string, basestring):
+    if isinstance(node_or_string, string_types):
         node_or_string = parse(node_or_string, mode='eval')
     if isinstance(node_or_string, Expression):
         node_or_string = node_or_string.body

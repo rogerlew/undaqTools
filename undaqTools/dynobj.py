@@ -69,18 +69,6 @@ class DynObj:
         error in relative distance estimate
         (assuming you know apriori the dynamic object travels the same path
         as the OwnVehicle)
-
-    Methods
-    -------
-    process(cvedId, frame_indices, row_indices, daq)
-        unpacks data `Daq` instance
-
-    write_hd5(self[, filename=None][, root=None])
-        writes DynObj to hdf5.
-        
-    read_hd5(self[, filename=None][, root=None])        
-        reads a DynObj from a hdf5 file
-        
     """
     def __init__(self):
         self.name = ''
@@ -125,7 +113,7 @@ class DynObj:
         # 0 = no frames are missing
         # 1 = frames are missing (vehicle was dropped when more than
         #     20 dynamic objects were present
-        async = int(not len(frame_indices) == (self.iend - self.i0))
+        _async = int(not len(frame_indices) == (self.iend - self.i0))
         
         r,c = row_indices[0], frame_indices[0]
         self.hcsmType = daq['SCC_DynObj_HcsmType'][r,c]
@@ -175,7 +163,7 @@ class DynObj:
         pos[1,:] = tmp
         
         # need to linearly interpolate asyncronous cveds
-        if async:
+        if _async:
             _frames = np.arange(i0, iend+1, dtype='i4')
             heading = np.interp(_frames, frame_indices, heading)
             speed = np.interp(_frames, frame_indices, speed)

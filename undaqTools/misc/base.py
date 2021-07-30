@@ -4,6 +4,8 @@ from __future__ import print_function
 # All rights reserved.
 
 
+from six import string_types
+
 from collections import namedtuple
 
 import numpy as np
@@ -31,7 +33,7 @@ def _flatten(L):
     flatten a multidimensional object
     """
     for item in L:
-        if isinstance(item, basestring):
+        if isinstance(item, string_types):
              yield item
         else: 
              try:
@@ -69,19 +71,6 @@ def _namedtuple_factory(typename, field_names, verbose=False,
     Point(x, y):  A point in 2D space
     '''
     # create a base class and concatenate its docstring and the one passed
-    _base = namedtuple(typename, field_names, verbose, rename)
-    _docstring = ''.join([_base.__doc__, ':  ', docstring])
-
-    # fill in template to create a no-op subclass with the combined docstring
-    template = '''class subclass(_base):
-        %(_docstring)r
-        pass\n''' % locals()
-
-    # execute code string in a temporary namespace
-    namespace = dict(_base=_base, _docstring=_docstring)
-    try:
-        exec template in namespace
-    except SyntaxError, e:
-        raise SyntaxError(e.message + ':\n' + template)
-
-    return namespace['subclass']  # subclass object created
+    _base = namedtuple(typename, field_names)
+    _base.__doc__ = docstring
+    return _base

@@ -14,6 +14,8 @@ from numpy.testing import assert_array_equal, \
                           assert_array_almost_equal
 from scipy import io as sio
 
+from six import string_types
+
 from undaqTools import Daq
 from undaqTools.deprecated import old_convert_daq
 from undaqTools.misc.base import _flatten
@@ -305,7 +307,7 @@ class Test_mat(unittest.TestCase):
             x2 = np.array(list(_flatten(new_daq['elemData'][name])))
 
             try:
-                is_string = isinstance(x1[0], basestring)
+                is_string = isinstance(x1[0], string_types)
             except:
                 is_string = None
 

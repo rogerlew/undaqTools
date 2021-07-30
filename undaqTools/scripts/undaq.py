@@ -83,7 +83,7 @@ def convert_daq(tupledArgs):
             retcode = ([str(w.message) for w in ws], 1)[ws==[]]
             return time.time()-t0, retcode
     except:
-        # this shoudldn't happen
+        # this shoudld happen
         return time.time()-t0, -1
         
 if __name__ == '__main__':

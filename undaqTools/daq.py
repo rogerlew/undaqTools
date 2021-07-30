@@ -296,11 +296,7 @@ class Daq(dict):
             warnings.warn(msg, RuntimeWarning)
             
     # create alias read for read_daq
-    def read(self, filename, **kwargs):
-        if filename.endswith('.daq'):
-            self.read_daq(filename, **kwargs)
-        else:
-            self.read_hd5(filename, **kwargs)
+    read = read_daq
                 
     def _loaddata(self):
         """
@@ -378,7 +374,7 @@ class Daq(dict):
                 # xrange (2.7, range in 3) is faster than range
                 for j in xrange(frame.count[-1]):
                     i = unpack('i', read(4))[0]
-                    
+
                     if _header.varrateflag[i]:
                         numitems = unpack('i', read(4))[0]
                     else:
@@ -408,8 +404,6 @@ class Daq(dict):
                 msg += ' (stopped reading file)'
                 warnings.warn(msg, RuntimeWarning)
                 bombed = True
-
-                print(j)
                 break
 
         fid.close()
@@ -542,8 +536,7 @@ class Daq(dict):
             VDS_Frame_Count        
         """
         global interpolation_wclist
-        f0 = self.frame.frame[:][0]
-        fend = self.frame.frame[:][-1]
+        f0, fend = self.f0, self.fend
         old_frames = self.frame.frame[:]
         new_frames = np.linspace(f0, fend, fend - f0 + 1)
         
